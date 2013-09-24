@@ -54,6 +54,17 @@ var events = [
 				}
 			];
 
+
+app.configure(function(){
+  app.set('views', __dirname + '/views');
+  app.set('view engine', 'jade');
+  app.use(express.bodyParser());
+  app.use(express.methodOverride());
+  app.use(app.router);
+  app.use(express.static(__dirname + '/public'));
+});
+
+
 app.get("/events", function(req,res) {
     console.log("New request for " + req.url);
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -61,8 +72,11 @@ app.get("/events", function(req,res) {
     res.end();
 });
 
-//app.use(express.static(__dirname)); // Current directory is root
-app.use(express.static(path.join(__dirname, 'public'))); //  "public" off of current is root
+app.get('/', function (req, res) {
+  res.render('index',
+  { title : 'Home' }
+  )
+});
 
 app.listen(8080);
 console.log('Listening on port 8080');
