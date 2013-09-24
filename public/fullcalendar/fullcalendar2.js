@@ -262,7 +262,8 @@ function Calendar(element, options, eventSources) {
 		header = new Header(t, options);
 		headerElement = header.render();
 		if (headerElement) {
-			element.prepend(headerElement);
+			//element.prepend(headerElement);
+			$('#newHeader').html(headerElement);
 		}
 
 		changeView(options.defaultView);

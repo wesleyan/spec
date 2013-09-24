@@ -1,8 +1,10 @@
 body {
-	margin-top: 40px;
+	margin-top: 10px;
+	margin-bottom: 20px;
 	text-align: center;
 	font-size: 14px;
-	
+	height: 100%;
+	overflow: hidden;
 	}
 
 #calendar {
