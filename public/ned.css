@@ -37,3 +37,13 @@ body {
 .leftBar {
 	margin-left: 5px;
 }
+.rightBar {
+	margin-right: 5px;
+}
+
+#sidebarButton {
+	position:fixed;
+    top:100px;
+    left:0px;
+    z-index: 1000;
+}

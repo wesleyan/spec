@@ -11,25 +11,30 @@ html
           
     script(src='fullcalendar/fullcalendar2.js')
           
-    link(href='http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css', rel='stylesheet')
+    link(href='http://getbootstrap.com/2.3.2/assets/css/bootstrap.css', rel='stylesheet')
     link(href='ned.css', rel='stylesheet')
     script(src='ned.js')
           
   body
-    .btn-group.pull-left.leftBar
-      button.btn.btn-info.dropdown-toggle(type='button', data-toggle='dropdown')
-        span.caret
-      ul.dropdown-menu(role='menu')
-        li
-          a(href='#') All Events
-        li
-          a(href='#') Hide Cancelled Events
-        li
-          a(href='#') Unstaffed Events
-        li.divider
-        li
-          a(href='#') Only Mine
+    .leftBar.pull-left
+      .btn-group
+        button.btn.btn-large.dropdown-toggle(type='button', data-toggle='dropdown')
+          i.icon-eye-open
+          span.caret
+        ul.dropdown-menu
+          li
+            a(href='#') All Events
+          li
+            a(href='#hideCancelled') Hide Cancelled Events
+          li
+            a(href='#unstaffed') Unstaffed Events
+          li.divider
+          li
+            a(href='#onlyMine') Only Mine
+    .rightBar.pull-right
+      .btn-group
+        button.btn.btn-large.btn-primary(type='button', data-toggle='dropdown')
+          i.icon-user.icon-white
     #newHeader
     #calendar
-    script(src='http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js')
-          
+    script(src='http://getbootstrap.com/2.3.2/assets/js/bootstrap-dropdown.js')

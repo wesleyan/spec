@@ -12,30 +12,50 @@
     </script>
     <script src="fullcalendar/fullcalendar2.js">
     </script>
-    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css" rel="stylesheet">
     <link href="ned.css" rel="stylesheet">
     <script src="ned.js">
     </script>
   </head>
   <body>
-	<div class="btn-group pull-left leftBar">
-	  <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
-	    <span class="caret"></span>
-	  </button>
-	  <ul class="dropdown-menu" role="menu">
-	    <li><a href="#">All Events</a></li>
-	    <li><a href="#">Hide Cancelled Events</a></li>
-	    <li><a href="#">Unstaffed Events</a></li>
-	    <li class="divider"></li>
-	    <li><a href="#">Only Mine</a></li>
-	  </ul>
+  	<div class="leftBar pull-left">
+		<div class="btn-group">
+		  <button type="button" class="btn btn-large dropdown-toggle" data-toggle="dropdown">
+		   <i class="icon-eye-open"></i> <span class="caret"></span>
+		  </button>
+		  <ul class="dropdown-menu">
+		    <li><a href="#">All Events</a></li>
+		    <li><a href="#hideCancelled">Hide Cancelled Events</a></li>
+		    <li><a href="#unstaffed">Unstaffed Events</a></li>
+		    <li class="divider"></li>
+		    <li><a href="#onlyMine">Only Mine</a></li>
+		  </ul>
+		</div>
 	</div>
-
+  	<div class="rightBar pull-right">
+		<div class="btn-group">
+		  <button type="button" class="btn btn-large btn-primary" data-toggle="dropdown">
+		  	<i class="icon-user icon-white"></i>
+		  </button>
+		</div>
+	</div>
     <div id="newHeader">
     </div>
     <div id="calendar">
     </div>
-    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js">
+
+	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-dropdown.js"></script>
+	<!--<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-transition.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-alert.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-modal.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-scrollspy.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-tab.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-tooltip.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-popover.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-button.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-collapse.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-carousel.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-typeahead.js"></script>-->
     </script>
   </body>
 </html>

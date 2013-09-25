@@ -48,7 +48,7 @@ var events = [
 				{
 					title: 'Birthday Party',
 					start: new Date(y, m, d+1, 19-diff, 0),
-					end: new Date(y, m, d+1, 22-diff, 30),
+					end: new Date(y, m, d+2, 2-diff, 30),
 					backgroundColor: '#666666'
 					//url: 'http://google.com/'
 				}
