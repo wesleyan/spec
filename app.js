@@ -66,7 +66,11 @@ app.configure(function(){
 
 
 app.get("/events", function(req,res) {
-    console.log("New request for " + req.url);
+	//86400s = 1d
+	var start = new Date(req.query.start*1000);
+	var end = new Date(req.query.end*1000);
+	//req.url
+    console.log("New request for events starting at " + start.toDateString() + " and ending before " + end.toDateString());
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.write(JSON.stringify(events).toString("utf-8"));
     res.end();
