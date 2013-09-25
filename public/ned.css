@@ -1,7 +1,7 @@
 body {
 	margin-top: 10px;
 	margin-bottom: 20px;
-	text-align: center;
+
 	font-size: 14px;
 	height: 100%;
 	overflow: hidden;
@@ -17,6 +17,7 @@ body {
 	width: 90%;
 	margin: 0 auto;
 	margin-bottom: 10px;
+
 	}
 
 #newHeader * {
@@ -31,4 +32,8 @@ body {
     margin: 0;
     padding: 0;
     z-index: 999;
+}
+
+.leftBar {
+	margin-left: 5px;
 }

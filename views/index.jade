@@ -1,16 +1,35 @@
 !!! 5
 html
   head
-    title New NED
+    title
+      | New NED
     link(href='fullcalendar/fullcalendar.css', rel='stylesheet')
     link(href='fullcalendar/fullcalendar.print.css', rel='stylesheet', media='print')
     script(src='lib/jquery.min.js')
+          
     script(src='lib/jquery-ui.custom.min.js')
+          
     script(src='fullcalendar/fullcalendar2.js')
+          
     link(href='http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css', rel='stylesheet')
     link(href='ned.css', rel='stylesheet')
     script(src='ned.js')
+          
   body
+    .btn-group.pull-left.leftBar
+      button.btn.btn-info.dropdown-toggle(type='button', data-toggle='dropdown')
+        span.caret
+      ul.dropdown-menu(role='menu')
+        li
+          a(href='#') All Events
+        li
+          a(href='#') Hide Cancelled Events
+        li
+          a(href='#') Unstaffed Events
+        li.divider
+        li
+          a(href='#') Only Mine
     #newHeader
     #calendar
     script(src='http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js')
+          
