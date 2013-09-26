@@ -22,6 +22,7 @@ var events = [
 				{
 					id: 1,
 					title: 'Luncheon: Division III NSM Luncheon',
+					desc: 'Please arrive at 11:30 am to help set up the existing projector and screen. Client will bring their own PC laptop.',
 					staffAdded: 1,
 					staffNeeded: 1,
 					start: new Date(y, m, d, 9-diff, 45),
@@ -39,12 +40,14 @@ var events = [
 				},
 				{
 					id: 3,
-					title: '<i class="icon-facetime-video icon-white"></i> Dance Presentation',
+					title: 'Dance Presentation',
+					desc: 'A technician is needed to stay for the duration of the presentation to assist with hooking up a laptop to the ceiling projector to play youtube clips and other things. NOTE: This is for a class so there should be no charge.',
 					staffAdded: 1,
 					staffNeeded: 1,
 					start: new Date(y, m, d, 13-diff, 15),
 					end: new Date(y, m, d, 14-diff, 30),
-					valid: true
+					valid: true,
+					video: true
 				},
 				{
 					id: 4,

@@ -36,4 +36,8 @@ body {
 
 .front {
 	z-index: 999;
-	}
+}
+
+.popover-inner {
+   max-width: 600px !important;
+}

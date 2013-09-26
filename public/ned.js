@@ -23,23 +23,30 @@ $(document).ready(function() {
 	    },
 		eventClick: function(calEvent, jsEvent, view) {
 		  //This function should contain specific stuff like opening the event-based selection/description box etc
-		  $(jsEvent.target).popover({
-		  	placement:'top',
-		  	html: 'deneme'
-		  });
+
 		  console.log(jsEvent.target + ' Event: ' + calEvent.title + ' & ID: ' + calEvent.id);
 		  //$(this).css('background-color','#da4f49');
 		},
 		eventRightClick: function(calEvent, jsEvent, view) {
 		  //This function should contain specific stuff like opening the event-based selection/description box etc
 		  jsEvent.preventDefault();
-		  console.log('Menu: ' + calEvent.title + ' & ID: ' + calEvent.id);
-
 		  //$(this).css('background-color','#da4f49');
 		},
-		eventRender: function(event, element) {                                          
-			element.find('.fc-event-title').html(event.title);
-			element.contextmenu({'target':'#context-menu'});				  
+		eventRender: function(event, element) {
+			if(event.video == true) {
+				symbol = '<i class="icon-facetime-video icon-white"></i> ';
+			} else {
+				symbol = '';
+			}                                          
+			element.find('.fc-event-title').html(symbol + event.title);
+			element.contextmenu({'target':'#context-menu'});
+			element.popover({
+			  	placement:'top',
+			  	trigger: 'hover',
+			  	html: true,
+			  	content: event.desc,
+			  	title: event.title
+			});				  
 		},
 		viewRender: function(view, element) {
 		 	console.log(view.name);
@@ -62,7 +69,7 @@ $(document).ready(function() {
 
 resizeMap = function () {
 		var column_height = $(window).height();
-		$('#calendar').fullCalendar('option', 'height', column_height - 70);
+		$('#calendar').fullCalendar('option', 'height', column_height - 40);
 		//$("#calendar").css("height", + "px")
 	};
 
