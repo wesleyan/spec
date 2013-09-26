@@ -16,25 +16,33 @@ html
     script(src='ned.js')
           
   body
-    .leftBar.pull-left
-      .btn-group
-        button.btn.btn-large.dropdown-toggle(type='button', data-toggle='dropdown')
+    span#leftGroup
+      span.btn-group
+        button.btn.dropdown-toggle(type='button', data-toggle='dropdown')
           i.icon-eye-open
           span.caret
         ul.dropdown-menu
           li
-            a(href='#') All Events
+            a(href='#')
+              i.icon-calendar
+              | All Events
           li
-            a(href='#hideCancelled') Hide Cancelled Events
+            a(href='#hideCancelled')
+              i.icon-tasks
+              | Hide Cancelled Events
           li
-            a(href='#unstaffed') Unstaffed Events
+            a(href='#unstaffed')
+              i.icon-list-alt
+              | Unstaffed Events
           li.divider
           li
-            a(href='#onlyMine') Only Mine
-    .rightBar.pull-right
-      .btn-group
-        button.btn.btn-large.btn-primary(type='button', data-toggle='dropdown')
-          i.icon-user.icon-white
+            a(href='#onlyMine')
+              i.icon-filter
+              | Only Mine
+    span#rightGroup
+      span.btn-group
+        button.btn.btn-info(type='button', data-toggle='dropdown')
+          i.icon-filter.icon-white
     #newHeader
     #calendar
     script(src='http://getbootstrap.com/2.3.2/assets/js/bootstrap-dropdown.js')
