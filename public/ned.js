@@ -14,7 +14,6 @@ $(document).ready(function() {
 
 		},
 		editable: false,
-		defaultView: 'agendaWeek',
 		allDaySlot: false,
 		allDayDefault: false,
 		firstDay: date.getDay(),
@@ -40,6 +39,9 @@ $(document).ready(function() {
 	    }
 	});
 	$('#calendar').fullCalendar('addEventSource', 'events/');
+	//Important: especially not using defaultView option of FullCalendar, for efficient use of lazyFetching.
+	$('#calendar').fullCalendar('changeView', 'agendaWeek'); 
+	//Loads the whole month events, and shows them from memory, instead of a new request for each prev/next click.
 	resizeMap();
 	$('#leftGroup').prependTo('.fc-header-left');
 	$('#rightGroup').appendTo('.fc-header-right');
