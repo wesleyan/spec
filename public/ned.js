@@ -23,16 +23,26 @@ $(document).ready(function() {
 	    },
 		eventClick: function(calEvent, jsEvent, view) {
 		  //This function should contain specific stuff like opening the event-based selection/description box etc
-		  console.log('Event: ' + calEvent.title + ' & ID: ' + calEvent.id);
+		  $(jsEvent.target).popover({
+		  	placement:'top',
+		  	html: 'deneme'
+		  });
+		  console.log(jsEvent.target + ' Event: ' + calEvent.title + ' & ID: ' + calEvent.id);
+		  //$(this).css('background-color','#da4f49');
+		},
+		eventRightClick: function(calEvent, jsEvent, view) {
+		  //This function should contain specific stuff like opening the event-based selection/description box etc
+		  jsEvent.preventDefault();
+		  console.log('Menu: ' + calEvent.title + ' & ID: ' + calEvent.id);
+
 		  //$(this).css('background-color','#da4f49');
 		},
 		eventRender: function(event, element) {                                          
-			element.find('.fc-event-title').html(event.title);				  
+			element.find('.fc-event-title').html(event.title);
+			element.contextmenu({'target':'#context-menu'});				  
 		},
 		viewRender: function(view, element) {
 		 	console.log(view.name);
-		},
-		viewDisplay: function(view) {
 	        try {
 	            setTimeline();
 	        } catch(err) {}
@@ -49,9 +59,10 @@ $(document).ready(function() {
 });
 
 
+
 resizeMap = function () {
 		var column_height = $(window).height();
-		$('#calendar').fullCalendar('option', 'height', column_height - 40);
+		$('#calendar').fullCalendar('option', 'height', column_height - 70);
 		//$("#calendar").css("height", + "px")
 	};
 

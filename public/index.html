@@ -31,9 +31,19 @@
 		    <li><a href="#onlyMine"><i class="icon-filter"></i> Only Mine</a></li>
 		  </ul>
 		</span>
+		<span class="btn-group">
+		  <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+		   <i class="icon-folder-open"></i> <span class="caret"></span>
+		  </button>
+		  <ul class="dropdown-menu">
+		    <li><a href="#printToday"><i class="icon-print"></i> Events of today</a></li>
+		    <li><a href="#recentVideo"><i class="icon-film"></i> Recent video events</a></li>
+		  </ul>
+		</span>
+		
 	</span>
   	<span id="rightGroup">
-		<span class="btn-group">
+  		<span class="btn-group">
 		  <button type="button" class="btn btn-info" data-toggle="dropdown">
 		  	<i class="icon-filter icon-white"></i>
 		  </button>
@@ -44,15 +54,23 @@
     </div>
     <div id="calendar">
     </div>
-
+ 	<div id="footBar" class="well">
+a<br>a<br>a<br>a<br>
+ 	</div>
+ 	<div id="context-menu" class="front">
+ 		<ul class="dropdown-menu">
+		    <li><a href="#"><i class="icon-resize-full"></i> Split Event</a></li>
+	  	</ul>
+ 	</div>
 	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-dropdown.js"></script>
+	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-tooltip.js"></script>
+	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-popover.js"></script>
+	<script src="lib/bootstrap-contextmenu.js"></script>
 	<!--<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-transition.js"></script>
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-alert.js"></script>
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-modal.js"></script>
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-scrollspy.js"></script>
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-tab.js"></script>
-    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-tooltip.js"></script>
-    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-popover.js"></script>
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-button.js"></script>
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-collapse.js"></script>
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-carousel.js"></script>

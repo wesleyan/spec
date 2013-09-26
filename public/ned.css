@@ -33,3 +33,7 @@ body {
     padding: 0;
     z-index: 999;
 }
+
+.front {
+	z-index: 999;
+	}

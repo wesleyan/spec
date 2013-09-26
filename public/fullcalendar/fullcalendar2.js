@@ -4686,6 +4686,12 @@ function View(element, calendar, viewName) {
 						return trigger('eventClick', this, event, ev);
 					}
 			})
+			.bind('contextmenu', function(ev) {
+				if (!eventElement.hasClass('ui-draggable-dragging') &&
+					!eventElement.hasClass('ui-resizable-resizing')) {
+						return trigger('eventRightClick', this, event, ev);
+					}
+			})
 			.hover(
 				function(ev) {
 					trigger('eventMouseover', this, event, ev);
