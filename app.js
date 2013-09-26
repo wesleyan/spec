@@ -29,7 +29,7 @@ var events = [
 				},
 				{
 					id: 999,
-					title: 'Dance Presentation',
+					title: '<i class="icon-facetime-video icon-white"></i> Dance Presentation',
 					start: new Date(y, m, d, 13-diff, 15),
 					end: new Date(y, m, d, 14-diff, 30),
 					backgroundColor: '#097054'

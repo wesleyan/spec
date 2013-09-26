@@ -27,8 +27,11 @@ $(document).ready(function() {
 		  console.log('Event: ' + calEvent.title + ' & ID: ' + calEvent.id);
 		  //$(this).css('background-color','#da4f49');
 		},
+		eventRender: function(event, element) {                                          
+			element.find('.fc-event-title').html(event.title);				  
+		},
 		viewRender: function(view, element) {
-		  console.log(view.name);
+		 	console.log(view.name);
 		},
 		viewDisplay: function(view) {
 	        try {
@@ -38,6 +41,8 @@ $(document).ready(function() {
 	});
 	$('#calendar').fullCalendar('addEventSource', 'events/');
 	resizeMap();
+	$('#leftGroup').prependTo('.fc-header-left');
+	$('#rightGroup').appendTo('.fc-header-right');
 
 });
 

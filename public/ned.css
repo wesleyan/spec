@@ -1,7 +1,7 @@
 body {
 	margin-top: 10px;
 	margin-bottom: 20px;
-
+	line-height: 15px;
 	font-size: 14px;
 	height: 100%;
 	overflow: hidden;
@@ -32,18 +32,4 @@ body {
     margin: 0;
     padding: 0;
     z-index: 999;
-}
-
-.leftBar {
-	margin-left: 5px;
-}
-.rightBar {
-	margin-right: 5px;
-}
-
-#sidebarButton {
-	position:fixed;
-    top:100px;
-    left:0px;
-    z-index: 1000;
 }
