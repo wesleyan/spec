@@ -1,84 +1,3 @@
-var lastClick, lastRightClick;
-//var weekdays = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-
-$(document).ready(function() {
-
-	var date = new Date();
-	var d = date.getDate();
-	var m = date.getMonth();
-	var y = date.getFullYear();
-			$('#popup').modalPopover({
-			    target: '#eventButton',
-			    placement: 'bottom',
-			    backdrop: false
-			});	
-
-	$('#calendar').fullCalendar({
-		header: {
-			left: 'prevYear,prev,next,nextYear today',
-			center: 'title',
-			right: 'month,agendaWeek,agendaDay'
-
-		},
-		editable: false,
-		allDaySlot: false,
-		allDayDefault: false,
-		firstDay: date.getDay(),
-		eventBorderColor: 'black',
-		windowResize: function(view) {
-	        resizeMap();
-	    },
-		eventClick: function(calEvent, jsEvent, view) {
-			if(calEvent.video == true) {
-				symbol = '<i class="icon-facetime-video"></i> ';
-			} else {
-				symbol = '';
-			}
-		  //This function should contain specific stuff like opening the event-based selection/description box etc
-			$('#popup').modalPopover('show');
-			$('#eventButton').removeClass('disabled');
-			$('#popupTitle').html(symbol + calEvent.title);
-			changePopupColor(calEvent);
-			$('#popupStaffInfo').html(calEvent.staffAdded + '/' + calEvent.staffNeeded);
-			$('#popupContentInside').html(calEvent.desc);
-			$('#popupContentHeader').html('<b>' + defaults.dayNames[calEvent.start.getDay()] + ' | ' + calEvent.loc + '</b>');
-
-		},
-		eventRightClick: function(calEvent, jsEvent, view) {
-		  jsEvent.preventDefault(); //Right click event only prevents default because context menu is binded in eventRender
-		},
-		eventRender: function(event, element) {
-			if(event.video == true) {
-				symbol = '<i class="icon-facetime-video icon-white"></i> ';
-			} else {
-				symbol = '';
-			}                                          
-			element.find('.fc-event-title').html(symbol + event.title);
-			element.contextmenu({'target':'#context-menu'});
-	  
-		},
-		viewRender: function(view, element) {
-		 	//console.log(view.name);
-	        try {
-	            setTimeline();
-	        } catch(err) {}
-	    },
-	    eventSources: [{
-	        url: 'events/', // Shows all events BUT need it to show only events to certain location
-	        ignoreTimezone: false
-	    }],
-	});
-	//$('#calendar').fullCalendar('addEventSource', 'events/');
-
-	//Important: especially not using defaultView option of FullCalendar, for efficient use of lazyFetching.
-	$('#calendar').fullCalendar('changeView', 'agendaWeek'); 
-	//Loads the whole month events, and shows them from memory, instead of a new request for each prev/next click.
-	resizeMap();
-	$('#leftGroup').prependTo('.fc-header-left');
-	$('#rightGroup').appendTo('.fc-header-right');
-
-});
-
 function changePopupColor(event) { //changes the events object
 	$("#popupTitleButton").removeClass("btn-success btn-inverse btn-warning btn-danger");
 	if(event.valid == false) {
@@ -141,43 +60,138 @@ function setTimeline(view) {
 
 }
 
-/*$('#splitModal').modal({
-  keyboard: false,
-  show: false
-});*/
 
-//Backbone.js Router
-var AppRouter = Backbone.Router.extend({
 
-  routes: {
-  	"printToday": "printToday",
-    "recentVideo": "recentVideo",
-    //"hideCancelled": "hideCancelled",
-    //"unstaffed": "unstaffed",
-    //"onlyMine": "onlyMine",
-    "*filter": "all"
-  }
+// The functions above are mostly done
+var lastClick, lastRightClick;
+var EventsGlobal = [];
+
+$(document).ready(function() {
+
+	var date = new Date();
+	var d = date.getDate();
+	var m = date.getMonth();
+	var y = date.getFullYear();
+			$('#popup').modalPopover({
+			    target: '#eventButton',
+			    placement: 'bottom',
+			    backdrop: false
+			});	
+
+	$('#calendar').fullCalendar({
+		header: {
+			left: 'prevYear,prev,next,nextYear today',
+			center: 'title',
+			right: 'month,agendaWeek,agendaDay'
+
+		},
+		editable: false,
+		allDaySlot: false,
+		allDayDefault: false,
+		firstDay: date.getDay(),
+		eventBorderColor: 'black',
+		windowResize: function(view) {
+	        resizeMap();
+	    },
+		eventClick: function(calEvent, jsEvent, view) {
+			if(calEvent.video == true) {
+				symbol = '<i class="icon-facetime-video"></i> ';
+			} else {
+				symbol = '';
+			}
+		  //This function should contain specific stuff like opening the event-based selection/description box etc
+			$('#popup').modalPopover('show');
+			$('#eventButton').removeClass('disabled');
+			$('#popupTitle').html(symbol + calEvent.title);
+			changePopupColor(calEvent);
+			$('#popupStaffInfo').html(calEvent.staffAdded + '/' + calEvent.staffNeeded);
+			$('#popupContentInside').html(calEvent.desc);
+			$('#popupContentHeader').html('<b>' + defaults.dayNames[calEvent.start.getDay()] + ' | ' + calEvent.loc + '</b>');
+
+		},
+		eventRightClick: function(calEvent, jsEvent, view) {
+		  jsEvent.preventDefault(); //Right click event only prevents default because context menu is binded in eventRender
+		},
+		eventRender: function(event, element) {
+			//Adding all events to an array for event filtering with Backbone.js router
+			EventsGlobal.push(event);
+
+			if(event.video == true) {
+				symbol = '<i class="icon-facetime-video icon-white"></i> ';
+			} else {
+				symbol = '';
+			}                                          
+			element.find('.fc-event-title').html(symbol + event.title);
+			element.contextmenu({'target':'#context-menu'});
+	  
+		},
+		viewRender: function(view, element) {
+		 	//console.log(view.name);
+	        try {
+	            setTimeline();
+	        } catch(err) {}
+	    },
+	    eventAfterAllRender: function(view) {
+
+	    },
+	    eventSources: [{
+	        url: 'events/', // Shows all events BUT need it to show only events to certain location
+	        ignoreTimezone: false
+	    }],
+	});
+	//$('#calendar').fullCalendar('addEventSource', 'events/');
+
+	//Important: especially not using defaultView option of FullCalendar, for efficient use of lazyFetching.
+	$('#calendar').fullCalendar('changeView', 'agendaWeek'); 
+	//EventsGlobal = $('#calendar').fullCalendar('clientEvents');
+	//Loads the whole month events, and shows them from memory, instead of a new request for each prev/next click.
+	resizeMap();
+	$('#leftGroup').prependTo('.fc-header-left');
+	$('#rightGroup').appendTo('.fc-header-right');
+
+
+
+	//Backbone.js Router
+
+	var AppRouter = Backbone.Router.extend({
+
+	  routes: {
+	  	"printToday": "printToday",
+	    "recentVideo": "recentVideo",
+	    //"hideCancelled": "hideCancelled",
+	    //"unstaffed": "unstaffed",
+	    //"onlyMine": "onlyMine",
+	    "*filter": "all"
+	  }
+
+	});
+
+	var app = new AppRouter;
+
+	app.on('route:printToday', function() {
+	  	console.log('printToday');
+	});
+	app.on('route:recentVideo', function() {
+	  	console.log('recentVideo');
+	});
+
+
+	app.on('route:all', function(filter) {
+		if(Backbone.history.fragment == '') {
+			//Show all of events
+			$('#calendar').fullCalendar('clientEvents', function(event) {
+				console.log(event.id);
+				event.className = 'hide';
+				$('#calendar').fullCalendar('updateEvent', event);
+			});
+			console.log('all');
+		} else {
+			console.log(Backbone.history.fragment);
+		}
+	});
+
+	Backbone.history.start();
 
 });
 
-var app = new AppRouter;
-
-app.on('route:printToday', function() {
-  	console.log('printToday');
-});
-app.on('route:recentVideo', function() {
-  	console.log('recentVideo');
-});
-
-
-app.on('route:all', function(hashFilter) {
-	if(Backbone.history.fragment == '') {
-		console.log('all');
-	} else {
-		console.log(Backbone.history.fragment);
-	}
-  	
-
-});
       
-Backbone.history.start();
