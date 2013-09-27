@@ -28,6 +28,8 @@
             });
         },
 
+        repos:function () {},
+
         show:function () {
             var $dialog = this.$element;
             $dialog.css({ top:0, left:0, display:'block', 'z-index':1050 });
@@ -38,7 +40,8 @@
 
             var pos = this.getPosition();
 
-            var actualWidth = $dialog[0].offsetWidth;
+           // var actualWidth = $dialog[0].offsetWidth;
+           var actualWidth = 400;
             var actualHeight = $dialog[0].offsetHeight;
 
             var tp;
