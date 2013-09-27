@@ -38,6 +38,9 @@ body {
 	z-index: 999;
 }
 
-.popover-inner {
-   max-width: 600px !important;
+.popover {
+   max-width: 400px !important;
+}
+.popover-title {
+	line-height: 20px;
 }

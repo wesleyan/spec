@@ -4689,7 +4689,9 @@ function View(element, calendar, viewName) {
 			.bind('contextmenu', function(ev) {
 				if (!eventElement.hasClass('ui-draggable-dragging') &&
 					!eventElement.hasClass('ui-resizable-resizing')) {
+						trigger('eventClick', this, event, ev);
 						return trigger('eventRightClick', this, event, ev);
+
 					}
 			})
 			.hover(

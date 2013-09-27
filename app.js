@@ -52,6 +52,7 @@ var events = [
 				{
 					id: 4,
 					title: 'Meeting',
+					desc:'Please have Heric Flores present on site for the duration of the meeting to serve as AV technician.',
 					staffAdded: 1,
 					staffNeeded: 1,
 					start: new Date(y, m, d+1, 10-diff, 30),
@@ -60,6 +61,7 @@ var events = [
 				{
 					id: 5,
 					title: 'Lunch',
+					desc:'Please have Heric Flores present on site at 8am and remain for the duration of the meeting to serve as AV technician. Presenter will arive at 8:30am and will bring laptop. Please connect presenter`s laptop to projection and project onto the screen on the west wall. Provide lavaliere mic for presenter.',
 					staffAdded: 1,
 					staffNeeded: 2,
 					start: new Date(y, m, d, 12, 0),
@@ -69,6 +71,7 @@ var events = [
 				{
 					id: 6,
 					title: 'Birthday Party',
+					desc:'Please arrive at 19:00 pm (promptly) to set up the existing computer, projector, and screen. Please plan to stay for the entire event to troubleshoot if necessary.',
 					staffAdded: 0,
 					staffNeeded: 1,
 					start: new Date(y, m, d+1, 19-diff, 0),
@@ -79,7 +82,7 @@ var events = [
 			];
 
 
-function addColor(events) { //changes the events object
+function addBackgroundColor(events) { //changes the events object
 	for (index = 0; index < events.length; ++index) {
 		event = events[index];
 		if(event.valid == false) {
@@ -95,7 +98,7 @@ function addColor(events) { //changes the events object
 	}
 	return events;
 }
-events = addColor(events);
+events = addBackgroundColor(events);
 
 app.configure(function(){
   app.set('views', __dirname + '/views');

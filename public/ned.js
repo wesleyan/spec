@@ -1,5 +1,6 @@
 var lastClick, lastRightClick;
 
+
 $(document).ready(function() {
 
 	var date = new Date();
@@ -34,7 +35,9 @@ $(document).ready(function() {
 		  //console.log(jsEvent.target + ' Event: ' + calEvent.title + ' & ID: ' + calEvent.id);
 		  //$(this).css('background-color','#da4f49');
 
-		  $('.popover-title').html(calEvent.title);
+		  $('#popupTitle').html(calEvent.title);
+		  changePopupColor(calEvent);
+		  $('#popupStaffInfo').html(calEvent.staffAdded + '/' + calEvent.staffNeeded);
 		  $('.popover-content').html(calEvent.desc);
 		},
 		eventRightClick: function(calEvent, jsEvent, view) {
@@ -76,6 +79,20 @@ $(document).ready(function() {
 	$('#rightGroup').appendTo('.fc-header-right');
 
 });
+
+function changePopupColor(event) { //changes the events object
+	$("#popupTitleButton").removeClass("btn-success btn-inverse btn-warning btn-danger");
+	if(event.valid == false) {
+			$("#popupTitleButton").addClass("btn-inverse");
+		} else if(event.staffAdded == 0) {
+			$("#popupTitleButton").addClass("btn-danger");
+		}
+		else if(event.staffAdded < event.staffNeeded) {
+			$("#popupTitleButton").addClass("btn-warning");
+		} else if(event.staffAdded == event.staffNeeded) {
+			$("#popupTitleButton").addClass("btn-success");
+	}
+}
 
 $('#eventButton').click(function(e) {
 	$('#eventButton').addClass('disabled');
