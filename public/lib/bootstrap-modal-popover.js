@@ -27,9 +27,6 @@
                 width:$element[0].offsetWidth, height:$element[0].offsetHeight
             });
         },
-
-        repos:function () {},
-
         show:function () {
             var $dialog = this.$element;
             $dialog.css({ top:0, left:0, display:'block', 'z-index':1050 });
