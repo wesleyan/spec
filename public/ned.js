@@ -41,15 +41,15 @@ $(document).ready(function() {
 			element.find('.fc-event-title').html(symbol + event.title);
 			element.contextmenu({'target':'#context-menu'});
 			element.popover({
-			  	placement:'top',
+			  	placement:'right',
 			  	trigger: 'hover',
 			  	html: true,
 			  	content: event.desc,
-			  	title: event.title
+			  	//title: event.title
 			});				  
 		},
 		viewRender: function(view, element) {
-		 	console.log(view.name);
+		 	//console.log(view.name);
 	        try {
 	            setTimeline();
 	        } catch(err) {}
@@ -109,3 +109,48 @@ function setTimeline(view) {
     }
 
 }
+
+var AppRouter = Backbone.Router.extend({
+
+  routes: {
+  	"printToday": "printToday",
+    "recentVideo": "recentVideo",
+    "staffEvent": "staffEvent",
+    "split": "split",
+    "unstaffed": "unstaffed",
+    "onlyMine": "onlyMine",
+    "": "all"
+  }
+
+});
+
+var app = new AppRouter;
+
+app.on('route:printToday', function() {
+  	console.log('printToday');
+});
+app.on('route:recentVideo', function() {
+  	console.log('recentVideo');
+});
+app.on('route:staffEvent', function() {
+  	console.log('staffEvent');
+});
+app.on('route:split', function() {
+  	console.log('split');
+});
+
+
+app.on('route:hideCancelled', function() {
+  	console.log('hideCancelled');
+});
+app.on('route:unstaffed', function() {
+  	console.log('unstaffed');
+});
+app.on('route:onlyMine', function() {
+  	console.log('onlyMine');
+});
+app.on('route:all', function() {
+  	console.log('all');
+});
+      
+Backbone.history.start();

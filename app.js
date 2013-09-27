@@ -118,11 +118,11 @@ app.get("/events", function(req,res) {
     res.end();
 });
 
-app.get('/', function (req, res) {
+/*app.get('/', function (req, res) {
   res.render('index',
   { title : 'Home' }
   )
-});
+});*/
 
 app.listen(8080);
 console.log('Listening on port 8080');

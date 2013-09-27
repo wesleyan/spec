@@ -6,16 +6,13 @@
     </title>
     <link href="fullcalendar/fullcalendar.css" rel="stylesheet">
     <link href="fullcalendar/fullcalendar.print.css" rel="stylesheet" media="print">
-    <script src="lib/jquery.min.js">
-    </script>
-    <script src="lib/jquery-ui.custom.min.js">
-    </script>
-    <script src="fullcalendar/fullcalendar2.js">
-    </script>
+    <script src="lib/jquery.min.js"></script>
+    <script type="text/javascript" src="http://underscorejs.org/underscore-min.js"></script>
+  	<script type="text/javascript" src="http://backbonejs.org/backbone-min.js"></script>
+    <script src="fullcalendar/fullcalendar2.js"></script>
     <link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css" rel="stylesheet">
     <link href="ned.css" rel="stylesheet">
-    <script src="ned.js">
-    </script>
+    <script src="ned.js"></script>
   </head>
   <body>
   	<span id="leftGroup">
@@ -57,9 +54,9 @@
     
  	<div id="context-menu" class="front">
  		<ul class="dropdown-menu">
- 			<li><a href="#"><i class="icon-plus"></i> Staff this event</a></li>
+ 			<li><a href="#staffEvent"><i class="icon-plus"></i> Staff this event</a></li>
  			<li class="divider"></li>
-		    <li><a href="#"><i class="icon-resize-full"></i> Split Event</a></li>
+		    <li><a href="#split"><i class="icon-resize-full"></i> Split Event</a></li>
 	  	</ul>
  	</div>
 	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-dropdown.js"></script>
