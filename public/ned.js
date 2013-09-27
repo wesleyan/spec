@@ -66,6 +66,69 @@ function setTimeline(view) {
 var lastClick, lastRightClick;
 var EventsGlobal = [];
 
+	//Backbone.js Router
+
+var AppRouter = Backbone.Router.extend({
+  routes: {
+  	"printToday": "printToday",
+    "recentVideo": "recentVideo",
+    //"hideCancelled": "hideCancelled",
+    //"unstaffed": "unstaffed",
+    //"onlyMine": "onlyMine",
+    "*filter": "all"
+  }
+
+});
+
+
+      
+var app = new AppRouter;
+
+app.on('route:printToday', function() {
+  	console.log('printToday');
+});
+app.on('route:recentVideo', function() {
+  	console.log('recentVideo');
+});
+
+
+app.on('route:all', function(filter) {
+	if(filter == null) {
+		//Show all of events
+		$('#calendar').fullCalendar('clientEvents', function(event) {
+			event.className = '';
+			$('#calendar').fullCalendar('updateEvent', event);
+		});
+		console.log('all');
+
+	} else if(filter == 'hideCancelled') {
+		
+		$('#calendar').fullCalendar('clientEvents', function(event) {
+			if(event.valid == false) {
+				event.className = 'hide';
+			} else {
+				event.className = '';
+			}
+			$('#calendar').fullCalendar('updateEvent', event);
+		});
+		console.log(filter);
+	} else if(filter == 'unstaffed') {
+		
+		$('#calendar').fullCalendar('clientEvents', function(event) {
+			if(event.staffAdded == event.staffNeeded || event.valid == false) {
+				event.className = 'hide';
+			} else {
+				event.className = '';
+			}
+			$('#calendar').fullCalendar('updateEvent', event);
+		});
+		console.log(filter);
+	}
+});
+
+Backbone.history.start();
+
+
 $(document).ready(function() {
 
 	var date = new Date();
@@ -132,7 +195,8 @@ $(document).ready(function() {
 	        } catch(err) {}
 	    },
 	    eventAfterAllRender: function(view) {
-
+	    	//app.navigate(Backbone.history.fragment, {trigger: true});
+	    	//console.log('FC Backbone: ' + Backbone.history.fragment);
 	    },
 	    eventSources: [{
 	        url: 'events/', // Shows all events BUT need it to show only events to certain location
@@ -148,50 +212,8 @@ $(document).ready(function() {
 	resizeMap();
 	$('#leftGroup').prependTo('.fc-header-left');
 	$('#rightGroup').appendTo('.fc-header-right');
-
-
-
-	//Backbone.js Router
-
-	var AppRouter = Backbone.Router.extend({
-
-	  routes: {
-	  	"printToday": "printToday",
-	    "recentVideo": "recentVideo",
-	    //"hideCancelled": "hideCancelled",
-	    //"unstaffed": "unstaffed",
-	    //"onlyMine": "onlyMine",
-	    "*filter": "all"
-	  }
-
-	});
-
-	var app = new AppRouter;
-
-	app.on('route:printToday', function() {
-	  	console.log('printToday');
-	});
-	app.on('route:recentVideo', function() {
-	  	console.log('recentVideo');
-	});
-
-
-	app.on('route:all', function(filter) {
-		if(Backbone.history.fragment == '') {
-			//Show all of events
-			$('#calendar').fullCalendar('clientEvents', function(event) {
-				console.log(event.id);
-				event.className = 'hide';
-				$('#calendar').fullCalendar('updateEvent', event);
-			});
-			console.log('all');
-		} else {
-			console.log(Backbone.history.fragment);
-		}
-	});
-
-	Backbone.history.start();
-
 });
 
-      
+
+
+
