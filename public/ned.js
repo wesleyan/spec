@@ -1,3 +1,5 @@
+var lastClick, lastRightClick;
+
 $(document).ready(function() {
 
 	var date = new Date();
@@ -110,13 +112,19 @@ function setTimeline(view) {
 
 }
 
+/*$('#splitModal').modal({
+  keyboard: false,
+  show: false
+});*/
+
+//Backbone.js Router
 var AppRouter = Backbone.Router.extend({
 
   routes: {
   	"printToday": "printToday",
     "recentVideo": "recentVideo",
     "staffEvent": "staffEvent",
-    "split": "split",
+    "hideCancelled": "hideCancelled",
     "unstaffed": "unstaffed",
     "onlyMine": "onlyMine",
     "": "all"
@@ -135,10 +143,6 @@ app.on('route:recentVideo', function() {
 app.on('route:staffEvent', function() {
   	console.log('staffEvent');
 });
-app.on('route:split', function() {
-  	console.log('split');
-});
-
 
 app.on('route:hideCancelled', function() {
   	console.log('hideCancelled');

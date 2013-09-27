@@ -12,7 +12,6 @@
     <script src="fullcalendar/fullcalendar2.js"></script>
     <link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css" rel="stylesheet">
     <link href="ned.css" rel="stylesheet">
-    <script src="ned.js"></script>
   </head>
   <body>
   	<span id="leftGroup">
@@ -54,24 +53,53 @@
     
  	<div id="context-menu" class="front">
  		<ul class="dropdown-menu">
- 			<li><a href="#staffEvent"><i class="icon-plus"></i> Staff this event</a></li>
+ 			<li><a href="#staffEvent" data-toggle="modal"><i class="icon-plus"></i> Staff this event</a></li>
  			<li class="divider"></li>
-		    <li><a href="#split"><i class="icon-resize-full"></i> Split Event</a></li>
+		    <li><a href="#split" data-toggle="modal"><i class="icon-resize-full"></i> Split Event</a></li>
 	  	</ul>
  	</div>
+
+	<div id="staffEvent" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-header">
+	    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+	    <h3 id="myModalLabel">Staff This Event</h3>
+	  </div>
+	  <div class="modal-body">
+	    <p>Stuff about staffing the event.</p>
+	  </div>
+	  <div class="modal-footer">
+	    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+	  </div>
+	</div>
+
+	<div id="split" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-header">
+	    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+	    <h3 id="myModalLabel">Split Event</h3>
+	  </div>
+	  <div class="modal-body">
+	    <p>Stuff about splitting the event.</p>
+	  </div>
+	  <div class="modal-footer">
+	    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+	  </div>
+	</div>
+
 	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-dropdown.js"></script>
 	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-tooltip.js"></script>
 	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-popover.js"></script>
-	<script src="lib/bootstrap-contextmenu.js"></script>
-	<!--<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-transition.js"></script>
-    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-alert.js"></script>
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-modal.js"></script>
+	<script src="lib/bootstrap-contextmenu.js"></script>
+	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-transition.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-alert.js"></script>
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-scrollspy.js"></script>
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-tab.js"></script>
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-button.js"></script>
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-collapse.js"></script>
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-carousel.js"></script>
-    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-typeahead.js"></script>-->
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-typeahead.js"></script>
+
+    <script src="ned.js"></script>
     </script>
   </body>
 </html>
