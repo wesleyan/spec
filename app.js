@@ -5,7 +5,8 @@ var app = express();
 var path = require('path');
 
 var date = new Date();
-var diff = date.getTimezoneOffset()/60;
+//var diff = date.getTimezoneOffset()/60;
+var diff =0;
 
 var d = date.getDate();
 var m = date.getMonth();

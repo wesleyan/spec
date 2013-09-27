@@ -29,21 +29,22 @@ $(document).ready(function() {
 	        resizeMap();
 	    },
 		eventClick: function(calEvent, jsEvent, view) {
+			if(calEvent.video == true) {
+				symbol = '<i class="icon-facetime-video"></i> ';
+			} else {
+				symbol = '';
+			}
 		  //This function should contain specific stuff like opening the event-based selection/description box etc
 			$('#popup').modalPopover('show');
 			$('#eventButton').removeClass('disabled');
-		  //console.log(jsEvent.target + ' Event: ' + calEvent.title + ' & ID: ' + calEvent.id);
-		  //$(this).css('background-color','#da4f49');
+			$('#popupTitle').html(symbol + calEvent.title);
+			changePopupColor(calEvent);
+			$('#popupStaffInfo').html(calEvent.staffAdded + '/' + calEvent.staffNeeded);
+			$('.popover-content').html(calEvent.desc);
 
-		  $('#popupTitle').html(calEvent.title);
-		  changePopupColor(calEvent);
-		  $('#popupStaffInfo').html(calEvent.staffAdded + '/' + calEvent.staffNeeded);
-		  $('.popover-content').html(calEvent.desc);
 		},
 		eventRightClick: function(calEvent, jsEvent, view) {
-		  //This function should contain specific stuff like opening the event-based selection/description box etc
-		  jsEvent.preventDefault();
-		  //$(this).css('background-color','#da4f49');
+		  jsEvent.preventDefault(); //Right click event only prevents default because context menu is binded in eventRender
 		},
 		eventRender: function(event, element) {
 			if(event.video == true) {
@@ -53,14 +54,6 @@ $(document).ready(function() {
 			}                                          
 			element.find('.fc-event-title').html(symbol + event.title);
 			element.contextmenu({'target':'#context-menu'});
-			/*element.popover({
-			  	placement:'right',
-			  	//trigger: 'hover',
-			  	html: true,
-			  	content: event.desc,
-			  	//title: event.title
-			});		*/
-
 	  
 		},
 		viewRender: function(view, element) {
@@ -68,9 +61,14 @@ $(document).ready(function() {
 	        try {
 	            setTimeline();
 	        } catch(err) {}
-	    }
+	    },
+	    eventSources: [{
+	        url: 'events/', // Shows all events BUT need it to show only events to certain location
+	        ignoreTimezone: false
+	    }],
 	});
-	$('#calendar').fullCalendar('addEventSource', 'events/');
+	//$('#calendar').fullCalendar('addEventSource', 'events/');
+
 	//Important: especially not using defaultView option of FullCalendar, for efficient use of lazyFetching.
 	$('#calendar').fullCalendar('changeView', 'agendaWeek'); 
 	//Loads the whole month events, and shows them from memory, instead of a new request for each prev/next click.
