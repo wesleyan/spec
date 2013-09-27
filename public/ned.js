@@ -6,7 +6,11 @@ $(document).ready(function() {
 	var d = date.getDate();
 	var m = date.getMonth();
 	var y = date.getFullYear();
-
+			$('#popup').modalPopover({
+			    target: '#eventButton',
+			    placement: 'bottom',
+			    backdrop: false
+			});	
 
 	$('#calendar').fullCalendar({
 		header: {
@@ -25,9 +29,13 @@ $(document).ready(function() {
 	    },
 		eventClick: function(calEvent, jsEvent, view) {
 		  //This function should contain specific stuff like opening the event-based selection/description box etc
-
-		  console.log(jsEvent.target + ' Event: ' + calEvent.title + ' & ID: ' + calEvent.id);
+			$('#popup').modalPopover('show');
+			$('#eventButton').removeClass('disabled');
+		  //console.log(jsEvent.target + ' Event: ' + calEvent.title + ' & ID: ' + calEvent.id);
 		  //$(this).css('background-color','#da4f49');
+
+		  $('.popover-title').html(calEvent.title);
+		  $('.popover-content').html(calEvent.desc);
 		},
 		eventRightClick: function(calEvent, jsEvent, view) {
 		  //This function should contain specific stuff like opening the event-based selection/description box etc
@@ -42,13 +50,15 @@ $(document).ready(function() {
 			}                                          
 			element.find('.fc-event-title').html(symbol + event.title);
 			element.contextmenu({'target':'#context-menu'});
-			element.popover({
+			/*element.popover({
 			  	placement:'right',
-			  	trigger: 'hover',
+			  	//trigger: 'hover',
 			  	html: true,
 			  	content: event.desc,
 			  	//title: event.title
-			});				  
+			});		*/
+
+	  
 		},
 		viewRender: function(view, element) {
 		 	//console.log(view.name);
@@ -67,7 +77,10 @@ $(document).ready(function() {
 
 });
 
-
+$('#eventButton').click(function(e) {
+	$('#eventButton').addClass('disabled');
+	$('#popup').modalPopover('hide');
+});
 
 resizeMap = function () {
 		var column_height = $(window).height();
