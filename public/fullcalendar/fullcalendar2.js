@@ -16,13 +16,6 @@
  			AgendaWeekView render function edited for daily prev/next buttons.
  */
  
-
-
-(function($, undefined) {
-
-
-;;
-
 var defaults = {
 
 	// display
@@ -99,6 +92,13 @@ var defaults = {
 	handleWindowResize: true
 	
 };
+
+(function($, undefined) {
+
+
+;;
+
+
 
 
 var fc = $.fullCalendar = { version: "1.6.4" };

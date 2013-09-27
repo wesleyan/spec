@@ -1,5 +1,5 @@
 var lastClick, lastRightClick;
-
+//var weekdays = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 
 $(document).ready(function() {
 
@@ -40,7 +40,8 @@ $(document).ready(function() {
 			$('#popupTitle').html(symbol + calEvent.title);
 			changePopupColor(calEvent);
 			$('#popupStaffInfo').html(calEvent.staffAdded + '/' + calEvent.staffNeeded);
-			$('.popover-content').html(calEvent.desc);
+			$('#popupContentInside').html(calEvent.desc);
+			$('#popupContentHeader').html('<b>' + defaults.dayNames[calEvent.start.getDay()] + ' | ' + calEvent.loc + '</b>');
 
 		},
 		eventRightClick: function(calEvent, jsEvent, view) {
@@ -151,11 +152,10 @@ var AppRouter = Backbone.Router.extend({
   routes: {
   	"printToday": "printToday",
     "recentVideo": "recentVideo",
-    "staffEvent": "staffEvent",
-    "hideCancelled": "hideCancelled",
-    "unstaffed": "unstaffed",
-    "onlyMine": "onlyMine",
-    "": "all"
+    //"hideCancelled": "hideCancelled",
+    //"unstaffed": "unstaffed",
+    //"onlyMine": "onlyMine",
+    "*filter": "all"
   }
 
 });
@@ -168,21 +168,16 @@ app.on('route:printToday', function() {
 app.on('route:recentVideo', function() {
   	console.log('recentVideo');
 });
-app.on('route:staffEvent', function() {
-  	console.log('staffEvent');
-});
 
-app.on('route:hideCancelled', function() {
-  	console.log('hideCancelled');
-});
-app.on('route:unstaffed', function() {
-  	console.log('unstaffed');
-});
-app.on('route:onlyMine', function() {
-  	console.log('onlyMine');
-});
-app.on('route:all', function() {
-  	console.log('all');
+
+app.on('route:all', function(hashFilter) {
+	if(Backbone.history.fragment == '') {
+		console.log('all');
+	} else {
+		console.log(Backbone.history.fragment);
+	}
+  	
+
 });
       
 Backbone.history.start();
