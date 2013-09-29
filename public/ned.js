@@ -70,7 +70,6 @@ function setTimeline(view) {
 
 // The functions above are mostly done
 var lastClick, lastRightClick;
-var EventsGlobal = [];
 
 	//Backbone.js Router
 
@@ -195,13 +194,13 @@ $(document).ready(function() {
 		},
 		eventRender: function(event, element) {
 			//Adding all events to an array for event filtering with Backbone.js router
-			EventsGlobal.push(event);
-
+			symbol = '';
+			if(event.duration == true) {
+				symbol += '<i class="icon-resize-horizontal icon-white"></i> ';
+			}
 			if(event.video == true) {
-				symbol = '<i class="icon-facetime-video icon-white"></i> ';
-			} else {
-				symbol = '';
-			}                                          
+				symbol += '<i class="icon-facetime-video icon-white"></i> ';  
+			}                                       
 			element.find('.fc-event-title').html(symbol + event.title);
 			element.contextmenu({'target':'#context-menu'});
 	  
@@ -212,7 +211,7 @@ $(document).ready(function() {
 	            setTimeline();
 	        } catch(err) {}
 	    },
-	    newEventsComplete: function() {
+	    newEventsComplete: function() { //after each ajax request to the server, new events also filtered by this way
 	    	var currentUrl = Backbone.history.fragment;
 	    	if(currentUrl != '') {
 	    		app.navigate('', {trigger: true});
@@ -224,11 +223,9 @@ $(document).ready(function() {
 	        ignoreTimezone: false
 	    }],
 	});
-	//$('#calendar').fullCalendar('addEventSource', 'events/');
 
 	//Important: especially not using defaultView option of FullCalendar, for efficient use of lazyFetching.
 	$('#calendar').fullCalendar('changeView', 'agendaWeek'); 
-	//EventsGlobal = $('#calendar').fullCalendar('clientEvents');
 	//Loads the whole month events, and shows them from memory, instead of a new request for each prev/next click.
 	resizeMap();
 	$('#leftGroup').prependTo('.fc-header-left');
