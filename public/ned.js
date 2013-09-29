@@ -212,13 +212,11 @@ $(document).ready(function() {
 	            setTimeline();
 	        } catch(err) {}
 	    },
-	    calendarDone: function(view) {
+	    newEventsComplete: function() {
 	    	var currentUrl = Backbone.history.fragment;
 	    	if(currentUrl != '') {
-	    		setTimeout(function(){
-		    		app.navigate('', {trigger: true});
-		    		app.navigate(currentUrl, {trigger: true});
-		    	},500);
+	    		app.navigate('', {trigger: true});
+	    		app.navigate(currentUrl, {trigger: true});
 	    	}
 	    },
 	    eventSources: [{

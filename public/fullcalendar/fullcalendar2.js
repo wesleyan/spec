@@ -240,7 +240,6 @@ function Calendar(element, options, eventSources) {
 			calcSize();
 			_renderView(inc);
 		}
-		options.calendarDone();
 	}
 	
 	
@@ -1054,6 +1053,7 @@ function EventManager(options, _sources) {
 					complete: function() {
 						applyAll(complete, this, arguments);
 						popLoading();
+						trigger('newEventsComplete'); //when ajax request for new events are completed
 					}
 				}));
 			}else{
