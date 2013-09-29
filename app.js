@@ -29,7 +29,9 @@ var events = [
 					staffNeeded: 1,
 					start: new Date(y, m, d, 9-diff, 45),
 					end: new Date(y, m, d, 13-diff, 30),
-					valid: true
+					valid: true,
+					duration: true,
+					people: ['ckorkut']
 				},
 				{
 					id: 2,
@@ -40,19 +42,23 @@ var events = [
 					staffNeeded: 1,
 					start: new Date(y, m, d, 13-diff, 0),
 					end: new Date(y, m, d, 18-diff, 0),
-					valid: true
+					valid: true,
+					duration: false,
+					people: ['tskim']
 				},
 				{
 					id: 3,
 					title: 'Dance Presentation',
 					desc: 'A technician is needed to stay for the duration of the presentation to assist with hooking up a laptop to the ceiling projector to play youtube clips and other things. NOTE: This is for a class so there should be no charge.',
 					loc: 'Schonberg Dance Studio',
-					staffAdded: 1,
-					staffNeeded: 1,
+					staffAdded: 2,
+					staffNeeded: 2,
 					start: new Date(y, m, d, 13-diff, 15),
 					end: new Date(y, m, d, 14-diff, 30),
 					valid: true,
-					video: true
+					video: true,
+					duration: true,
+					people: ['jgoh','ckorkut']
 				},
 				{
 					id: 4,
@@ -62,7 +68,9 @@ var events = [
 					staffAdded: 1,
 					staffNeeded: 1,
 					start: new Date(y, m, d+1, 10-diff, 30),
-					valid: false
+					valid: false,
+					duration: true,
+					people: ['hflores']
 				},
 				{
 					id: 5,
@@ -73,7 +81,9 @@ var events = [
 					staffNeeded: 2,
 					start: new Date(y, m, d, 12, 0),
 					end: new Date(y, m, d, 14, 0),
-					valid: true
+					valid: true,
+					duration: false,
+					people: ['hflores']
 				},
 				{
 					id: 6,
@@ -84,7 +94,9 @@ var events = [
 					staffNeeded: 1,
 					start: new Date(y, m, d+1, 19-diff, 0),
 					end: new Date(y, m, d+2, 2-diff, 30),
-					valid: true
+					valid: true,
+					duration: true,
+					people: []
 					//url: 'http://google.com/'
 				}
 			];

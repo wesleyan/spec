@@ -87,6 +87,8 @@ var AppRouter = Backbone.Router.extend({
 });
 
 
+//User info must be imported for this part
+var username = 'ckorkut';
       
 var app = new AppRouter;
 
@@ -122,6 +124,17 @@ app.on('route:all', function(filter) {
 		
 		$('#calendar').fullCalendar('clientEvents', function(event) {
 			if(event.staffAdded == event.staffNeeded || event.valid == false) {
+				event.className = 'hide';
+			} else {
+				event.className = '';
+			}
+			$('#calendar').fullCalendar('updateEvent', event);
+		});
+		console.log(filter);
+	} else if(filter == 'onlyMine') {
+		
+		$('#calendar').fullCalendar('clientEvents', function(event) {
+			if(event.people.indexOf(username) == -1) {
 				event.className = 'hide';
 			} else {
 				event.className = '';
