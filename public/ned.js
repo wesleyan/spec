@@ -121,7 +121,6 @@ app.on('route:all', function(filter) {
 		});
 		console.log(filter);
 	} else if(filter == 'unstaffed') {
-		
 		$('#calendar').fullCalendar('clientEvents', function(event) {
 			if(event.staffAdded == event.staffNeeded || event.valid == false) {
 				event.className = 'hide';
@@ -132,7 +131,6 @@ app.on('route:all', function(filter) {
 		});
 		console.log(filter);
 	} else if(filter == 'onlyMine') {
-		
 		$('#calendar').fullCalendar('clientEvents', function(event) {
 			if(event.people.indexOf(username) == -1) {
 				event.className = 'hide';
@@ -214,9 +212,14 @@ $(document).ready(function() {
 	            setTimeline();
 	        } catch(err) {}
 	    },
-	    eventAfterAllRender: function(view) {
-	    	//app.navigate(Backbone.history.fragment, {trigger: true});
-	    	//console.log('FC Backbone: ' + Backbone.history.fragment);
+	    calendarDone: function(view) {
+	    	var currentUrl = Backbone.history.fragment;
+	    	if(currentUrl != '') {
+	    		setTimeout(function(){
+		    		app.navigate('', {trigger: true});
+		    		app.navigate(currentUrl, {trigger: true});
+		    	},500);
+	    	}
 	    },
 	    eventSources: [{
 	        url: 'events/', // Shows all events BUT need it to show only events to certain location

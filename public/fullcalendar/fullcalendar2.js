@@ -240,6 +240,7 @@ function Calendar(element, options, eventSources) {
 			calcSize();
 			_renderView(inc);
 		}
+		options.calendarDone();
 	}
 	
 	
