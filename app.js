@@ -101,6 +101,14 @@ var events = [
 				}
 			];
 
+inventory = [
+	"Video Camera",
+	"Camera",
+	'HDMI Cable',
+	'Laptop',
+	'Projector'
+	];
+
 
 function addBackgroundColor(events) { //changes the events object
 	for (index = 0; index < events.length; ++index) {
@@ -138,6 +146,17 @@ app.get("/events", function(req,res) {
     console.log("Req for events starting at " + start.toDateString() + " and ending before " + end.toDateString());
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.write(JSON.stringify(events).toString("utf-8"));
+    res.end();
+});
+
+app.get("/inventory", function(req,res) {
+	//86400s = 1d
+	var start = new Date(req.query.start*1000);
+	var end = new Date(req.query.end*1000);
+	//req.url
+    console.log("Req for inventory");
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.write(JSON.stringify(inventory).toString("utf-8"));
     res.end();
 });
 

@@ -240,7 +240,7 @@ $(document).ready(function() {
 	$('#inventory').tagsinput({
 	  typeahead: {
 	    source: function(query) {
-	      return $.getJSON('inventory.json');
+	      return $.getJSON('inventory/');
 	    }
 	  }
 	});
