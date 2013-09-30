@@ -45,6 +45,6 @@ body {
 	line-height: 20px;
 }
 
-.striped-event {
+.striped {
 	background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.3) 35px, rgba(255,255,255,.3) 70px);
 }

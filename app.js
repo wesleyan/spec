@@ -43,7 +43,7 @@ var events = [
 					start: new Date(y, m, d, 13-diff, 0),
 					end: new Date(y, m, d, 18-diff, 0),
 					valid: true,
-					duration: false,
+					duration: false,className:['striped'],
 					people: ['tskim']
 				},
 				{
@@ -82,7 +82,7 @@ var events = [
 					start: new Date(y, m, d, 12, 0),
 					end: new Date(y, m, d, 14, 0),
 					valid: true,
-					duration: false,
+					duration: false,className:['striped'],
 					people: ['hflores']
 				},
 				{
