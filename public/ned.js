@@ -66,6 +66,17 @@ function setTimeline(view) {
 
 }
 
+Array.prototype.removeItem = function(a) {
+            for (i = 0; i < this.length; i++) {
+                if (this[i] == a) {
+                    for (i2 = i; i2 < this.length - 1; i2++) {
+                        this[i2] = this[i2 + 1];
+                    }
+                    this.length = this.length - 1
+                    return;
+                }
+            }
+        }
 
 
 // The functions above are mostly done
@@ -103,7 +114,7 @@ app.on('route:all', function(filter) {
 	if(filter == null) {
 		//Show all of events
 		$('#calendar').fullCalendar('clientEvents', function(event) {
-			event.className = '';
+			event.className.removeItem('hide');
 			$('#calendar').fullCalendar('updateEvent', event);
 		});
 		console.log('all');
@@ -111,30 +122,27 @@ app.on('route:all', function(filter) {
 	} else if(filter == 'hideCancelled') {
 		
 		$('#calendar').fullCalendar('clientEvents', function(event) {
+			event.className.removeItem('hide');
 			if(event.valid == false) {
-				event.className = 'hide';
-			} else {
-				event.className = '';
+				event.className.push('hide');
 			}
 			$('#calendar').fullCalendar('updateEvent', event);
 		});
 		console.log(filter);
 	} else if(filter == 'unstaffed') {
 		$('#calendar').fullCalendar('clientEvents', function(event) {
+			event.className.removeItem('hide');
 			if(event.staffAdded == event.staffNeeded || event.valid == false) {
-				event.className = 'hide';
-			} else {
-				event.className = '';
+				event.className.push('hide');
 			}
 			$('#calendar').fullCalendar('updateEvent', event);
 		});
 		console.log(filter);
 	} else if(filter == 'onlyMine') {
 		$('#calendar').fullCalendar('clientEvents', function(event) {
+			event.className.removeItem('hide');
 			if(event.people.indexOf(username) == -1) {
-				event.className = 'hide';
-			} else {
-				event.className = '';
+				event.className.push('hide');
 			}
 			$('#calendar').fullCalendar('updateEvent', event);
 		});
@@ -174,11 +182,10 @@ $(document).ready(function() {
 	        resizeMap();
 	    },
 		eventClick: function(calEvent, jsEvent, view) {
+			symbol = '';
 			if(calEvent.video == true) {
-				symbol = '<i class="icon-facetime-video"></i> ';
-			} else {
-				symbol = '';
-			}
+				symbol += '<i class="icon-facetime-video"></i> ';  
+			} 
 		  //This function should contain specific stuff like opening the event-based selection/description box etc
 			$('#popup').modalPopover('show');
 			$('#eventButton').removeClass('disabled');
@@ -195,12 +202,9 @@ $(document).ready(function() {
 		eventRender: function(event, element) {
 			//Adding all events to an array for event filtering with Backbone.js router
 			symbol = '';
-			if(event.duration == true) {
-				symbol += '<i class="icon-resize-horizontal icon-white"></i> ';
-			}
 			if(event.video == true) {
 				symbol += '<i class="icon-facetime-video icon-white"></i> ';  
-			}                                       
+			}                                   
 			element.find('.fc-event-title').html(symbol + event.title);
 			element.contextmenu({'target':'#context-menu'});
 	  
