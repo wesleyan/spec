@@ -78,6 +78,12 @@ Array.prototype.removeItem = function(a) {
             }
         }
 
+function dropdownActiveFix() {
+	$('a').removeClass('drop-active');
+	$('a[href="#' + Backbone.history.fragment + '"]').addClass('drop-active');
+
+}
+
 
 // The functions above are mostly done
 var lastClick, lastRightClick;
@@ -111,6 +117,7 @@ app.on('route:recentVideo', function() {
 
 
 app.on('route:all', function(filter) {
+	dropdownActiveFix();
 	if(filter == null) {
 		//Show all of events
 		$('#calendar').fullCalendar('clientEvents', function(event) {

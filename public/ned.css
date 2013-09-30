@@ -48,3 +48,20 @@ body {
 .striped {
 	background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.3) 35px, rgba(255,255,255,.3) 70px);
 }
+
+.drop-active {  
+  background-color: hsl(360, 5%, 81%) !important;
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#eeecec", endColorstr="#d0cccc");
+  background-image: -khtml-gradient(linear, left top, left bottom, from(#eeecec), to(#d0cccc));
+  background-image: -moz-linear-gradient(top, #eeecec, #d0cccc);
+  background-image: -ms-linear-gradient(top, #eeecec, #d0cccc);
+  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #eeecec), color-stop(100%, #d0cccc));
+  background-image: -webkit-linear-gradient(top, #eeecec, #d0cccc);
+  background-image: -o-linear-gradient(top, #eeecec, #d0cccc);
+  background-image: linear-gradient(#eeecec, #d0cccc);
+  border-color: #d0cccc #d0cccc hsl(360, 5%, 78%);
+  color: #333;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.19);
+  -webkit-font-smoothing: antialiased;
+}
