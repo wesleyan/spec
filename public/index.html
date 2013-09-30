@@ -84,7 +84,7 @@
 	    <h3 id="myModalLabel">Split Event</h3>
 	  </div>
 	  <div class="modal-body">
-	    <p>Stuff about splititng the event.</p>
+	    <p>Stuff about spliting the event.</p>
 	  </div>
 	  <div class="modal-footer">
 	    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
@@ -97,14 +97,22 @@
 		    <span id="popupTitle">Event Title</span> 
 
 		    <span class="pull-right">
-		    	<button id="popupTitleButton" class="btn btn-small" type="button" href="#staffEvent" data-toggle="modal"><i class="icon-plus icon-white"></i> <span id="popupStaffInfo"></span></button>
+			    <div class="btn-group">
+			    	<button class="btn btn-small" data-toggle="collapse" data-target="#viewdetails"><i class="icon-wrench"></i></button>
+			    	
+			    	<button id="popupTitleButton" class="btn btn-small" type="button" href="#staffEvent" data-toggle="modal"><i class="icon-plus icon-white"></i> <span id="popupStaffInfo"></span></button>
+			    </div>
 		    </span>
 	    </h3>
 	    <div class="popover-content">
    	        <p id="popupContentHeader">
 	        </p>
-	        <p id="popupContentInside">
-	        </p>
+	        <span id="popupContentInside">
+	        </span>
+	        <div class="collapse" id="viewdetails">
+	        	<input type="text" value="Amsterdam,Washington" data-role="tagsinput" id="inventory"/>
+	        </div>
+          
 	    </div>
 	</div>
 
@@ -113,6 +121,7 @@
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-modal.js"></script>
 	<script src="lib/bootstrap-contextmenu.js"></script>
 	<script src="lib/bootstrap-modal-popover.js"></script>
+	<script src="lib/bootstrap-tagsinput.js"></script>
 	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-popover.js"></script>
 	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-transition.js"></script>
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-alert.js"></script>
