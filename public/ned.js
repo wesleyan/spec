@@ -237,13 +237,6 @@ $(document).ready(function() {
 	$('#leftGroup').prependTo('.fc-header-left');
 	$('#rightGroup').appendTo('.fc-header-right');
 
-	$('#inventory').tagsinput({
-	  typeahead: {
-	    source: function(query) {
-	      return $.getJSON('inventory/');
-	    }
-	  }
-	});
 
 });
 
