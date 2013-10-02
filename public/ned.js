@@ -266,7 +266,7 @@ $(document).ready(function() {
     });
 	$('.combobox').combobox();
 	
-	$('#inventory').typeahead({
+	/*$('#inventory').typeahead({
 		source: function(query, process) {
 	        jQuery.ajax({
 	            url : "inventory/video",
@@ -277,7 +277,13 @@ $(document).ready(function() {
 	            }
 	        });
 	    }
+	});*/
+	$('#inventory').tags({
+		//suggestions: ["Banana", "Durian", "Cocos"],
+		suggestion_url: "inventory/video",
+		values_url: 'inventory/computer'
 	});
+
 
 
 

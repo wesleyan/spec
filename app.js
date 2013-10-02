@@ -144,16 +144,34 @@ app.get("/events", function(req,res) {
 });
 
 var videoInventory = [
-	"Video Camera",
-	"Camera",
-	'HDMI Cable',
-	'Projector'
-	];
-
+    {
+        "id": "4",
+        "text": "Video Camera",
+        "title": "This item needs to be recorded."
+    },
+    {
+        "id": "5",
+        "text": "HDMI Cable",
+        "title": "This item needs to be recorded."
+    },
+    {
+        "id": "1",
+        "text": "Projector",
+        "title": "This item needs to be recorded."
+    }
+];
 var compInventory = [
-	"Macbook Pro 13",
-	"iMac 21.5"
-	];
+    {
+        "id": "2",
+        "text": "Macbook Pro 13",
+        "title": "This item needs to be recorded."
+    },
+    {
+        "id": "3",
+        "text": "iMac 21.5",
+        "title": "This item needs to be recorded."
+    }
+];
 
 app.get("/inventory/video", function(req,res) {
 	//req.url
