@@ -289,9 +289,22 @@ $(document).ready(function() {
 	$('#inventory').tags({
 		//suggestions: ["Banana", "Durian", "Cocos"],
 		suggestion_url: "inventory/all",
-		values_url: 'inventory/existing'
-	});
+		values_url: 'inventory/existing',
 
+		//These methods below have to send AJAX requests to update the inventory.
+		onRemove: function(pill){
+	        var id = pill.data('tag-id');
+	        // do something...
+	        console.log('pill with ID ' + id + ' removed');
+	    },
+	   	onBeforeAdd: function(pill){ //
+	        var id = pill.data('tag-id');
+	        // do something...
+	        console.log('pill with ID ' + id + ' added');
+	        return pill; //has to return pill
+	    }
+	});
+//should look for ways to modify inventory tags because recalling the method just appends. maybe recreating this for each event click.
 
 
 
