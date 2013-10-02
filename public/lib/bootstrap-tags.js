@@ -268,7 +268,7 @@
                 })
             )
             .css({
-                "overflow": "hidden",
+                //"overflow": "hidden",
                 "white-space": "nowrap"
             });
 
