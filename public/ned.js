@@ -161,13 +161,15 @@ $('a[href="#staffEvent"]').click(function(e) {
 
 // Solves Bootstrap typeahead dropdown problem
 $('.collapse').on({
-    shown: function(){
-       $(this).css('overflow','visible');
-    },
     hide: function(){
        $(this).css('overflow','hidden');
-    }
+       //$(this).hide();
+    },
+    click: function() {
+		$('.collapse').css('overflow','visible');
+	}
 });
+
 
 $(document).ready(function() {
 
