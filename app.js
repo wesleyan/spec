@@ -101,13 +101,7 @@ var events = [
 				}
 			];
 
-inventory = [
-	"Video Camera",
-	"Camera",
-	'HDMI Cable',
-	'Laptop',
-	'Projector'
-	];
+
 
 
 function addBackgroundColor(events) { //changes the events object
@@ -149,14 +143,30 @@ app.get("/events", function(req,res) {
     res.end();
 });
 
-app.get("/inventory", function(req,res) {
-	//86400s = 1d
-	var start = new Date(req.query.start*1000);
-	var end = new Date(req.query.end*1000);
+var videoInventory = [
+	"Video Camera",
+	"Camera",
+	'HDMI Cable',
+	'Projector'
+	];
+
+var compInventory = [
+	"Macbook Pro 13",
+	"iMac 21.5"
+	];
+
+app.get("/inventory/video", function(req,res) {
 	//req.url
     console.log("Req for inventory");
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.write(JSON.stringify(inventory).toString("utf-8"));
+    res.write(JSON.stringify(videoInventory).toString("utf-8"));
+    res.end();
+});
+app.get("/inventory/computer", function(req,res) {
+	//req.url
+    console.log("Req for inventory");
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.write(JSON.stringify(compInventory).toString("utf-8"));
     res.end();
 });
 
