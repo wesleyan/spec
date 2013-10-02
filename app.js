@@ -166,5 +166,12 @@ app.get("/inventory", function(req,res) {
   )
 });*/
 
+app.get('/printtoday', function (req, res) {
+  res.render('printtoday'
+  )
+});
+
+
+
 app.listen(8080);
 console.log('Listening on port 8080');

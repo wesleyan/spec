@@ -12,6 +12,7 @@
     <script src="fullcalendar/fullcalendar2.js"></script>
     <link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css" rel="stylesheet">
     <link href="ned.css" rel="stylesheet">
+    <link href="lib/bootstrap-timepicker.css" rel="stylesheet">
   </head>
   <body>
   	<span id="leftGroup">
@@ -84,7 +85,42 @@
 	    <h3 id="myModalLabel">Split Event</h3>
 	  </div>
 	  <div class="modal-body">
-	    <p>Stuff about spliting the event.</p>
+	    <p><b><span class="eventName"></span></b><br>
+	    <span class="eventTime"></span>
+
+	    <table class="table table-bordered table-hover table-condensed">
+		<thead><th><i class="icon-user"></i>  Staff</th><th><i class="icon-time"></i> From</th><th><i class="icon-time"></i> To</th>
+		<th><button class="btn btn-primary btn-small" type="button"><i class="icon-plus icon-white"></i></button></th></thead>
+		<tbody>
+			<tr>
+				<td>
+					<select class="combobox input-medium" name="normal">
+		                <option value="">Choose a staff</option>
+		                <option value="PA">Maksim Trifunovski</option>
+		                <option value="CT">Ted Kim</option>
+		                <option value="NY">Heric Flores</option>
+		                <option value="MD">Cumhur Korkut</option>
+		                <option value="VA">John Doe</option>
+		              </select>
+				</td>
+				<td>
+					<div class="bootstrap-timepicker">
+			            <input id="timepicker5" type="text" class="input-small">
+			        </div>
+			    </td>
+			    <td>
+	    		    <div class="bootstrap-timepicker">
+			            <input id="timepicker6" type="text" class="input-small">
+			        </div>
+			    </td>
+			    <td><button class="btn btn-danger btn-mini" type="button"><i class="icon-remove icon-white"></i></button></td>
+
+		    </tr>
+
+		</tbody>
+		</table>
+
+	    </p>
 	  </div>
 	  <div class="modal-footer">
 	    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
@@ -100,7 +136,7 @@
 			    <div class="btn-group">
 			    	<button class="btn btn-small" data-toggle="collapse" data-target="#viewdetails"><i class="icon-wrench"></i></button>
 			    	
-			    	<button id="popupTitleButton" class="btn btn-small" type="button" href="#staffEvent" data-toggle="modal"><i class="icon-plus icon-white"></i> <span id="popupStaffInfo"></span></button>
+			    	<a id="popupTitleButton" class="btn btn-small" type="button" href="#staffEvent" data-toggle="modal"><i class="icon-plus icon-white"></i> <span id="popupStaffInfo"></span></a>
 			    </div>
 		    </span>
 	    </h3>
@@ -121,6 +157,8 @@
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-modal.js"></script>
 	<script src="lib/bootstrap-contextmenu.js"></script>
 	<script src="lib/bootstrap-modal-popover.js"></script>
+	<script src="lib/bootstrap-timepicker.js"></script>
+	
 	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-popover.js"></script>
 	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-transition.js"></script>
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-alert.js"></script>
@@ -130,7 +168,7 @@
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-collapse.js"></script>
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-carousel.js"></script>
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-typeahead.js"></script>
-
+    <script src="lib/bootstrap-combobox.js"></script>
     <script src="ned.js"></script>
     </script>
   </body>

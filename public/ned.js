@@ -83,18 +83,13 @@ function dropdownActiveFix() {
 // The functions above are mostly done
 var lastClick, lastRightClick;
 
-	//Backbone.js Router
-
+// BACKBONE.JS ROUTER SECTION
 var AppRouter = Backbone.Router.extend({
   routes: {
   	"printToday": "printToday",
     "recentVideo": "recentVideo",
-    //"hideCancelled": "hideCancelled",
-    //"unstaffed": "unstaffed",
-    //"onlyMine": "onlyMine",
     "*filter": "all"
   }
-
 });
 
 
@@ -109,7 +104,6 @@ app.on('route:printToday', function() {
 app.on('route:recentVideo', function() {
   	console.log('recentVideo');
 });
-
 
 app.on('route:all', function(filter) {
 	dropdownActiveFix();
@@ -154,6 +148,16 @@ app.on('route:all', function(filter) {
 
 Backbone.history.start();
 
+var lastClickedEvent;
+$('a[href="#split"]').click(function(e) {
+	//Split window update should be done here
+	$('.eventName').html(lastClickedEvent.title);
+});
+$('a[href="#staffEvent"]').click(function(e) {
+	//Staff window update should be done here
+	$('.eventName').html(lastClickedEvent.title);
+});
+
 
 $(document).ready(function() {
 
@@ -196,10 +200,11 @@ $(document).ready(function() {
 			$('#popupStaffInfo').html(calEvent.staffAdded + '/' + calEvent.staffNeeded);
 			$('#popupContentInside').html(calEvent.desc);
 			$('#popupContentHeader').html('<b>' + defaults.dayNames[calEvent.start.getDay()] + ' | ' + calEvent.loc + '</b>');
-
+			lastClickedEvent = calEvent;
 		},
 		eventRightClick: function(calEvent, jsEvent, view) {
 		  jsEvent.preventDefault(); //Right click event only prevents default because context menu is binded in eventRender
+		  lastClickedEvent = calEvent;
 		},
 		eventRender: function(event, element) {
 			//Adding all events to an array for event filtering with Backbone.js router
@@ -237,7 +242,20 @@ $(document).ready(function() {
 	$('#leftGroup').prependTo('.fc-header-left');
 	$('#rightGroup').appendTo('.fc-header-right');
 
-
+	$('#timepicker5').timepicker({
+            template: false,
+            showInputs: false,
+            minuteStep: 5,
+            defaultTime: '9:45 AM'
+    });
+	$('#timepicker6').timepicker({
+            template: false,
+            showInputs: false,
+            minuteStep: 5,
+            defaultTime: '11:45 AM'
+    });
+	$('.combobox').combobox();
+	
 });
 
 
