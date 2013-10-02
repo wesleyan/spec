@@ -69,3 +69,6 @@ body {
 .collapse {
 	margin-top:7px;
 }
+
+.modal { overflow: visible; }
+.modal-body { overflow-y: visible; }
