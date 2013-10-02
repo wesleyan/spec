@@ -143,10 +143,20 @@ app.get("/events", function(req,res) {
     res.end();
 });
 
-var videoInventory = [
+var allInventory = [
     {
         "id": "4",
         "text": "Video Camera",
+        "title": "This item needs to be recorded."
+    },
+    {
+        "id": "3",
+        "text": "Camera",
+        "title": "This item needs to be recorded."
+    },
+    {
+        "id": "3",
+        "text": "Tripod",
         "title": "This item needs to be recorded."
     },
     {
@@ -158,9 +168,8 @@ var videoInventory = [
         "id": "1",
         "text": "Projector",
         "title": "This item needs to be recorded."
-    }
-];
-var compInventory = [
+    },
+
     {
         "id": "2",
         "text": "Macbook Pro 13",
@@ -172,19 +181,26 @@ var compInventory = [
         "title": "This item needs to be recorded."
     }
 ];
+var existingInventory = [
+    {
+        "id": "2",
+        "text": "Macbook Pro 13",
+        "title": "This item needs to be recorded."
+    }
+];
 
-app.get("/inventory/video", function(req,res) {
+app.get("/inventory/all", function(req,res) {
 	//req.url
     console.log("Req for inventory");
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.write(JSON.stringify(videoInventory).toString("utf-8"));
+    res.write(JSON.stringify(allInventory).toString("utf-8"));
     res.end();
 });
-app.get("/inventory/computer", function(req,res) {
+app.get("/inventory/existing", function(req,res) {
 	//req.url
     console.log("Req for inventory");
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.write(JSON.stringify(compInventory).toString("utf-8"));
+    res.write(JSON.stringify(existingInventory).toString("utf-8"));
     res.end();
 });
 

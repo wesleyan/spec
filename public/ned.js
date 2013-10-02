@@ -163,13 +163,19 @@ $('a[href="#staffEvent"]').click(function(e) {
 $('.collapse').on({
     hide: function(){
        $(this).css('overflow','hidden');
+
        //$(this).hide();
     },
     click: function() {
 		$('.collapse').css('overflow','visible');
+	},
+	shown: function() {
+		$('.collapse').css('overflow','visible');
 	}
 });
-
+$('button[data-target="#viewdetails"]').click(function(){
+        $(this).toggleClass("active");
+    });
 
 $(document).ready(function() {
 
@@ -282,8 +288,8 @@ $(document).ready(function() {
 	});*/
 	$('#inventory').tags({
 		//suggestions: ["Banana", "Durian", "Cocos"],
-		suggestion_url: "inventory/video",
-		values_url: 'inventory/computer'
+		suggestion_url: "inventory/all",
+		values_url: 'inventory/existing'
 	});
 
 
