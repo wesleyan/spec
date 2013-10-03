@@ -55,18 +55,6 @@ function setTimeline(view) { //this is borrowed from stackoverflow
 	}
 }
 
-Array.prototype.removeItem = function(a) { //try to avoid changing Array.prototype
-	for (i = 0; i < this.length; i++) {
-		if (this[i] == a) {
-			for (i2 = i; i2 < this.length - 1; i2++) {
-				this[i2] = this[i2 + 1];
-			}
-			this.length = this.length - 1
-			return;
-		}
-	}
-}
-
 function dropdownActiveFix() {
 	$('a').removeClass('drop-active');
 	$('a[href="#' + Backbone.history.fragment + '"]').addClass('drop-active');
@@ -109,7 +97,7 @@ app.on('route:all', function(filter) {
 	if (filter == null) {
 		//Show all of events
 		$('#calendar').fullCalendar('clientEvents', function(event) {
-			event.className.removeItem('hide');
+			event.className = _.without(event.className, 'hide');
 			$('#calendar').fullCalendar('updateEvent', event);
 		});
 		console.log('all');
@@ -117,7 +105,7 @@ app.on('route:all', function(filter) {
 	} else if (filter == 'hideCancelled') {
 
 		$('#calendar').fullCalendar('clientEvents', function(event) {
-			event.className.removeItem('hide');
+			event.className = _.without(event.className, 'hide');
 			if (event.valid == false) {
 				event.className.push('hide');
 			}
@@ -126,7 +114,7 @@ app.on('route:all', function(filter) {
 		console.log(filter);
 	} else if (filter == 'unstaffed') {
 		$('#calendar').fullCalendar('clientEvents', function(event) {
-			event.className.removeItem('hide');
+			event.className = _.without(event.className, 'hide');
 			if (event.staffAdded == event.staffNeeded || event.valid == false) {
 				event.className.push('hide');
 			}
@@ -135,7 +123,7 @@ app.on('route:all', function(filter) {
 		console.log(filter);
 	} else if (filter == 'onlyMine') {
 		$('#calendar').fullCalendar('clientEvents', function(event) {
-			event.className.removeItem('hide');
+			event.className = _.without(event.className, 'hide');
 			if (event.people.indexOf(username) == -1) {
 				event.className.push('hide');
 			}
