@@ -16,11 +16,6 @@ $('#eventButton').click(function(e) {
 	$('#popup').modalPopover('hide');
 });
 
-$('.modal').on('show', function() {
-	$('#popup').css('opacity', 0.7);
-}).on('hide', function() {
-	$('#popup').css('opacity', 1);
-});
 
 resizeMap = function() {
 	var column_height = $(window).height();
@@ -60,7 +55,7 @@ function setTimeline(view) { //this is borrowed from stackoverflow
 	}
 }
 
-Array.prototype.removeItem = function(a) {
+Array.prototype.removeItem = function(a) { //try to avoid changing Array.prototype
 	for (i = 0; i < this.length; i++) {
 		if (this[i] == a) {
 			for (i2 = i; i2 < this.length - 1; i2++) {
@@ -77,6 +72,12 @@ function dropdownActiveFix() {
 	$('a[href="#' + Backbone.history.fragment + '"]').addClass('drop-active');
 
 }
+
+$('.modal').on('show', function() {
+	$('#popup').css('opacity', 0.7);
+}).on('hide', function() {
+	$('#popup').css('opacity', 1);
+});
 
 
 // The functions above are mostly done
@@ -148,13 +149,15 @@ app.on('route:all', function(filter) {
 Backbone.history.start();
 
 var lastClickedEvent;
-$('a[href="#split"]').click(function(e) {
-	//Split window update should be done here
-	$('.eventName').html(lastClickedEvent.title);
-});
 $('a[href="#staffEvent"]').click(function(e) {
-	//Staff window update should be done here
+	//This part should get the event data and update staff adding modal box
 	$('.eventName').html(lastClickedEvent.title);
+	$.ajax({
+		type: "GET",
+		url: "staff/get/" + lastClickedEvent.id,
+	}).done(function(data) {
+			console.log(data);
+	});
 });
 
 
@@ -175,8 +178,6 @@ $('.collapse').on({
 $('button[data-target="#viewdetails"]').click(function() {
 	$(this).toggleClass("active");
 });
-
-
 
 var inventoryProto = {
 	suggestion_url: "inventory/all",

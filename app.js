@@ -124,7 +124,8 @@ app.configure(function() {
 	app.use(express.static(__dirname + '/public'));
 });
 
-
+//EVENTS
+//Event fetching should be filtered according to the time variables
 app.get("/events", function(req, res) {
 	//86400s = 1d
 	var start = new Date(req.query.start * 1000);
@@ -137,6 +138,11 @@ app.get("/events", function(req, res) {
 	res.write(JSON.stringify(events).toString("utf-8"));
 	res.end();
 });
+
+app.get('/printtoday', function(req, res) {
+	res.render('printtoday')
+});
+
 
 var allInventory = [{
 		"id": "4",
@@ -176,34 +182,61 @@ var existingInventory = [{
 	"title": "This item needs to be recorded."
 }];
 
-app.get("/inventory/all", function(req, res) {
-	//req.url
-	console.log("Req for all inventory");
-	res.writeHead(200, {
-		'Content-Type': 'application/json'
+// INVENTORY
+	// All inventory
+	app.get("/inventory/all", function(req, res) {
+		//req.url
+		console.log("Req for all inventory");
+		res.writeHead(200, {
+			'Content-Type': 'application/json'
+		});
+		res.write(JSON.stringify(allInventory).toString("utf-8"));
+		res.end();
 	});
-	res.write(JSON.stringify(allInventory).toString("utf-8"));
-	res.end();
-});
-app.get("/inventory/existing/:id", function(req, res) {
-	//req.url
-	console.log("Req for inventory of Event ID" + req.params.id);
-	res.writeHead(200, {
-		'Content-Type': 'application/json'
+
+	//Existing inventory for each event
+	app.get("/inventory/existing/:id", function(req, res) {
+		//req.url
+		console.log("Req for inventory of Event ID" + req.params.id);
+		res.writeHead(200, {
+			'Content-Type': 'application/json'
+		});
+		res.write(JSON.stringify(existingInventory).toString("utf-8"));
+		res.end();
 	});
-	res.write(JSON.stringify(existingInventory).toString("utf-8"));
-	res.end();
-});
 
-/*app.get('/', function (req, res) {
-  res.render('index',
-  { title : 'Home' }
-  )
-});*/
+	//Inventory Update
+		//Add inventory to an event (POST)
 
-app.get('/printtoday', function(req, res) {
-	res.render('printtoday')
-});
+		//Remove inventory from an event (POST)
+
+// STAFF
+	//Get the existing staff of an event
+	app.get("/staff/get/:id", function(req, res) {
+		//req.url
+		console.log("Req for staff info of Event ID" + req.params.id);
+
+		var existingStaff = []; // Filter the events/database and return the staff and shifts info (requires to decide on db structure)
+
+		res.writeHead(200, {
+			'Content-Type': 'application/json'
+		});
+		res.write(JSON.stringify(existingStaff).toString("utf-8"));
+		res.end();
+	});
+
+	//Add staff/shift to an event (POST)
+
+	//Remove staff/shift from an event (POST)
+
+
+//Main Page Rendering
+	/*app.get('/', function (req, res) {
+	  res.render('index',
+	  { title : 'Home' }
+	  )
+	});*/
+
 
 app.listen(8080);
 console.log('Listening on port 8080');
