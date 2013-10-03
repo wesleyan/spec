@@ -16,14 +16,11 @@ $('#eventButton').click(function(e) {
 	$('#popup').modalPopover('hide');
 });
 
-
 resizeMap = function() {
 	var column_height = $(window).height();
 	$('#calendar').fullCalendar('option', 'height', column_height - 40);
 	//$("#calendar").css("height", + "px")
 };
-
-
 
 function setTimeline(view) { //this is borrowed from stackoverflow
 	var parentDiv = jQuery(".fc-agenda-slots:visible").parent();
@@ -65,7 +62,6 @@ $('.modal').on('show', function() {
 }).on('hide', function() {
 	$('#popup').css('opacity', 1);
 });
-
 
 // The functions above are mostly done
 var lastClick, lastRightClick;
@@ -142,8 +138,10 @@ $('a[href="#staffEvent"]').click(function(e) {
 	$.ajax({
 		type: "GET",
 		url: "staff/get/" + lastClickedEvent.id,
-	}).done(function(data) {
-			console.log(data);
+	}).done(function(staff) {
+		$.each(staff, function(key, value) {
+			//staff rendering will happen here
+		});
 	});
 });
 
@@ -152,8 +150,6 @@ $('a[href="#staffEvent"]').click(function(e) {
 $('.collapse').on({
 	hide: function() {
 		$(this).css('overflow', 'hidden');
-
-		//$(this).hide();
 	},
 	click: function() {
 		$('.collapse').css('overflow', 'visible');
@@ -203,6 +199,7 @@ var _inventoryProto = {
 	}
 };
 
+
 $(document).ready(function() {
 
 
@@ -221,7 +218,6 @@ $(document).ready(function() {
 			left: 'prevYear,prev,next,nextYear today',
 			center: 'title',
 			right: 'month,agendaWeek,agendaDay'
-
 		},
 		editable: false,
 		allDaySlot: false,
@@ -232,8 +228,6 @@ $(document).ready(function() {
 			resizeMap();
 		},
 		eventClick: function(calEvent, jsEvent, view) {
-
-			
 			//This function should contain specific stuff like opening the event-based selection/description box etc
 			
 			//front-end eye-candy stuff
@@ -318,10 +312,24 @@ $(document).ready(function() {
 		minuteStep: 5,
 		defaultTime: '11:45 AM'
 	});
-	$('.combobox').combobox();
 
-	//should look for ways to modify inventory tags because recalling the method just appends. maybe recreating this for each event click.
-
-
-
+	var ComboboxInitiation = function() {
+		$.ajax({
+			type: "GET",
+			url: "staff/all/",
+		}).done(function(staff) {
+			$('.combobox').html('');
+			$.each(staff, function(key, value) {
+				$('.combobox')
+					.append($('<option>', {
+							value: key
+						})
+						.text(value));
+			});
+			$('.combobox').combobox({
+				placeholder: 'Choose a staff'
+			});
+		});
+	}
+	ComboboxInitiation();
 });

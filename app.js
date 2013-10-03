@@ -229,20 +229,35 @@ var existingInventory = [{
 		});
 
 // STAFF
-	//Get the existing staff of an event
-	app.get("/staff/get/:id", function(req, res) {
+var existingStaff = {
+			'mtrifunovski': 'Maksim Trifunovski (mtrifunovski)',
+			'tskim': 'Ted Kim (tskim)',
+			'hflores': 'Heric Flores (hflores)',
+			'ckorkut': 'Cumhur Korkut (ckorkut)',
+			'jdoe': 'John Doe (jdoe)',
+		};
+	//All event staff in IMS
+	app.get("/staff/all", function(req, res) {
 		//req.url
-		console.log("Req for staff info of Event ID " + req.params.id);
-
-		var existingStaff = []; // Filter the events/database and return the staff and shifts info (requires to decide on db structure)
-
+		console.log("Req for all staff info");
+		// Filter the events/database and return the staff and shifts info (requires to decide on db structure)
 		res.writeHead(200, {
 			'Content-Type': 'application/json'
 		});
 		res.write(JSON.stringify(existingStaff).toString("utf-8"));
 		res.end();
 	});
-
+	//Get the existing staff of an event
+	app.get("/staff/get/:id", function(req, res) {
+		//req.url
+		console.log("Req for staff info of Event ID " + req.params.id);
+		// Filter the events/database and return the staff and shifts info (requires to decide on db structure)
+		res.writeHead(200, {
+			'Content-Type': 'application/json'
+		});
+		res.write(JSON.stringify(existingStaff).toString("utf-8"));
+		res.end();
+	});
 	//Add staff/shift to an event (POST)
 
 	//Remove staff/shift from an event (POST)
