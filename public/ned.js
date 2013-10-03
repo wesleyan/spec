@@ -187,7 +187,13 @@ var _inventoryProto = {
 	onBeforeAdd: function(pill) { //this also works for initial/on modal click loading.
 		var id = pill.data('tag-id');
 		// do something...
-		console.log('pill with ID ' + id + ' added');
+		console.log('initial pill with ID ' + id + ' added');
+		return pill; //has to return pill
+	},
+	onBeforeNewAdd: function(pill) { //this also works for initial/on modal click loading.
+		var id = pill.data('tag-id');
+		// do something...
+		console.log('after pill with ID ' + id + ' added');
 		return pill; //has to return pill
 	}
 };

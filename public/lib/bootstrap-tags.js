@@ -1,7 +1,7 @@
 ;
 (function($) {
     "use strict";
-
+    var afterInitial = false;
     var defaults = {
         values: [],
         values_url: '',
@@ -51,6 +51,9 @@
         onBeforeAdd: function(pill, value) {
             return pill;
         },
+        onBeforeNewAdd: function(pill, value) {
+            return pill;
+        },
         onLoadSuggestions: function(values) {
             return values;
         }
@@ -58,7 +61,7 @@
 
 
     function Tags(context, params) {
-
+        afterInitial = false;
         this.options = $.extend(true, {}, defaults, params);
 
         var $self = this;
@@ -271,8 +274,12 @@
                 //"overflow": "hidden",
                 "white-space": "nowrap"
             });
-
-        tag = $self.options.onBeforeAdd(tag, value);
+        if(afterInitial == false) {
+             tag = $self.options.onBeforeAdd(tag, value);
+         } else {
+            tag = $self.options.onBeforeNewAdd(tag, value);
+         }
+       
 
         pills_list.append(tag);
 
@@ -298,6 +305,7 @@
     $.fn.tags = function(params) {
         return this.each(function() {
             new Tags($(this), params);
+            afterInitial = true;
         })
     }
 }(window.jQuery));
