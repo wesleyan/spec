@@ -209,7 +209,7 @@ var existingInventory = [{
 		//Add inventory to an event (POST)
 		app.post("/inventory/add", function(req, res) {
 			//req.url
-			console.log("Req for adding inventory ID " + req.params.inventoryid + " to Event ID " + req.params.id);
+			console.log("Req for adding inventory ID " + req.body.inventoryid + " to Event ID " + req.body.eventid);
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
@@ -220,7 +220,7 @@ var existingInventory = [{
 		//Remove inventory from an event (POST)
 		app.post("/inventory/remove", function(req, res) {
 			//req.url
-			console.log("Req for removing inventory ID " + req.params.inventoryid + " from Event ID " + req.params.id);
+			console.log("Req for removing inventory ID " + req.body.inventoryid + " from Event ID " + req.body.eventid);
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});

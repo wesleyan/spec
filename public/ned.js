@@ -171,7 +171,6 @@ var _inventoryProto = {
 	//These methods below have to send AJAX requests to update the inventory.
 	onRemove: function(pill) {
 		var id = pill.data('tag-id');
-		// do something...
 		$.ajax({
 			type: "POST",
 			url: "inventory/remove",
@@ -182,18 +181,24 @@ var _inventoryProto = {
 		}).done(function(msg) {
 			console.log('pill with ID ' + id + ' removed');
 		});
-		
 	},
 	onBeforeAdd: function(pill) { //this also works for initial/on modal click loading.
 		var id = pill.data('tag-id');
-		// do something...
 		console.log('initial pill with ID ' + id + ' added');
 		return pill; //has to return pill
 	},
 	onBeforeNewAdd: function(pill) { //this also works for initial/on modal click loading.
 		var id = pill.data('tag-id');
-		// do something...
-		console.log('after pill with ID ' + id + ' added');
+		$.ajax({
+			type: "POST",
+			url: "inventory/add",
+			data: {
+				eventid: lastClickedEvent.id,
+				inventoryid: pill.data('tag-id')
+			}
+		}).done(function(msg) {
+			console.log('pill with ID ' + id + ' added');
+		});
 		return pill; //has to return pill
 	}
 };
