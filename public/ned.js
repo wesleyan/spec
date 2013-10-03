@@ -172,9 +172,19 @@ var _inventoryProto = {
 	onRemove: function(pill) {
 		var id = pill.data('tag-id');
 		// do something...
-		console.log('pill with ID ' + id + ' removed');
+		$.ajax({
+			type: "POST",
+			url: "inventory/remove",
+			data: {
+				eventid: lastClickedEvent.id,
+				inventoryid:pill.data('tag-id')
+			}
+		}).done(function(msg) {
+			console.log('pill with ID ' + id + ' removed');
+		});
+		
 	},
-	onBeforeAdd: function(pill) { //
+	onBeforeAdd: function(pill) { //this also works for initial/on modal click loading.
 		var id = pill.data('tag-id');
 		// do something...
 		console.log('pill with ID ' + id + ' added');

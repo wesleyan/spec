@@ -197,7 +197,7 @@ var existingInventory = [{
 	//Existing inventory for each event
 	app.get("/inventory/existing/:id", function(req, res) {
 		//req.url
-		console.log("Req for inventory of Event ID" + req.params.id);
+		console.log("Req for inventory of Event ID " + req.params.id);
 		res.writeHead(200, {
 			'Content-Type': 'application/json'
 		});
@@ -207,14 +207,32 @@ var existingInventory = [{
 
 	//Inventory Update
 		//Add inventory to an event (POST)
+		app.post("/inventory/add", function(req, res) {
+			//req.url
+			console.log("Req for adding inventory ID " + req.params.inventoryid + " to Event ID " + req.params.id);
+			res.writeHead(200, {
+				'Content-Type': 'application/json'
+			});
+			res.write(JSON.stringify(true).toString("utf-8"));
+			res.end();
+		});
 
 		//Remove inventory from an event (POST)
+		app.post("/inventory/remove", function(req, res) {
+			//req.url
+			console.log("Req for removing inventory ID " + req.params.inventoryid + " from Event ID " + req.params.id);
+			res.writeHead(200, {
+				'Content-Type': 'application/json'
+			});
+			res.write(JSON.stringify(true).toString("utf-8"));
+			res.end();
+		});
 
 // STAFF
 	//Get the existing staff of an event
 	app.get("/staff/get/:id", function(req, res) {
 		//req.url
-		console.log("Req for staff info of Event ID" + req.params.id);
+		console.log("Req for staff info of Event ID " + req.params.id);
 
 		var existingStaff = []; // Filter the events/database and return the staff and shifts info (requires to decide on db structure)
 
