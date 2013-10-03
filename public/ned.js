@@ -70,7 +70,6 @@ Array.prototype.removeItem = function(a) { //try to avoid changing Array.prototy
 function dropdownActiveFix() {
 	$('a').removeClass('drop-active');
 	$('a[href="#' + Backbone.history.fragment + '"]').addClass('drop-active');
-
 }
 
 $('.modal').on('show', function() {
@@ -93,7 +92,7 @@ var AppRouter = Backbone.Router.extend({
 });
 
 
-//User info must be imported for this part
+//User info must be imported for this part: work on BACKBONE JS SESSION
 var username = 'ckorkut';
 
 var app = new AppRouter;
@@ -179,7 +178,7 @@ $('button[data-target="#viewdetails"]').click(function() {
 	$(this).toggleClass("active");
 });
 
-var inventoryProto = {
+var _inventoryProto = {
 	suggestion_url: "inventory/all",
 	//These methods below have to send AJAX requests to update the inventory.
 	onRemove: function(pill) {
@@ -247,7 +246,7 @@ $(document).ready(function() {
 			var inventoryOptions = {
 				values_url: 'inventory/existing/' + calEvent.id,
 			};
-			$.extend(inventoryOptions,inventoryProto);
+			$.extend(inventoryOptions,_inventoryProto);
 			$('#inventory').html('');
 			$('#inventory').tags(inventoryOptions);
 			lastClickedEvent = calEvent;
