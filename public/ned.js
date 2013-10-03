@@ -176,6 +176,24 @@ $('button[data-target="#viewdetails"]').click(function() {
 	$(this).toggleClass("active");
 });
 
+
+
+var inventoryProto = {
+	suggestion_url: "inventory/all",
+	//These methods below have to send AJAX requests to update the inventory.
+	onRemove: function(pill) {
+		var id = pill.data('tag-id');
+		// do something...
+		console.log('pill with ID ' + id + ' removed');
+	},
+	onBeforeAdd: function(pill) { //
+		var id = pill.data('tag-id');
+		// do something...
+		console.log('pill with ID ' + id + ' added');
+		return pill; //has to return pill
+	}
+};
+
 $(document).ready(function() {
 
 
@@ -205,18 +223,32 @@ $(document).ready(function() {
 			resizeMap();
 		},
 		eventClick: function(calEvent, jsEvent, view) {
+
+			
+			//This function should contain specific stuff like opening the event-based selection/description box etc
+			
+			//front-end eye-candy stuff
 			symbol = '';
 			if (calEvent.video == true) {
 				symbol += '<i class="icon-facetime-video"></i> ';
 			}
-			//This function should contain specific stuff like opening the event-based selection/description box etc
 			$('#popup').modalPopover('show');
 			$('#eventButton').removeClass('disabled');
-			$('#popupTitle').html(symbol + calEvent.title);
 			changePopupColor(calEvent);
+
+			//Popover update with event information
+			$('#popupTitle').html(symbol + calEvent.title);
 			$('#popupStaffInfo').html(calEvent.staffAdded + '/' + calEvent.staffNeeded);
 			$('#popupContentInside').html(calEvent.desc);
 			$('#popupContentHeader').html('<b>' + defaults.dayNames[calEvent.start.getDay()] + ' | ' + calEvent.loc + '</b>');
+			
+			//Inventory update
+			var inventoryOptions = {
+				values_url: 'inventory/existing/' + calEvent.id,
+			};
+			$.extend(inventoryOptions,inventoryProto);
+			$('#inventory').html('');
+			$('#inventory').tags(inventoryOptions);
 			lastClickedEvent = calEvent;
 		},
 		eventRightClick: function(calEvent, jsEvent, view) {
@@ -279,36 +311,6 @@ $(document).ready(function() {
 	});
 	$('.combobox').combobox();
 
-	/*$('#inventory').typeahead({
-		source: function(query, process) {
-	        jQuery.ajax({
-	            url : "inventory/video",
-	            type : 'GET',
-	            dataType : 'json',
-	            success : function(json) {
-	                process(json);
-	            }
-	        });
-	    }
-	});*/
-	$('#inventory').tags({
-		//suggestions: ["Banana", "Durian", "Cocos"],
-		suggestion_url: "inventory/all",
-		values_url: 'inventory/existing',
-
-		//These methods below have to send AJAX requests to update the inventory.
-		onRemove: function(pill) {
-			var id = pill.data('tag-id');
-			// do something...
-			console.log('pill with ID ' + id + ' removed');
-		},
-		onBeforeAdd: function(pill) { //
-			var id = pill.data('tag-id');
-			// do something...
-			console.log('pill with ID ' + id + ' added');
-			return pill; //has to return pill
-		}
-	});
 	//should look for ways to modify inventory tags because recalling the method just appends. maybe recreating this for each event click.
 
 

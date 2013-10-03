@@ -178,16 +178,16 @@ var existingInventory = [{
 
 app.get("/inventory/all", function(req, res) {
 	//req.url
-	console.log("Req for inventory");
+	console.log("Req for all inventory");
 	res.writeHead(200, {
 		'Content-Type': 'application/json'
 	});
 	res.write(JSON.stringify(allInventory).toString("utf-8"));
 	res.end();
 });
-app.get("/inventory/existing", function(req, res) {
+app.get("/inventory/existing/:id", function(req, res) {
 	//req.url
-	console.log("Req for inventory");
+	console.log("Req for inventory of Event ID" + req.params.id);
 	res.writeHead(200, {
 		'Content-Type': 'application/json'
 	});
