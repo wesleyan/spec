@@ -256,7 +256,7 @@ var existingNotes = [{
 		//Add inventory to an event (POST)
 		app.post("/notes/add", function(req, res) {
 			//req.url
-			console.log("Req for adding note \" + req.body.note + "\" to Event ID " + req.body.eventid);
+			console.log("Req for adding note \"" + req.body.note + "\" to Event ID " + req.body.eventid);
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
