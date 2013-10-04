@@ -131,6 +131,24 @@ app.on('route:all', function(filter) {
 
 Backbone.history.start();
 
+NotesView = Backbone.View.extend({
+        initialize: function(){
+            this.render();
+        },
+        render: function(){
+            //Pass variables in using Underscore.js Template
+            var variables = { eventid: this.options.eventid };
+            console.log(this);
+            // Compile the template using underscore
+            var template = _.template( $("#notes_template").html(), variables );
+            // Load the compiled HTML into the Backbone "el"
+            $("#notes").html( template );
+        }
+    });
+
+
+
+
 var lastClickedEvent;
 $('a[href="#staffEvent"]').click(function(e) {
 	//This part should get the event data and update staff adding modal box
@@ -248,6 +266,10 @@ $(document).ready(function() {
 			$.extend(inventoryOptions,_inventoryProto);
 			$('#inventory').html('');
 			$('#inventory').tags(inventoryOptions);
+
+			//Notes update
+			var note_view = new NotesView({ eventid: calEvent.id });
+
 			lastClickedEvent = calEvent;
 		},
 		eventRightClick: function(calEvent, jsEvent, view) {
