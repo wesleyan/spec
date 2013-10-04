@@ -20,22 +20,38 @@ $('#addNote').click(function(e) {
 	$('#newNote').modal('show');
 	return false;
 });
+$('#newNote textarea').bind('keypress', function(e) {
+  if ((e.keyCode || e.which) == 13) {
+    $( "#noteSubmit" ).trigger("click");
+    return false;
+  }
+});
 $('#noteSubmit').click(function(e) {
 	$('#newNote').modal('hide');
 	var note = $('#newNote textarea').val();
 	$.ajax({
-			type: "POST",
-			url: "notes/add",
-			data: {
-				'note': note,
-				eventid: lastClickedEvent.id
+		type: "POST",
+		url: "notes/add",
+		data: {
+			'note': note,
+			eventid: lastClickedEvent.id
+		}
+	}).done(function(msg) {
+		console.log('note added to event ID ' + lastClickedEvent.id + ': ' + note);
+
+		var each_note_view = new EachNoteView({ //Backbone new note view used
+			'eventid': lastClickedEvent.id,
+			'note': {
+				'id': msg.id,
+				'text': note,
+				'user': username,
+				'date': new Date()
 			}
-		}).done(function(msg) {
-			console.log('note added to event ID ' + lastClickedEvent.id + ': ' + note);
 		});
+
+	});
 	$('#newNote textarea').val('');
 });
-
 
 resizeMap = function() {
 	var column_height = $(window).height();
@@ -155,14 +171,25 @@ Backbone.history.start();
 NotesView = Backbone.View.extend({
         initialize: function(){
             this.render();
+            this.options.notes.forEach(function(note) {
+            	var each_note_view = new EachNoteView({ 'eventid': lastClickedEvent.id, 'note':note });
+            });
         },
         render: function(){
-            //Pass variables in using Underscore.js Template
             var variables = { eventid: this.options.eventid, notes: this.options.notes };
-            // Compile the template using underscore
             var template = _.template( $("#notes_template").html(), variables );
-            // Load the compiled HTML into the Backbone "el"
             $("#notes").html( template );
+        }
+    });
+
+EachNoteView = Backbone.View.extend({
+        initialize: function(){
+            this.render();
+        },
+        render: function(){
+            var variables = { eventid: this.options.eventid, 'note': this.options.note };
+            var template = _.template( $("#each_note_template").html(), variables );
+            $("#notesBody").append( template );
         }
     });
 
@@ -181,10 +208,6 @@ StaffView = Backbone.View.extend({
         }
     });
 
-
-
-
-
 var lastClickedEvent;
 $('a[href="#staffEvent"]').click(function(e) {
 	//This part should get the event data and update staff adding modal box
@@ -200,18 +223,13 @@ $('a[href="#staffEvent"]').click(function(e) {
 	});
 });
 
-
-// Solves Bootstrap typeahead dropdown problem
+// Solves Bootstrap typeahead dropdown overflow problem
 
 $('#collapseTwo').on('click shown keydown', function() {
 		$(this).css('overflow', 'visible');
 	}).on('hide', function() {
 		$(this).css('overflow', 'hidden');
 	});
-
-/*$('button[data-target="#viewdetails"]').click(function() {
-	$(this).toggleClass("active");
-});*/
 
 var _inventoryProto = {
 	suggestion_url: "inventory/all",
@@ -230,8 +248,8 @@ var _inventoryProto = {
 		});
 	},
 	onBeforeAdd: function(pill) { //this also works for initial/on modal click loading.
-		var id = pill.data('tag-id');
-		console.log('initial pill with ID ' + id + ' added');
+		//var id = pill.data('tag-id');
+		//console.log('initial pill with ID ' + id + ' added');
 		return pill; //has to return pill
 	},
 	onBeforeNewAdd: function(pill) { //this also works for initial/on modal click loading.

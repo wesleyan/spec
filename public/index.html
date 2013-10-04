@@ -126,8 +126,8 @@
 	    </p>
 	  </div>
 	  <div class="modal-footer">
-	    <button class="btn btn-primary" id="noteSubmit">Add note</button>
-	    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+	    <button class="btn btn-primary" id="noteSubmit" data-dismiss="modal">Add note</button>
+	    <button class="btn" aria-hidden="true">Cancel</button>
 	  </div>
 	</div>
 
@@ -141,11 +141,6 @@
 
 		    <span class="pull-right">
 		    <a id="popupTitleButton" class="btn btn-small" type="button" href="#staffEvent" data-toggle="modal"><i class="icon-plus icon-white"></i> <span id="popupStaffInfo"></span></a>
-			    <!--<div class="btn-group">
-			    	<button class="btn btn-small" data-toggle="collapse" data-target="#viewdetails"><i class="icon-wrench"></i></button>
-			    	
-			    	
-			    </div>-->
 		    </span>
 	    </h3>
 	    <div class="popover-content">
@@ -216,24 +211,25 @@
 
 	<script type="text/template" id="notes_template">
 	    <table class="table table-hover table-condensed">
-		    <tbody>
-			     <% _.each( notes, function( item, i ){ 
-			     	item.date = new Date(Date.parse(item.date));
-			     	%>
-			     	<tr>
-			     		<td class="notesTable">
-			     			<%= item.text %>
-			     			<br>
-			     			<span class="label"><%= item.user %> | <%= defaults.monthNamesShort[item.date.getMonth()] %> <%= item.date.getDate() %></span>
-			     			
-			     		</td>
-
-				   	</tr>
-				<% }); %>
+		    <tbody id="notesBody">
+			    
 		    </tbody>
 	    </table>
-	    
 	</script>
+	<script type="text/template" id="each_note_template">
+	     	<% note.date = new Date(Date.parse(note.date));	%>
+	     	<tr>
+	     		<td class="notesTable">
+	     			<%= note.text %>
+	     			<br>
+	     			<span class="label"><%= note.user %> | <%= defaults.monthNamesShort[note.date.getMonth()] %> <%= note.date.getDate() %></span>
+					<% if(note.user == username) { %>
+	     				<span class="pull-right badge badge-important"><i class="icon-remove icon-white"></i></span>
+	     			<% } %>
+	     		</td>
+		   	</tr>
+	</script>
+
 	<script type="text/template" id="staff_template">
 	    This is the staff rendering with ID <%= eventid %> and this is rendered by Backbone.js
 	    <%= staff %>
