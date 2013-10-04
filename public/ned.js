@@ -16,42 +16,45 @@ $('#eventButton').click(function(e) {
 	$('#popup').modalPopover('hide');
 });
 
-$('#addNote').click(function(e) {
-	$('#newNote').modal('show');
-	return false;
-});
-$('#newNote textarea').bind('keypress', function(e) {
-  if ((e.keyCode || e.which) == 13) {
-    $( "#noteSubmit" ).trigger("click");
-    return false;
-  }
-});
-$('#noteSubmit').click(function(e) {
-	$('#newNote').modal('hide');
-	var note = $('#newNote textarea').val();
-	$.ajax({
-		type: "POST",
-		url: "notes/add",
-		data: {
-			'note': note,
-			eventid: lastClickedEvent.id
-		}
-	}).done(function(msg) {
-		console.log('note added to event ID ' + lastClickedEvent.id + ': ' + note);
 
-		var each_note_view = new EachNoteView({ //Backbone new note view used
-			'eventid': lastClickedEvent.id,
-			'note': {
-				'id': msg.id,
-				'text': note,
-				'user': username,
-				'date': new Date()
-			}
-		});
-
+// NOTE ADDING
+	$('#addNote').click(function(e) {
+		$('#newNote').modal('show');
+		return false;
 	});
-	$('#newNote textarea').val('');
-});
+	$('#newNote textarea').bind('keypress', function(e) {
+	  if ((e.keyCode || e.which) == 13) {
+	    $( "#noteSubmit" ).trigger("click");
+	    return false;
+	  }
+	});
+	$('#noteSubmit').click(function(e) {
+		$('#newNote').modal('hide');
+		var note = $('#newNote textarea').val();
+		if(note === '' ) {return false;}
+		$.ajax({
+			type: "POST",
+			url: "notes/add",
+			data: {
+				'note': note,
+				eventid: lastClickedEvent.id
+			}
+		}).done(function(msg) {
+			console.log('note added to event ID ' + lastClickedEvent.id + ': ' + note);
+
+			var each_note_view = new EachNoteView({ //Backbone new note view used
+				'eventid': lastClickedEvent.id,
+				'note': {
+					'id': msg.id,
+					'text': note,
+					'user': username,
+					'date': new Date()
+				}
+			});
+
+		});
+		$('#newNote textarea').val('');
+	});
 
 resizeMap = function() {
 	var column_height = $(window).height();
