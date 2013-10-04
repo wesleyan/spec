@@ -114,10 +114,14 @@ body {
     -webkit-border-radius: 0px;
     -moz-border-radius: 0px;
     border-radius: 0px;
-}    
+}   
+#notes {
+    margin-bottom: -15px !important;
+}  
 #popoverAccordion .accordion-inner {
     border: 0px !important;
     padding-top: 0px !important;
+    padding-bottom: 0px !important;
 }   
 
 #popoverAccordion .accordion-heading {
