@@ -114,6 +114,26 @@
 	  </div>
 	</div>
 
+
+	<div id="newNote" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-header">
+	    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+	    <h3 id="myModalLabel">Type your note below:</h3>
+	  </div>
+	  <div class="modal-body">
+	    <p>
+	    	<textarea rows="3"></textarea>
+	    </p>
+	  </div>
+	  <div class="modal-footer">
+	    <button class="btn btn-primary" id="noteSubmit">Add note</button>
+	    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+	  </div>
+	</div>
+
+
+
+
 	<div id="popup" class="popover">
 	    <div class="arrow"></div>
 	    <h3 class="popover-title">
@@ -139,7 +159,7 @@
 			    <div class="accordion-heading drop-active">
 			      <a class="accordion-toggle" data-toggle="collapse" href="#collapseOne">
 			         <i class="icon-comment"></i> &nbsp;Notes
-			         <span class="pull-right"><button class="btn btn-mini btn-inverse" type="button" id="addNote"><i class="icon-plus icon-white"></i></button></span>
+			         <span class="pull-right"><button class="btn btn-mini btn-inverse" id="addNote"><i class="icon-plus icon-white"></i></button></span>
 			      </a>
 			      
 			    </div>

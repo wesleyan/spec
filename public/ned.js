@@ -17,7 +17,23 @@ $('#eventButton').click(function(e) {
 });
 
 $('#addNote').click(function(e) {
+	$('#newNote').modal('show');
 	return false;
+});
+$('#noteSubmit').click(function(e) {
+	$('#newNote').modal('hide');
+	var note = $('#newNote textarea').val();
+	$.ajax({
+			type: "POST",
+			url: "notes/add",
+			data: {
+				'note': note,
+				eventid: lastClickedEvent.id
+			}
+		}).done(function(msg) {
+			console.log('note added to event ID ' + lastClickedEvent.id + ': ' + note);
+		});
+	$('#newNote textarea').val('');
 });
 
 
@@ -161,7 +177,7 @@ StaffView = Backbone.View.extend({
             // Compile the template using underscore
             var template = _.template( $("#modal_template").html(), variables );
             // Load the compiled HTML into the Backbone "el"
-            $(".modal-body").html( template );
+            $("#staffEvent .modal-body").html( template );
         }
     });
 

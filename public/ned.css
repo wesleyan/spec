@@ -141,3 +141,9 @@ body {
 	border-top: 1px dashed #ccc !important;
 	font-size: 13px;
 }
+
+textarea{ 
+	width: 97%; 
+	height:50px; 
+	resize:vertical;
+}
