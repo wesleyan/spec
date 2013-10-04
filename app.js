@@ -149,11 +149,11 @@ var allInventory = [{
 		"text": "Video Camera",
 		"title": "This item needs to be recorded."
 	}, {
-		"id": "3",
+		"id": "6",
 		"text": "Camera",
 		"title": "This item needs to be recorded."
 	}, {
-		"id": "3",
+		"id": "7",
 		"text": "Tripod",
 		"title": "This item needs to be recorded."
 	}, {
@@ -165,7 +165,6 @@ var allInventory = [{
 		"text": "Projector",
 		"title": "This item needs to be recorded."
 	},
-
 	{
 		"id": "2",
 		"text": "Macbook Pro 13",

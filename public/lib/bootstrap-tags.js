@@ -7,7 +7,7 @@
         values_url: '',
 
         templates: {
-            pill: '<span class="badge badge-info tag-badge">{0}</span>',
+            pill: '<span class="badge btn-primary tag-badge">{0}</span>',
             add_pill: '<span class="badge tag-badge">...</span>',
             input_pill: '<span class="badge tag-badge"></span>',
             number: ' <sup><small>{0}</small></sup>',

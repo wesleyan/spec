@@ -88,11 +88,6 @@
 			<tr> <!-- rows that have been updated/fetched on the database should come before this-->
 				<td>
 					<select class="combobox input-medium" name="normal">
-		              <!--  <option value="PA">Maksim Trifunovski (mtrifunovski)</option>
-		                <option value="CT">Ted Kim (tskim)</option>
-		                <option value="NY">Heric Flores (hflores)</option>
-		                <option value="MD">Cumhur Korkut (ckorkut)</option>
-		                <option value="VA">John Doe (jdoe)</option>-->
 		              </select>
 				</td>
 				<td>
@@ -125,11 +120,12 @@
 		    <span id="popupTitle">Event Title</span> 
 
 		    <span class="pull-right">
-			    <div class="btn-group">
+		    <a id="popupTitleButton" class="btn btn-small" type="button" href="#staffEvent" data-toggle="modal"><i class="icon-plus icon-white"></i> <span id="popupStaffInfo"></span></a>
+			    <!--<div class="btn-group">
 			    	<button class="btn btn-small" data-toggle="collapse" data-target="#viewdetails"><i class="icon-wrench"></i></button>
 			    	
-			    	<a id="popupTitleButton" class="btn btn-small" type="button" href="#staffEvent" data-toggle="modal"><i class="icon-plus icon-white"></i> <span id="popupStaffInfo"></span></a>
-			    </div>
+			    	
+			    </div>-->
 		    </span>
 	    </h3>
 	    <div class="popover-content">
@@ -137,11 +133,41 @@
 	        </p>
 	        <span id="popupContentInside">
 	        </span>
-	        <div class="collapse" id="viewdetails">
-	        	<!--<input type="text" id="inventory" placeholder="The name of the item"/>-->
+
+	        <div class="accordion" id="popoverAccordion">
+			  <div class="accordion-group">
+			    <div class="accordion-heading drop-active">
+			      <a class="accordion-toggle" data-toggle="collapse" href="#collapseOne">
+			         <i class="icon-comment"></i> &nbsp;Notes
+			      </a>
+			    </div>
+			    <div id="collapseOne" class="accordion-body collapse">
+			      <div class="accordion-inner">
+			        Anim pariatur cliche...
+			      </div>
+			    </div>
+			  </div>
+			  <div class="accordion-group">
+			    <div class="accordion-heading drop-active">
+			      <a class="accordion-toggle" data-toggle="collapse" href="#collapseTwo">
+			        <i class="icon-wrench"></i> &nbsp;Inventory
+			      </a>
+			    </div>
+			    <div id="collapseTwo" class="accordion-body collapse">
+			      <div class="accordion-inner" id="inventory">
+			        
+			      </div>
+			    </div>
+			  </div>
+			</div>
+
+
+	        <!--<div class="collapse" id="viewdetails">
+	        	<input type="text" id="inventory" placeholder="The name of the item"/>
 	        	<div id="inventory"></div>
 
-	        </div>
+	        </div>-->
+	       
           
 	    </div>
 	</div>

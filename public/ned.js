@@ -147,20 +147,16 @@ $('a[href="#staffEvent"]').click(function(e) {
 
 
 // Solves Bootstrap typeahead dropdown problem
-$('.collapse').on({
-	hide: function() {
+
+$('#collapseTwo').on('click shown keydown', function() {
+		$(this).css('overflow', 'visible');
+	}).on('hide', function() {
 		$(this).css('overflow', 'hidden');
-	},
-	click: function() {
-		$('.collapse').css('overflow', 'visible');
-	},
-	shown: function() {
-		$('.collapse').css('overflow', 'visible');
-	}
-});
-$('button[data-target="#viewdetails"]').click(function() {
+	});
+
+/*$('button[data-target="#viewdetails"]').click(function() {
 	$(this).toggleClass("active");
-});
+});*/
 
 var _inventoryProto = {
 	suggestion_url: "inventory/all",
