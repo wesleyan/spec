@@ -235,7 +235,7 @@ var existingNotes = [{
 }, {
 	id: 2,
 	text: 'SHADOWING: Austin (dpham@wesleyan.edu)',
-	user: 'pinoa',
+	user: 'ckorkut',
 	date: new Date(y, m, d, 7 - diff, 45)
 }, 
 ];
@@ -252,7 +252,7 @@ var existingNotes = [{
 		res.end();
 	});
 
-	//Inventory Update
+	//Notes Update
 		//Add inventory to an event (POST)
 		app.post("/notes/add", function(req, res) {
 			//req.url
@@ -260,14 +260,15 @@ var existingNotes = [{
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
-			res.write(JSON.stringify(true).toString("utf-8"));
+			var noteId = 5;
+			res.write(JSON.stringify({'id':noteId}).toString("utf-8"));
 			res.end();
 		});
 
 		//Remove inventory from an event (POST)
 		app.post("/notes/remove", function(req, res) {
 			//req.url
-			console.log("Req for removing inventory ID " + req.body.inventoryid + " from Event ID " + req.body.eventid);
+			console.log("Req for removing note ID " + req.body.id + " from Event ID " + req.body.eventid);
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});

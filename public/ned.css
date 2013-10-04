@@ -147,3 +147,7 @@ textarea{
 	height:50px; 
 	resize:vertical;
 }
+
+.removeNote {
+	font-size: 10px;
+}

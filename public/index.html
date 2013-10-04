@@ -224,7 +224,7 @@
 	     			<br>
 	     			<span class="label"><%= note.user %> | <%= defaults.monthNamesShort[note.date.getMonth()] %> <%= note.date.getDate() %></span>
 					<% if(note.user == username) { %>
-	     				<span class="pull-right badge badge-important"><i class="icon-remove icon-white"></i></span>
+	     				<span class="pull-right btn btn-mini btn-danger removeNote" href="<%= note.id %>"><i class="icon-remove icon-white"></i></span>
 	     			<% } %>
 	     		</td>
 		   	</tr>

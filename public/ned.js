@@ -41,7 +41,7 @@ $('#eventButton').click(function(e) {
 			}
 		}).done(function(msg) {
 			console.log('note added to event ID ' + lastClickedEvent.id + ': ' + note);
-
+			//console.log(msg);
 			var each_note_view = new EachNoteView({ //Backbone new note view used
 				'eventid': lastClickedEvent.id,
 				'note': {
@@ -51,10 +51,11 @@ $('#eventButton').click(function(e) {
 					'date': new Date()
 				}
 			});
-
 		});
 		$('#newNote textarea').val('');
 	});
+
+	//$('.removeNote').on('click',function(e) {alert('hpkajsna');});
 
 resizeMap = function() {
 	var column_height = $(window).height();
@@ -188,7 +189,28 @@ NotesView = Backbone.View.extend({
 EachNoteView = Backbone.View.extend({
         initialize: function(){
             this.render();
-        },
+
+            //Note deleting (I couldn't understand why I have to bind this again after each note addition, PROBLEM!!)
+            var removedItem;
+            $('.removeNote').unbind( "click" );
+			$('.removeNote').on('click', function(e) {
+				removedItem = this;
+				var noteid = $(this).attr('href');
+				$.ajax({
+					type: "POST",
+					url: "notes/remove",
+					data: {
+						'id': noteid,
+						eventid: lastClickedEvent.id
+					}
+				}).done(function(msg) {
+					console.log('note removed from event ID ' + lastClickedEvent.id + ', ID: ' + noteid);
+					$(removedItem).parent().parent().remove();
+				});
+				return false;
+			});
+
+        }, //end of initialize
         render: function(){
             var variables = { eventid: this.options.eventid, 'note': this.options.note };
             var template = _.template( $("#each_note_template").html(), variables );
