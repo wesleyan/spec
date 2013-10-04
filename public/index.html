@@ -195,6 +195,13 @@
 	<script type="text/template" id="notes_template">
 	    This is the Event with ID <%= eventid %> and this is rendered by Backbone.js
 	</script>
+	<script type="text/template" id="staff_template">
+	    This is the staff rendering with ID <%= eventid %> and this is rendered by Backbone.js
+	    <%= staff %>
+	    <% _.each( staff, function( item, i ){ %>
+		   <%= item %>
+		<% }); %>
+	</script>
 
   </body>
 </html>

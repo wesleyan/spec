@@ -138,13 +138,28 @@ NotesView = Backbone.View.extend({
         render: function(){
             //Pass variables in using Underscore.js Template
             var variables = { eventid: this.options.eventid };
-            console.log(this);
             // Compile the template using underscore
             var template = _.template( $("#notes_template").html(), variables );
             // Load the compiled HTML into the Backbone "el"
             $("#notes").html( template );
         }
     });
+
+//incomplete
+StaffView = Backbone.View.extend({
+        initialize: function(){
+            this.render();
+        },
+        render: function(){
+            //Pass variables in using Underscore.js Template
+            var variables = { eventid: this.options.eventid };
+            // Compile the template using underscore
+            var template = _.template( $(".modal-body").html(), variables );
+            // Load the compiled HTML into the Backbone "el"
+            $("#notes").html( template );
+        }
+    });
+
 
 
 
@@ -157,9 +172,10 @@ $('a[href="#staffEvent"]').click(function(e) {
 		type: "GET",
 		url: "staff/get/" + lastClickedEvent.id,
 	}).done(function(staff) {
-		$.each(staff, function(key, value) {
-			//staff rendering will happen here
-		});
+		//staff rendering will happen here
+		var staff_view = new StaffView({ 'event': lastClickedEvent, 'staff': staff });
+		/*$.each(staff, function(key, value) {
+		});*/
 	});
 });
 
@@ -253,7 +269,7 @@ $(document).ready(function() {
 			$('#eventButton').removeClass('disabled');
 			changePopupColor(calEvent);
 
-			//Popover update with event information
+			//Popover update with event information (can be hidden in a Backbone view)
 			$('#popupTitle').html(symbol + calEvent.title);
 			$('#popupStaffInfo').html(calEvent.staffAdded + '/' + calEvent.staffNeeded);
 			$('#popupContentInside').html(calEvent.desc);
