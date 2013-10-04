@@ -227,6 +227,54 @@ var existingInventory = [{
 			res.end();
 		});
 
+var existingNotes = [{
+	id: 1,
+	text: 'SHADOWING: Cloie (clogan@wesleyan.edu)',
+	user: 'dsongcho',
+	date: new Date(y, m, d, 8 - diff, 45)
+}, {
+	id: 2,
+	text: 'SHADOWING: Austin (dpham@wesleyan.edu)',
+	user: 'pinoa',
+	date: new Date(y, m, d, 7 - diff, 45)
+}, 
+];
+
+// NOTES
+	//Existing notes for each event
+	app.get("/notes/existing/:id", function(req, res) {
+		//req.url
+		console.log("Req for fetching notes of Event ID " + req.params.id);
+		res.writeHead(200, {
+			'Content-Type': 'application/json'
+		});
+		res.write(JSON.stringify(existingNotes).toString("utf-8"));
+		res.end();
+	});
+
+	//Inventory Update
+		//Add inventory to an event (POST)
+		app.post("/notes/add", function(req, res) {
+			//req.url
+			console.log("Req for adding inventory ID " + req.body.inventoryid + " to Event ID " + req.body.eventid);
+			res.writeHead(200, {
+				'Content-Type': 'application/json'
+			});
+			res.write(JSON.stringify(true).toString("utf-8"));
+			res.end();
+		});
+
+		//Remove inventory from an event (POST)
+		app.post("/notes/remove", function(req, res) {
+			//req.url
+			console.log("Req for removing inventory ID " + req.body.inventoryid + " from Event ID " + req.body.eventid);
+			res.writeHead(200, {
+				'Content-Type': 'application/json'
+			});
+			res.write(JSON.stringify(true).toString("utf-8"));
+			res.end();
+		});
+
 // STAFF
 var existingStaff = {
 			'mtrifunovski': 'Maksim Trifunovski (mtrifunovski)',

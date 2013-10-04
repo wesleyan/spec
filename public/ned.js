@@ -137,7 +137,7 @@ NotesView = Backbone.View.extend({
         },
         render: function(){
             //Pass variables in using Underscore.js Template
-            var variables = { eventid: this.options.eventid };
+            var variables = { eventid: this.options.eventid, notes: this.options.notes };
             // Compile the template using underscore
             var template = _.template( $("#notes_template").html(), variables );
             // Load the compiled HTML into the Backbone "el"
@@ -152,11 +152,11 @@ StaffView = Backbone.View.extend({
         },
         render: function(){
             //Pass variables in using Underscore.js Template
-            var variables = { eventid: this.options.eventid };
+            var variables = { eventid: this.options.eventid, 'staff': this.options.staff };
             // Compile the template using underscore
-            var template = _.template( $(".modal-body").html(), variables );
+            var template = _.template( $("#modal_template").html(), variables );
             // Load the compiled HTML into the Backbone "el"
-            $("#notes").html( template );
+            $(".modal-body").html( template );
         }
     });
 
@@ -284,8 +284,12 @@ $(document).ready(function() {
 			$('#inventory').tags(inventoryOptions);
 
 			//Notes update
-			var note_view = new NotesView({ eventid: calEvent.id });
-
+			$.ajax({
+				type: "GET",
+				url: "notes/existing/" + calEvent.id,
+			}).done(function(notes) {
+				var note_view = new NotesView({ 'eventid': calEvent.id, 'notes':notes });
+			});
 			lastClickedEvent = calEvent;
 		},
 		eventRightClick: function(calEvent, jsEvent, view) {

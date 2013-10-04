@@ -193,7 +193,24 @@
 
 
 	<script type="text/template" id="notes_template">
-	    This is the Event with ID <%= eventid %> and this is rendered by Backbone.js
+	    <table class="table table-hover table-condensed">
+		    <tbody>
+			     <% _.each( notes, function( item, i ){ 
+			     	item.date = new Date(Date.parse(item.date));
+			     	%>
+			     	<tr>
+			     		<td class="notesTable">
+			     			<%= item.text %>
+			     			<br>
+			     			<span class="label"><%= item.user %> | <%= defaults.monthNamesShort[item.date.getMonth()] %> <%= item.date.getDate() %></span>
+			     			
+			     		</td>
+
+				   	</tr>
+				<% }); %>
+		    </tbody>
+	    </table>
+	    <span class="pull-right"><button class="btn btn-mini" type="button"><i class="icon-plus"></i></button></span>
 	</script>
 	<script type="text/template" id="staff_template">
 	    This is the staff rendering with ID <%= eventid %> and this is rendered by Backbone.js
