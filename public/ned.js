@@ -16,6 +16,11 @@ $('#eventButton').click(function(e) {
 	$('#popup').modalPopover('hide');
 });
 
+$('#addNote').click(function(e) {
+	return false;
+});
+
+
 resizeMap = function() {
 	var column_height = $(window).height();
 	$('#calendar').fullCalendar('option', 'height', column_height - 40);

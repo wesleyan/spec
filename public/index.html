@@ -139,7 +139,9 @@
 			    <div class="accordion-heading drop-active">
 			      <a class="accordion-toggle" data-toggle="collapse" href="#collapseOne">
 			         <i class="icon-comment"></i> &nbsp;Notes
+			         <span class="pull-right"><button class="btn btn-mini btn-inverse" type="button" id="addNote"><i class="icon-plus icon-white"></i></button></span>
 			      </a>
+			      
 			    </div>
 			    <div id="collapseOne" class="accordion-body collapse">
 			      <div class="accordion-inner" id="notes">
@@ -210,7 +212,7 @@
 				<% }); %>
 		    </tbody>
 	    </table>
-	    <span class="pull-right"><button class="btn btn-mini" type="button"><i class="icon-plus"></i></button></span>
+	    
 	</script>
 	<script type="text/template" id="staff_template">
 	    This is the staff rendering with ID <%= eventid %> and this is rendered by Backbone.js
