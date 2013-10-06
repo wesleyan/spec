@@ -36,7 +36,18 @@ var events = [{
 		"id": "4",
 		"text": "Video Camera",
 		"title": "This item needs to be recorded."
-	},]
+	},],
+	notes: [{
+		id: 1,
+		text: 'SHADOWING: Cloie (clogan@wesleyan.edu)',
+		user: 'ckorkut',
+		date: new Date(y, m, d, 8 - diff, 45)
+	}, {
+		id: 2,
+		text: 'SHADOWING: Austin (dpham@wesleyan.edu)',
+		user: 'tskim',
+		date: new Date(y, m, d, 7 - diff, 45)
+	}, ]
 }, {
 	id: 2,
 	title: 'Reception: Prof. F. Reeve Memorial & Reception',
@@ -54,7 +65,18 @@ var events = [{
 		"id": "2",
 		"text": "Macbook Pro 13",
 		"title": "This item needs to be recorded."
-	},]
+	},],
+	notes: [{
+		id: 1,
+		text: 'SHADOWING: Cloie (clogan@wesleyan.edu)',
+		user: 'dsongcho',
+		date: new Date(y, m, d, 8 - diff, 45)
+	}, {
+		id: 2,
+		text: 'SHADOWING: Austin (dpham@wesleyan.edu)',
+		user: 'ckorkut',
+		date: new Date(y, m, d, 7 - diff, 45)
+	}, ]
 }, {
 	id: 3,
 	title: 'Dance Presentation',
@@ -76,7 +98,18 @@ var events = [{
 		"id": "6",
 		"text": "Camera",
 		"title": "This item needs to be recorded."
-	}]
+	}],
+	notes: [{
+		id: 1,
+		text: 'SHADOWING: Cloie (clogan@wesleyan.edu)',
+		user: 'dsongcho',
+		date: new Date(y, m, d, 8 - diff, 45)
+	}, {
+		id: 2,
+		text: 'SHADOWING: Austin (dpham@wesleyan.edu)',
+		user: 'ckorkut',
+		date: new Date(y, m, d, 7 - diff, 45)
+	}, ]
 }, {
 	id: 4,
 	title: 'Meeting',
@@ -92,7 +125,18 @@ var events = [{
 		"id": "4",
 		"text": "Video Camera",
 		"title": "This item needs to be recorded."
-	},]
+	},],
+	notes: [{
+		id: 1,
+		text: 'SHADOWING: Cloie (clogan@wesleyan.edu)',
+		user: 'dsongcho',
+		date: new Date(y, m, d, 8 - diff, 45)
+	}, {
+		id: 2,
+		text: 'SHADOWING: Austin (dpham@wesleyan.edu)',
+		user: 'ckorkut',
+		date: new Date(y, m, d, 7 - diff, 45)
+	}, ]
 }, {
 	id: 5,
 	title: 'Lunch',
@@ -110,7 +154,18 @@ var events = [{
 		"id": "1",
 		"text": "Projector",
 		"title": "This item needs to be recorded."
-	},]
+	},],
+	notes: [{
+		id: 1,
+		text: 'SHADOWING: Cloie (clogan@wesleyan.edu)',
+		user: 'dsongcho',
+		date: new Date(y, m, d, 8 - diff, 45)
+	}, {
+		id: 2,
+		text: 'SHADOWING: Austin (dpham@wesleyan.edu)',
+		user: 'ckorkut',
+		date: new Date(y, m, d, 7 - diff, 45)
+	}, ]
 }, {
 	id: 6,
 	title: 'Birthday Party',
@@ -127,7 +182,18 @@ var events = [{
 		"id": "4",
 		"text": "Video Camera",
 		"title": "This item needs to be recorded."
-	},]
+	},],
+	notes: [{
+		id: 1,
+		text: 'SHADOWING: Cloie (clogan@wesleyan.edu)',
+		user: 'dsongcho',
+		date: new Date(y, m, d, 8 - diff, 45)
+	}, {
+		id: 2,
+		text: 'SHADOWING: Austin (dpham@wesleyan.edu)',
+		user: 'ckorkut',
+		date: new Date(y, m, d, 7 - diff, 45)
+	}, ]
 	//url: 'http://google.com/'
 }];
 
@@ -262,28 +328,19 @@ var allInventory = [{
 			res.end();
 		});
 
-var existingNotes = [{
-	id: 1,
-	text: 'SHADOWING: Cloie (clogan@wesleyan.edu)',
-	user: 'dsongcho',
-	date: new Date(y, m, d, 8 - diff, 45)
-}, {
-	id: 2,
-	text: 'SHADOWING: Austin (dpham@wesleyan.edu)',
-	user: 'ckorkut',
-	date: new Date(y, m, d, 7 - diff, 45)
-}, 
-];
-
 // NOTES
 	//Existing notes for each event
 	app.get("/notes/existing/:id", function(req, res) {
 		//req.url
 		console.log("Req for fetching notes of Event ID " + req.params.id);
+		//Event filtering and inventory
+		var selectedEvent = events.filter(function(event) {
+			return event.id == req.params.id;
+		})[0];
 		res.writeHead(200, {
 			'Content-Type': 'application/json'
 		});
-		res.write(JSON.stringify(existingNotes).toString("utf-8"));
+		res.write(JSON.stringify(selectedEvent.notes).toString("utf-8"));
 		res.end();
 	});
 
