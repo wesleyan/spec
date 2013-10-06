@@ -37,7 +37,7 @@ $('#eventButton').click(function(e) {
 			url: "notes/add",
 			data: {
 				'note': note,
-				eventid: lastClickedEvent.id
+				eventid: lastClickedEvent[_id]
 			}
 		}).done(function(msg) {
 			console.log('note added to event ID ' + lastClickedEvent.id + ': ' + note);
@@ -201,7 +201,7 @@ EachNoteView = Backbone.View.extend({
 					url: "notes/remove",
 					data: {
 						'id': noteid,
-						eventid: lastClickedEvent.id
+						eventid: lastClickedEvent[_id]
 					}
 				}).done(function(msg) {
 					console.log('note removed from event ID ' + lastClickedEvent.id + ', ID: ' + noteid);
@@ -265,7 +265,7 @@ var _inventoryProto = {
 			type: "POST",
 			url: "inventory/remove",
 			data: {
-				eventid: lastClickedEvent.id,
+				eventid: lastClickedEvent[_id],
 				inventoryid:pill.data('tag-id')
 			}
 		}).done(function(msg) {
@@ -283,7 +283,7 @@ var _inventoryProto = {
 			type: "POST",
 			url: "inventory/add",
 			data: {
-				eventid: lastClickedEvent.id,
+				eventid: lastClickedEvent[_id],
 				inventoryid: pill.data('tag-id')
 			}
 		}).done(function(msg) {
@@ -341,7 +341,7 @@ $(document).ready(function() {
 			
 			//Inventory update
 			var inventoryOptions = {
-				values_url: 'inventory/existing/' + calEvent.id,
+				values_url: 'inventory/existing/' + calEvent['_id'],
 			};
 			$.extend(inventoryOptions,_inventoryProto);
 			$('#inventory').html('');
@@ -350,9 +350,9 @@ $(document).ready(function() {
 			//Notes update
 			$.ajax({
 				type: "GET",
-				url: "notes/existing/" + calEvent.id,
+				url: "notes/existing/" + calEvent['_id'],
 			}).done(function(notes) {
-				var note_view = new NotesView({ 'eventid': calEvent.id, 'notes':notes });
+				var note_view = new NotesView({ 'eventid': calEvent['_id'], 'notes':notes });
 			});
 			lastClickedEvent = calEvent;
 		},
