@@ -3,6 +3,7 @@ var express = require('express');
 
 var app = express();
 var path = require('path');
+var sugar = require('sugar');
 
 var date = new Date();
 //var diff = date.getTimezoneOffset()/60;
@@ -30,7 +31,12 @@ var events = [{
 	end: new Date(y, m, d, 13 - diff, 30),
 	valid: true,
 	duration: true,
-	people: ['ckorkut']
+	people: ['ckorkut'],
+	inventory: [{
+		"id": "4",
+		"text": "Video Camera",
+		"title": "This item needs to be recorded."
+	},]
 }, {
 	id: 2,
 	title: 'Reception: Prof. F. Reeve Memorial & Reception',
@@ -43,7 +49,12 @@ var events = [{
 	valid: true,
 	duration: false,
 	className: ['striped'],
-	people: ['tskim']
+	people: ['tskim'],
+	inventory: [{
+		"id": "2",
+		"text": "Macbook Pro 13",
+		"title": "This item needs to be recorded."
+	},]
 }, {
 	id: 3,
 	title: 'Dance Presentation',
@@ -56,7 +67,16 @@ var events = [{
 	valid: true,
 	video: true,
 	duration: true,
-	people: ['jgoh', 'ckorkut']
+	people: ['jgoh', 'ckorkut'],
+	inventory: [{
+		"id": "4",
+		"text": "Video Camera",
+		"title": "This item needs to be recorded."
+	},{
+		"id": "6",
+		"text": "Camera",
+		"title": "This item needs to be recorded."
+	}]
 }, {
 	id: 4,
 	title: 'Meeting',
@@ -67,7 +87,12 @@ var events = [{
 	start: new Date(y, m, d + 1, 10 - diff, 30),
 	valid: false,
 	duration: true,
-	people: ['hflores']
+	people: ['hflores'],
+	inventory: [{
+		"id": "4",
+		"text": "Video Camera",
+		"title": "This item needs to be recorded."
+	},]
 }, {
 	id: 5,
 	title: 'Lunch',
@@ -80,7 +105,12 @@ var events = [{
 	valid: true,
 	duration: false,
 	className: ['striped'],
-	people: ['hflores']
+	people: ['hflores'],
+	inventory: [{
+		"id": "1",
+		"text": "Projector",
+		"title": "This item needs to be recorded."
+	},]
 }, {
 	id: 6,
 	title: 'Birthday Party',
@@ -92,7 +122,12 @@ var events = [{
 	end: new Date(y, m, d + 2, 2 - diff, 30),
 	valid: true,
 	duration: true,
-	people: []
+	people: [],
+	inventory: [{
+		"id": "4",
+		"text": "Video Camera",
+		"title": "This item needs to be recorded."
+	},]
 	//url: 'http://google.com/'
 }];
 
@@ -175,11 +210,6 @@ var allInventory = [{
 		"title": "This item needs to be recorded."
 	}
 ];
-var existingInventory = [{
-	"id": "4",
-	"text": "Video Camera",
-	"title": "This item needs to be recorded."
-}];
 
 // INVENTORY
 	// All inventory
@@ -200,7 +230,11 @@ var existingInventory = [{
 		res.writeHead(200, {
 			'Content-Type': 'application/json'
 		});
-		res.write(JSON.stringify(existingInventory).toString("utf-8"));
+		//Event filtering and inventory
+		var selectedEvent = events.filter(function(event) {
+			return event.id == req.params.id;
+		})[0];
+		res.write(JSON.stringify(selectedEvent.inventory).toString("utf-8"));
 		res.end();
 	});
 
@@ -212,6 +246,7 @@ var existingInventory = [{
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
+
 			res.write(JSON.stringify(true).toString("utf-8"));
 			res.end();
 		});
