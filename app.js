@@ -18,19 +18,19 @@ var d = date.getDate();
 var m = date.getMonth();
 var y = date.getFullYear();
 
-var color = {
-	'green': '#097054',
-	'red': '#9E3B33',
-	'yellow': '#E48743',
-	'gray': '#666666'
-}
-
-
-// if duration==false then 	className: ['striped'],
 
 function addBackgroundColor(events) { //changes the events object
+	var color = {
+		'green': '#097054',
+		'red': '#9E3B33',
+		'yellow': '#E48743',
+		'gray': '#666666'
+	};
 	for (index = 0; index < events.length; ++index) {
 		event = events[index];
+		if(event.duration == false) {
+			events[index]['className'] = ['striped']; //handles the setup and breakdown events as well
+		}
 		if (event.valid == false) {
 			events[index]['backgroundColor'] = color.gray;
 		} else if (event.staffAdded == 0) {
@@ -79,7 +79,7 @@ app.get("/events", function(req, res) {
 });
 
 app.get('/printtoday', function(req, res) {
-	res.render('printtoday')
+	res.render('printtoday');
 });
 
 
@@ -155,12 +155,22 @@ var allInventory = [{
 		app.post("/inventory/add", function(req, res) {
 			//req.url
 			console.log("Req for adding inventory ID " + req.body.inventoryid + " to Event ID " + req.body.eventid);
+			//frontend checks for the same inventory adding, so no control needed for that
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
-
-			res.write(JSON.stringify(true).toString("utf-8"));
-			res.end();
+			//this is so much problematic for now, figure out the inventory id thing, try to assign new _id to them if possible
+			db.users.update({_id: new mongo.ObjectID(req.params.eventid), //select
+							{ $push: { inventory: { $each: [{text: req.body.inventoryid}] } } }, 
+							function(err, updated) {
+								if (err || !updated) {
+									console.log("Inventory not added");
+								} else {
+									console.log("Inventory added");
+									res.write(JSON.stringify(true).toString("utf-8"));
+									res.end();
+								}
+							});
 		});
 
 		//Remove inventory from an event (POST)
