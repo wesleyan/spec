@@ -39,13 +39,13 @@ $('#eventButton').click(function(e) {
 				'note': note,
 				eventid: lastClickedEvent['_id']
 			}
-		}).done(function(msg) {
+		}).done(function(noteid) {
 			console.log('note added to event ID ' + lastClickedEvent['_id'] + ': ' + note);
 			//console.log(msg);
 			var each_note_view = new EachNoteView({ //Backbone new note view used
 				'eventid': lastClickedEvent.id,
 				'note': {
-					'id': msg.id,
+					'id': noteid,
 					'text': note,
 					'user': username,
 					'date': new Date()

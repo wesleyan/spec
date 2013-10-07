@@ -226,17 +226,17 @@ var allInventory = [{
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
-			var generatedID;
+			var generatedID = new mongo.ObjectID();
 			var fetchUser;
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
-				{ $addToSet: {'notes': {'id': req.body.generatedID, 'text': req.body.note,'user': fetchUser, 'date': new Date()}} }, 
+				{ $addToSet: {'notes': {'id': generatedID, 'text': req.body.note,'user': fetchUser, 'date': new Date()}} }, 
 				function(err, updated) {
 					if (err || !updated) {
 						console.log("Note not added:" + err);
 					} else {
 						console.log("Note added");
-						res.write(JSON.stringify(true).toString("utf-8"));
+						res.write(JSON.stringify(generatedID.toString()).toString("utf-8"));
 						res.end();
 					}
 				});
@@ -251,7 +251,7 @@ var allInventory = [{
 			});
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
-				{ $pull: {'notes': {'id': req.body.id} } }, 
+				{ $pull: {'notes': {'id': new mongo.ObjectID(req.body.id)} } }, 
 				function(err, updated) {
 					if (err || !updated) {
 						console.log("Note not removed:" + err);
