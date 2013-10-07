@@ -205,9 +205,6 @@ var allInventory = [{
 		//req.url
 		console.log("Req for fetching notes of Event ID " + req.params.id);
 		//Event filtering and inventory
-		/*var selectedEvent = events.filter(function(event) {
-			return event.id == req.params.id;
-		})[0];*/
 		res.writeHead(200, {
 			'Content-Type': 'application/json'
 		});
@@ -219,21 +216,30 @@ var allInventory = [{
 				res.end();
 			}
 		});
-		/*res.write(JSON.stringify(selectedEvent.notes).toString("utf-8"));
-		res.end();*/
 	});
 
 	//Notes Update
-		//Add inventory to an event (POST)
+		//Add inventory to an event (POST) - not tested
 		app.post("/notes/add", function(req, res) {
 			//req.url
 			console.log("Req for adding note \"" + req.body.note + "\" to Event ID " + req.body.eventid);
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
-			var noteId = 5;
-			res.write(JSON.stringify({'id':noteId}).toString("utf-8"));
-			res.end();
+			var generatedID;
+			var fetchUser;
+			db.events.update(
+				{_id: new mongo.ObjectID(req.body.eventid)},
+				{ $addToSet: {'notes': {'id': req.body.generatedID, 'text': req.body.note,'user': fetchUser, 'date': new Date()}} }, 
+				function(err, updated) {
+					if (err || !updated) {
+						console.log("Note not added:" + err);
+					} else {
+						console.log("Note added");
+						res.write(JSON.stringify(true).toString("utf-8"));
+						res.end();
+					}
+				});
 		});
 
 		//Remove inventory from an event (POST)
@@ -243,8 +249,18 @@ var allInventory = [{
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
-			res.write(JSON.stringify(true).toString("utf-8"));
-			res.end();
+			db.events.update(
+				{_id: new mongo.ObjectID(req.body.eventid)},
+				{ $pull: {'notes': {'id': req.body.id} } }, 
+				function(err, updated) {
+					if (err || !updated) {
+						console.log("Note not removed:" + err);
+					} else {
+						console.log("Note removed");
+						res.write(JSON.stringify(true).toString("utf-8"));
+						res.end();
+					}
+				});
 		});
 
 // STAFF

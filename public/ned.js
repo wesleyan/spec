@@ -257,6 +257,7 @@ $('#collapseTwo').on('click shown keydown', function() {
 	});
 
 var _inventoryProto = {
+	only_suggestions: true,
 	suggestion_url: "inventory/all",
 	//These methods below have to send AJAX requests to update the inventory.
 	onRemove: function(pill) {
