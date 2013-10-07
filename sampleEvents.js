@@ -1,6 +1,15 @@
 var databaseUrl = "spec"; // "username:password@example.com/mydb"
 var collections = ["events"]
 var db = require("mongojs").connect(databaseUrl, collections);
+var mongo = require('mongodb-wrapper');
+var date = new Date();
+//var diff = date.getTimezoneOffset()/60;
+var diff = 0;
+
+var d = date.getDate();
+var m = date.getMonth();
+var y = date.getFullYear();
+
 var events = [{
 	title: 'Luncheon: Division III NSM Luncheon',
 	desc: 'Please arrive at 11:30 am to help set up the existing projector and screen. Client will bring their own PC laptop.',
@@ -18,12 +27,12 @@ var events = [{
 		"title": "This item needs to be recorded."
 	},],
 	notes: [{
-		id: 1,
+		id: new mongo.ObjectID(),
 		text: 'SHADOWING: Cloie (clogan@wesleyan.edu)',
 		user: 'ckorkut',
 		date: new Date(y, m, d, 8 - diff, 45)
 	}, {
-		id: 2,
+		id: new mongo.ObjectID(),
 		text: 'SHADOWING: Austin (dpham@wesleyan.edu)',
 		user: 'tskim',
 		date: new Date(y, m, d, 7 - diff, 45)
@@ -45,12 +54,12 @@ var events = [{
 		"title": "This item needs to be recorded."
 	},],
 	notes: [{
-		id: 1,
+		id: new mongo.ObjectID(),
 		text: 'SHADOWING: Cloie (clogan@wesleyan.edu)',
 		user: 'dsongcho',
 		date: new Date(y, m, d, 8 - diff, 45)
 	}, {
-		id: 2,
+		id: new mongo.ObjectID(),
 		text: 'SHADOWING: Austin (dpham@wesleyan.edu)',
 		user: 'ckorkut',
 		date: new Date(y, m, d, 7 - diff, 45)
@@ -77,12 +86,12 @@ var events = [{
 		"title": "This item needs to be recorded."
 	}],
 	notes: [{
-		id: 1,
+		id: new mongo.ObjectID(),
 		text: 'SHADOWING: Cloie (clogan@wesleyan.edu)',
 		user: 'dsongcho',
 		date: new Date(y, m, d, 8 - diff, 45)
 	}, {
-		id: 2,
+		id: new mongo.ObjectID(),
 		text: 'SHADOWING: Austin (dpham@wesleyan.edu)',
 		user: 'ckorkut',
 		date: new Date(y, m, d, 7 - diff, 45)
@@ -103,12 +112,12 @@ var events = [{
 		"title": "This item needs to be recorded."
 	},],
 	notes: [{
-		id: 1,
+		id: new mongo.ObjectID(),
 		text: 'SHADOWING: Cloie (clogan@wesleyan.edu)',
 		user: 'dsongcho',
 		date: new Date(y, m, d, 8 - diff, 45)
 	}, {
-		id: 2,
+		id: new mongo.ObjectID(),
 		text: 'SHADOWING: Austin (dpham@wesleyan.edu)',
 		user: 'ckorkut',
 		date: new Date(y, m, d, 7 - diff, 45)
@@ -130,12 +139,12 @@ var events = [{
 		"title": "This item needs to be recorded."
 	},],
 	notes: [{
-		id: 1,
+		id: new mongo.ObjectID(),
 		text: 'SHADOWING: Cloie (clogan@wesleyan.edu)',
 		user: 'dsongcho',
 		date: new Date(y, m, d, 8 - diff, 45)
 	}, {
-		id: 2,
+		id: new mongo.ObjectID(),
 		text: 'SHADOWING: Austin (dpham@wesleyan.edu)',
 		user: 'ckorkut',
 		date: new Date(y, m, d, 7 - diff, 45)
@@ -157,12 +166,12 @@ var events = [{
 		"title": "This item needs to be recorded."
 	},],
 	notes: [{
-		id: 1,
+		id: new mongo.ObjectID(),
 		text: 'SHADOWING: Cloie (clogan@wesleyan.edu)',
 		user: 'dsongcho',
 		date: new Date(y, m, d, 8 - diff, 45)
 	}, {
-		id: 2,
+		id: new mongo.ObjectID(),
 		text: 'SHADOWING: Austin (dpham@wesleyan.edu)',
 		user: 'ckorkut',
 		date: new Date(y, m, d, 7 - diff, 45)
@@ -170,7 +179,7 @@ var events = [{
 }];
 events.forEach(function(event) {
 	db.events.save(event, function(err, saved) {
-		if (err || !saved) console.log("User not saved");
-		else console.log("User saved");
+		if (err || !saved) console.log("Event not saved");
+		else console.log("Event saved");
 	});
 });
