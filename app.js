@@ -84,32 +84,32 @@ app.get('/printtoday', function(req, res) {
 
 
 var allInventory = [{
-		"id": "4",
+		"id": 4,
 		"text": "Video Camera",
 		"title": "This item needs to be recorded."
 	}, {
-		"id": "6",
+		"id": 6,
 		"text": "Camera",
 		"title": "This item needs to be recorded."
 	}, {
-		"id": "7",
+		"id": 7,
 		"text": "Tripod",
 		"title": "This item needs to be recorded."
 	}, {
-		"id": "5",
+		"id": 5,
 		"text": "HDMI Cable",
 		"title": "This item needs to be recorded."
 	}, {
-		"id": "1",
+		"id": 1,
 		"text": "Projector",
 		"title": "This item needs to be recorded."
 	},
 	{
-		"id": "2",
+		"id": 2,
 		"text": "Macbook Pro 13",
 		"title": "This item needs to be recorded."
 	}, {
-		"id": "3",
+		"id": 3,
 		"text": "iMac 21.5",
 		"title": "This item needs to be recorded."
 	}
@@ -159,12 +159,17 @@ var allInventory = [{
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
+			 //try to find the thing by its id and use the same data
+			var selectedInventory = allInventory.filter(function(thing) {
+				return thing.id == req.body.inventoryid;
+			})[0];
+			
 			//this is so much problematic for now, figure out the inventory id thing, try to assign new _id to them if possible
-			db.users.update({_id: new mongo.ObjectID(req.params.eventid), //select
-							{ $push: { inventory: { $each: [{text: req.body.inventoryid}] } } }, 
+			db.events.update({_id: new mongo.ObjectID(req.body.eventid)},
+							{ $addToSet: {'inventory': {'id': req.body.inventoryid, 'text': selectedInventory.text,'title': selectedInventory.title}} }, 
 							function(err, updated) {
 								if (err || !updated) {
-									console.log("Inventory not added");
+									console.log("Inventory not added:" + err);
 								} else {
 									console.log("Inventory added");
 									res.write(JSON.stringify(true).toString("utf-8"));

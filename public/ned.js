@@ -37,10 +37,10 @@ $('#eventButton').click(function(e) {
 			url: "notes/add",
 			data: {
 				'note': note,
-				eventid: lastClickedEvent[_id]
+				eventid: lastClickedEvent['_id']
 			}
 		}).done(function(msg) {
-			console.log('note added to event ID ' + lastClickedEvent.id + ': ' + note);
+			console.log('note added to event ID ' + lastClickedEvent['_id'] + ': ' + note);
 			//console.log(msg);
 			var each_note_view = new EachNoteView({ //Backbone new note view used
 				'eventid': lastClickedEvent.id,
@@ -201,7 +201,7 @@ EachNoteView = Backbone.View.extend({
 					url: "notes/remove",
 					data: {
 						'id': noteid,
-						eventid: lastClickedEvent[_id]
+						eventid: lastClickedEvent['_id']
 					}
 				}).done(function(msg) {
 					console.log('note removed from event ID ' + lastClickedEvent.id + ', ID: ' + noteid);
@@ -265,7 +265,7 @@ var _inventoryProto = {
 			type: "POST",
 			url: "inventory/remove",
 			data: {
-				eventid: lastClickedEvent[_id],
+				eventid: lastClickedEvent['_id'],
 				inventoryid:pill.data('tag-id')
 			}
 		}).done(function(msg) {
@@ -283,7 +283,7 @@ var _inventoryProto = {
 			type: "POST",
 			url: "inventory/add",
 			data: {
-				eventid: lastClickedEvent[_id],
+				eventid: lastClickedEvent['_id'],
 				inventoryid: pill.data('tag-id')
 			}
 		}).done(function(msg) {
