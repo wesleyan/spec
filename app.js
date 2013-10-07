@@ -164,18 +164,18 @@ var allInventory = [{
 				return thing.id == req.body.inventoryid;
 			})[0];
 			
-			//this is so much problematic for now, figure out the inventory id thing, try to assign new _id to them if possible
-			db.events.update({_id: new mongo.ObjectID(req.body.eventid)},
-							{ $addToSet: {'inventory': {'id': req.body.inventoryid, 'text': selectedInventory.text,'title': selectedInventory.title}} }, 
-							function(err, updated) {
-								if (err || !updated) {
-									console.log("Inventory not added:" + err);
-								} else {
-									console.log("Inventory added");
-									res.write(JSON.stringify(true).toString("utf-8"));
-									res.end();
-								}
-							});
+			db.events.update(
+				{_id: new mongo.ObjectID(req.body.eventid)},
+				{ $addToSet: {'inventory': {'id': req.body.inventoryid, 'text': selectedInventory.text,'title': selectedInventory.title}} }, 
+				function(err, updated) {
+					if (err || !updated) {
+						console.log("Inventory not added:" + err);
+					} else {
+						console.log("Inventory added");
+						res.write(JSON.stringify(true).toString("utf-8"));
+						res.end();
+					}
+				});
 		});
 
 		//Remove inventory from an event (POST)
@@ -185,8 +185,18 @@ var allInventory = [{
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
-			res.write(JSON.stringify(true).toString("utf-8"));
-			res.end();
+			db.events.update(
+				{_id: new mongo.ObjectID(req.body.eventid)},
+				{ $pull: {'inventory': {'id': req.body.inventoryid} } }, 
+				function(err, updated) {
+					if (err || !updated) {
+						console.log("Inventory not removed:" + err);
+					} else {
+						console.log("Inventory removed");
+						res.write(JSON.stringify(true).toString("utf-8"));
+						res.end();
+					}
+				});
 		});
 
 // NOTES
