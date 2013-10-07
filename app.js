@@ -8,6 +8,7 @@ var sugar = require('sugar');
 var databaseUrl = "spec"; // "username:password@example.com/mydb"
 var collections = ["events"]
 var db = require("mongojs").connect(databaseUrl, collections);
+var mongo = require('mongodb-wrapper');
 
 var date = new Date();
 //var diff = date.getTimezoneOffset()/60;
@@ -42,7 +43,6 @@ function addBackgroundColor(events) { //changes the events object
 	}
 	return events;
 }
-//events = addBackgroundColor(events);
 
 app.configure(function() {
 	app.set('views', __dirname + '/views');
@@ -64,6 +64,7 @@ app.get("/events", function(req, res) {
 		if (err || !events) {
 			console.log("No events found");
 		} else {
+			events = addBackgroundColor(events);
 			res.write(JSON.stringify(events).toString("utf-8"));
 			res.end();
 		}
@@ -137,11 +138,11 @@ var allInventory = [{
 		/*var selectedEvent = events.filter(function(event) {
 			return event.id == req.params.id;
 		})[0];*/
-		db.events.find({_id: req.params.id}, function(err, events) {
+		db.events.find({_id: new mongo.ObjectID(req.params.id)}, function(err, events) {
 			if (err || !events) {
 				console.log("No events found");
 			} else {
-				res.write(JSON.stringify(events).toString("utf-8"));
+				res.write(JSON.stringify(events[0].inventory).toString("utf-8"));
 				res.end();
 			}
 		});
@@ -185,7 +186,7 @@ var allInventory = [{
 		res.writeHead(200, {
 			'Content-Type': 'application/json'
 		});
-		db.events.find({_id: req.params.id}, function(err, events) {
+		db.events.find({_id: new mongo.ObjectID(req.params.id)}, function(err, events) {
 			if (err || !events) {
 				console.log("No events found");
 			} else {
