@@ -261,7 +261,7 @@ EachStaffView = Backbone.View.extend({
 						'eventid': lastClickedEvent['_id']
 					}
 				}).done(function(msg) {
-					console.log('staff removed from event ID ' + lastClickedEvent.id + ', ID: ' + shiftid);
+					console.log('staff removed from event ID ' + lastClickedEvent['_id'] + ', ID: ' + shiftid);
 					$(removedItem).parent().parent().remove();
 				});
 				return false;
@@ -524,20 +524,23 @@ function NewRowInit(lastShift) {
 			data: {
 				'staff': chosenStaff,
 				'start': $('#timepicker5').val(),
-				'end': $('#timepicker5').val(),
-				'eventid': lastClickedEvent['_id']
+				'end': $('#timepicker6').val(),
+				'eventid': lastClickedEvent['_id'],
+				'eventStart': lastClickedEvent.start,
+				'eventEnd': lastClickedEvent.end,
 			}
 		}).done(function(res) {
 			console.log('staff added to event ID ' + lastClickedEvent['_id'] + ': ' + res.id);
 			var each_staff_view2 = new EachStaffView({ //Backbone new note view used
 				'item': {
 					'id': res.id,
-					'start': $('#timepicker5').val(),
-					'end': $('#timepicker5').val(),
+					'start': res.start,
+					'end': res.end,
 					'staff': chosenStaff,
+					'staffname': $('.combobox').val().substring(0, $('.combobox').val().indexOf('(')-1),
 				}
 			});
-			$('.combobox').html('');
+			$('.combobox').val('');
 		}); //done function
 	}); 	//click event
 }

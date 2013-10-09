@@ -307,7 +307,30 @@ var allInventory = [{
 		});
 	});
 	//Add staff/shift to an event (POST)
-
+		app.post("/staff/add", function(req, res) {
+			//req.url
+			console.log("Req for adding shift \"" + req.body.staff + "\" to Event ID " + req.body.eventid);
+			var eventStart = new Date(Date.parse(req.body.eventStart));
+			var eventEnd = new Date(Date.parse(req.body.eventEnd));
+			res.writeHead(200, {
+				'Content-Type': 'application/json'
+			});
+			var generatedID = new mongo.ObjectID();
+			var startDate = new Date(Date.parse(eventStart.getFullYear() + "-" + eventStart.getMonth() + "-" + eventStart.getDate() + " " +req.body.start));
+			var endDate = new Date(Date.parse(eventEnd.getFullYear() + "-" + eventEnd.getMonth() + "-" + eventEnd.getDate() + " " +req.body.end));
+			db.events.update(
+				{_id: new mongo.ObjectID(req.body.eventid)},
+				{ $addToSet: {'shifts': {'id': generatedID, 'start': startDate,'end': endDate, 'staff': req.body.staff}} }, 
+				function(err, updated) {
+					if (err || !updated) {
+						console.log("Shift not added:" + err);
+					} else {
+						console.log("Shift added");
+						res.write(JSON.stringify({'id':generatedID.toString(),'start':startDate, 'end':endDate}).toString("utf-8"));
+						res.end();
+					}
+				});
+		});
 	//Remove staff/shift from an event (POST)
 		app.post("/staff/remove", function(req, res) {
 			//req.url
