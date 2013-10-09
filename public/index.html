@@ -197,14 +197,14 @@
 	<script type="text/template" id="staff_template">
 
 
-		<p><b><%= lastClickedEvent.title %></b><br>
-	    <span class="eventTime"></span>
+		<p><b><%= lastClickedEvent.title %></b>
+	    <span class="pull-right"><%= formatAMPM(new Date(Date.parse(lastClickedEvent.start))) %> - <%= formatAMPM(new Date(Date.parse(lastClickedEvent.end))) %></span>
 
 	    <table class="table table-bordered table-hover table-condensed">
 		<thead><th><i class="icon-user"></i>  Staff</th><th><i class="icon-time"></i> From</th><th><i class="icon-time"></i> To</th>
 		<th><i class="icon-edit"></i></th></thead>
 		<tbody>
-			<tr> <!-- rows that have been updated/fetched on the database should come before this-->
+			<tr>
 				<td>
 					<select class="combobox input-medium" name="normal">
 		              </select>
