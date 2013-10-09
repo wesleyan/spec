@@ -1,3 +1,4 @@
+var storeAllStaff;
 function changePopupColor(event) { //changes the events object
 	$("#popupTitleButton").removeClass("btn-success btn-inverse btn-warning btn-danger");
 	if (event.valid == false) {
@@ -229,25 +230,46 @@ StaffView = Backbone.View.extend({
         },
         render: function(){
             //Pass variables in using Underscore.js Template
-            var variables = { event: this.options.event, 'shifts': this.options.shifts };
+            var variables = {'shifts': this.options.shifts };
             // Compile the template using underscore
             var template = _.template( $("#staff_template").html(), variables );
             // Load the compiled HTML into the Backbone "el"
             $("#staffEvent .modal-body").html( template );
+            NewRowInit(this.options.shifts.slice(-1)[0]);
+            $('.combobox').combobox({
+				placeholder: 'Choose a staff'
+			});
         }
     });
+
+function formatAMPM(date) {
+  var hours = date.getHours();
+  var minutes = date.getMinutes();
+  var ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0'+minutes : minutes;
+  var strTime = hours + ':' + minutes + ' ' + ampm;
+  return strTime;
+}
 
 var lastClickedEvent;
 $('a[href="#staffEvent"]').click(function(e) {
 	//This part should get the event data and update staff adding modal box
-	$('.eventName').html(lastClickedEvent.title);
+	//$('.eventName').html(lastClickedEvent.title);
 	$.ajax({
 		type: "GET",
 		url: "staff/get/" + lastClickedEvent['_id'],
 	}).done(function(shifts) {
 		//staff rendering will happen here
 		//foreach new Date(Date.parse(shift.date));
-		var staff_view = new StaffView({ 'event': lastClickedEvent, 'shifts': shifts });
+		for(i = 0; i < shifts.length; i++) {
+			var staffProfile = storeAllStaff.filter(function(staff) {
+				return staff.username == shifts[i].staff;
+			})[0];
+			shifts[i].staffname = staffProfile.name;
+		}
+		var staff_view = new StaffView({'shifts': shifts });
 		/*$.each(staff, function(key, value) {
 		});*/
 	});
@@ -408,39 +430,13 @@ $(document).ready(function() {
 	$('#leftGroup').prependTo('.fc-header-left');
 	$('#rightGroup').appendTo('.fc-header-right');
 
-	$('#timepicker5').timepicker({
-		template: false,
-		showInputs: false,
-		minuteStep: 5,
-		defaultTime: '9:45 AM'
-	});
-	$('#timepicker6').timepicker({
-		template: false,
-		showInputs: false,
-		minuteStep: 5,
-		defaultTime: '11:45 AM'
-	});
 
-	var ComboboxInitiation = function() {
 		$.ajax({
 			type: "GET",
 			url: "staff/all/",
 		}).done(function(staff) {
-			$('.combobox').html('');
-			staff.forEach(function(person) {
-				if(person.name == false) {return;}
-				$('.combobox')
-					.append($('<option>', {
-							'value': person.username
-						})
-						.text(person.name + ' (' + person.username + ')'));
-			});
-			$('.combobox').combobox({
-				placeholder: 'Choose a staff'
-			});
+			storeAllStaff = staff;
 		});
-	}
-	ComboboxInitiation();
 });
 $(document).ajaxStart(function() {
 	$("#eventButton i").removeClass('icon-book');
@@ -450,3 +446,34 @@ $(document).ajaxStop(function() {
 	$("#eventButton i").removeClass('icon-refresh');
 	$("#eventButton i").addClass('icon-book');
 });
+
+function NewRowInit(lastShift) {
+	if(lastShift == undefined) {
+		var startTime = formatAMPM(lastClickedEvent.start);
+		var endTime = formatAMPM(lastClickedEvent.end);
+	} else {
+		var startTime = formatAMPM(new Date(Date.parse(lastShift.start)));
+		var endTime = formatAMPM(new Date(Date.parse(lastShift.end)));
+	}
+ 	$('#timepicker5').timepicker({
+		template: false,
+		showInputs: false,
+		minuteStep: 5,
+		defaultTime: startTime
+	});
+	$('#timepicker6').timepicker({
+		template: false,
+		showInputs: false,
+		minuteStep: 5,
+		defaultTime: endTime
+	});
+	$('.combobox').html('');
+			storeAllStaff.forEach(function(person) {
+				if(person.name == false) {return;}
+				$('.combobox')
+					.append($('<option>', {
+							'value': person.username
+						})
+						.text(person.name + ' (' + person.username + ')'));
+			});
+}

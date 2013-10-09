@@ -70,42 +70,7 @@
 	    <h3 id="myModalLabel">Staff This Event</h3>
 	  </div>
 	  <div class="modal-body">
-	    <p><b><span class="eventName"></span></b><br>
-	    <span class="eventTime"></span>
 
-	    <table class="table table-bordered table-hover table-condensed">
-		<thead><th><i class="icon-user"></i>  Staff</th><th><i class="icon-time"></i> From</th><th><i class="icon-time"></i> To</th>
-		<th><i class="icon-edit"></i></th></thead>
-		<tbody>
-			<tr>
-				<td>Tyler Harden (tharden)</td>
-				<td>08:00 AM</td>
-				<td>09:45 AM</td>
-				<td><button class="btn btn-danger btn-mini" type="button"><i class="icon-remove icon-white"></i></button></td>
-			</tr>
-			<tr> <!-- rows that have been updated/fetched on the database should come before this-->
-				<td>
-					<select class="combobox input-medium" name="normal">
-		              </select>
-				</td>
-				<td>
-					<div class="bootstrap-timepicker">
-			            <input id="timepicker5" type="text" class="input-small">
-			        </div>
-			    </td>
-			    <td>
-	    		    <div class="bootstrap-timepicker">
-			            <input id="timepicker6" type="text" class="input-small">
-			        </div>
-			    </td>
-			    <td><button class="btn btn-primary btn-mini" type="button"><i class="icon-plus icon-white"></i></button></td>
-
-		    </tr>
-
-		</tbody>
-		</table>
-
-	    </p>
 	  </div>
 	  <div class="modal-footer">
 	    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
@@ -230,10 +195,48 @@
 	</script>
 
 	<script type="text/template" id="staff_template">
-	    This is the staff rendering with ID <%= event['_id'] %> and this is rendered by Backbone.js
-	    <% _.each( shifts, function( item, i ){ %>
-		   <%= item %>
-		<% }); %>
+
+
+		<p><b><%= lastClickedEvent.title %></b><br>
+	    <span class="eventTime"></span>
+
+	    <table class="table table-bordered table-hover table-condensed">
+		<thead><th><i class="icon-user"></i>  Staff</th><th><i class="icon-time"></i> From</th><th><i class="icon-time"></i> To</th>
+		<th><i class="icon-edit"></i></th></thead>
+		<tbody>
+			<% _.each( shifts, function( item, i ){ %>
+				<tr>
+					<td><%= item.staffname %> (<%= item.staff %>)</td>
+					<td><%= formatAMPM(new Date(Date.parse(item.start))) %></td>
+					<td><%= formatAMPM(new Date(Date.parse(item.end))) %></td>
+					<td><button class="btn btn-danger btn-mini" type="button"><i class="icon-remove icon-white"></i></button></td>
+				</tr>
+			   
+			<% }); %>
+			
+			<tr> <!-- rows that have been updated/fetched on the database should come before this-->
+				<td>
+					<select class="combobox input-medium" name="normal">
+		              </select>
+				</td>
+				<td>
+					<div class="bootstrap-timepicker">
+			            <input id="timepicker5" type="text" class="input-small">
+			        </div>
+			    </td>
+			    <td>
+	    		    <div class="bootstrap-timepicker">
+			            <input id="timepicker6" type="text" class="input-small">
+			        </div>
+			    </td>
+			    <td><button class="btn btn-primary btn-mini" type="button"><i class="icon-plus icon-white"></i></button></td>
+
+		    </tr>
+
+		</tbody>
+		</table>
+
+	    </p>
 	</script>
 
   </body>

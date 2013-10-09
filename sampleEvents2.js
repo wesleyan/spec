@@ -94,6 +94,11 @@ var events = [{
 		start: new Date(y, m, d, 13 - diff, 15),
 		end: new Date(y, m, d, 14 - diff, 30),
 		staff:'ckorkut'
+	},
+	{
+		start: new Date(y, m, d, 13 - diff, 15),
+		end: new Date(y, m, d, 14 - diff, 30),
+		staff:'mdietz'
 	}
 	]
 }, {
