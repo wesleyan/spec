@@ -39,18 +39,18 @@ $('#eventButton').click(function(e) {
 				'note': note,
 				eventid: lastClickedEvent['_id']
 			}
-		}).done(function(noteid) {
+		}).done(function(res) {
 			console.log('note added to event ID ' + lastClickedEvent['_id'] + ': ' + note);
 			//console.log(msg);
 			var each_note_view = new EachNoteView({ //Backbone new note view used
 				'eventid': lastClickedEvent.id,
 				'note': {
-					'id': noteid,
+					'id': res.id,
 					'text': note,
-					'user': username,
+					'user': res.user,
 					'date': new Date()
 				}
-			});
+			});3
 		});
 		$('#newNote textarea').val('');
 	});
@@ -161,7 +161,11 @@ app.on('route:all', function(filter) {
 	} else if (filter == 'onlyMine') {
 		$('#calendar').fullCalendar('clientEvents', function(event) {
 			event.className = _.without(event.className, 'hide');
-			if (event.people.indexOf(username) == -1) {
+			var people = [];
+			event.shifts.forEach(function(shift) {
+				people.push(shift.staff);
+			})
+			if (people.indexOf(username) == -1) {
 				event.className.push('hide');
 			}
 			$('#calendar').fullCalendar('updateEvent', event);
@@ -225,9 +229,9 @@ StaffView = Backbone.View.extend({
         },
         render: function(){
             //Pass variables in using Underscore.js Template
-            var variables = { eventid: this.options.eventid, 'staff': this.options.staff };
+            var variables = { event: this.options.event, 'shifts': this.options.shifts };
             // Compile the template using underscore
-            var template = _.template( $("#modal_template").html(), variables );
+            var template = _.template( $("#staff_template").html(), variables );
             // Load the compiled HTML into the Backbone "el"
             $("#staffEvent .modal-body").html( template );
         }
@@ -239,10 +243,11 @@ $('a[href="#staffEvent"]').click(function(e) {
 	$('.eventName').html(lastClickedEvent.title);
 	$.ajax({
 		type: "GET",
-		url: "staff/get/" + lastClickedEvent.id,
-	}).done(function(staff) {
+		url: "staff/get/" + lastClickedEvent['_id'],
+	}).done(function(shifts) {
 		//staff rendering will happen here
-		var staff_view = new StaffView({ 'event': lastClickedEvent, 'staff': staff });
+		//foreach new Date(Date.parse(shift.date));
+		var staff_view = new StaffView({ 'event': lastClickedEvent, 'shifts': shifts });
 		/*$.each(staff, function(key, value) {
 		});*/
 	});
@@ -422,12 +427,13 @@ $(document).ready(function() {
 			url: "staff/all/",
 		}).done(function(staff) {
 			$('.combobox').html('');
-			$.each(staff, function(key, value) {
+			staff.forEach(function(person) {
+				if(person.name == false) {return;}
 				$('.combobox')
 					.append($('<option>', {
-							value: key
+							'value': person.username
 						})
-						.text(value));
+						.text(person.name + ' (' + person.username + ')'));
 			});
 			$('.combobox').combobox({
 				placeholder: 'Choose a staff'
@@ -435,4 +441,12 @@ $(document).ready(function() {
 		});
 	}
 	ComboboxInitiation();
+});
+$(document).ajaxStart(function() {
+	$("#eventButton i").removeClass('icon-book');
+	$("#eventButton i").addClass('icon-refresh');
+});
+$(document).ajaxStop(function() {
+	$("#eventButton i").removeClass('icon-refresh');
+	$("#eventButton i").addClass('icon-book');
 });

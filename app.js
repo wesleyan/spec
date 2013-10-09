@@ -6,9 +6,11 @@ var path = require('path');
 var sugar = require('sugar');
 
 var databaseUrl = "spec"; // "username:password@example.com/mydb"
-var collections = ["events"]
+var collections = ['events','staff']
 var db = require("mongojs").connect(databaseUrl, collections);
 var mongo = require('mongodb-wrapper');
+
+var username = 'ckorkut';
 
 var date = new Date();
 //var diff = date.getTimezoneOffset()/60;
@@ -142,7 +144,14 @@ var allInventory = [{
 			if (err || !events) {
 				console.log("No events found");
 			} else {
-				res.write(JSON.stringify(events[0].inventory).toString("utf-8"));
+				//events[0].inventory
+				var existingList = [];
+				events[0].inventory.forEach(function(id) {
+					existingList.push(allInventory.filter(function(tool) {
+						return tool.id == id;
+					})[0]);
+				});
+				res.write(JSON.stringify(existingList).toString("utf-8"));
 				res.end();
 			}
 		});
@@ -166,7 +175,7 @@ var allInventory = [{
 			
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
-				{ $addToSet: {'inventory': {'id': req.body.inventoryid, 'text': selectedInventory.text,'title': selectedInventory.title}} }, 
+				{ $addToSet: {'inventory': req.body.inventoryid} }, 
 				function(err, updated) {
 					if (err || !updated) {
 						console.log("Inventory not added:" + err);
@@ -187,7 +196,7 @@ var allInventory = [{
 			});
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
-				{ $pull: {'inventory': {'id': req.body.inventoryid} } }, 
+				{ $pull: {'inventory': req.body.inventoryid } }, 
 				function(err, updated) {
 					if (err || !updated) {
 						console.log("Inventory not removed:" + err);
@@ -219,7 +228,7 @@ var allInventory = [{
 	});
 
 	//Notes Update
-		//Add inventory to an event (POST) - not tested
+		//Add inventory to an event (POST) - not tested // username is required
 		app.post("/notes/add", function(req, res) {
 			//req.url
 			console.log("Req for adding note \"" + req.body.note + "\" to Event ID " + req.body.eventid);
@@ -227,22 +236,21 @@ var allInventory = [{
 				'Content-Type': 'application/json'
 			});
 			var generatedID = new mongo.ObjectID();
-			var fetchUser;
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
-				{ $addToSet: {'notes': {'id': generatedID, 'text': req.body.note,'user': fetchUser, 'date': new Date()}} }, 
+				{ $addToSet: {'notes': {'id': generatedID, 'text': req.body.note,'user': username, 'date': new Date()}} }, 
 				function(err, updated) {
 					if (err || !updated) {
 						console.log("Note not added:" + err);
 					} else {
 						console.log("Note added");
-						res.write(JSON.stringify(generatedID.toString()).toString("utf-8"));
+						res.write(JSON.stringify({'id':generatedID.toString(), 'user':username}).toString("utf-8"));
 						res.end();
 					}
 				});
 		});
 
-		//Remove inventory from an event (POST)
+		//Remove inventory from an event (POST) - username is required for verification
 		app.post("/notes/remove", function(req, res) {
 			//req.url
 			console.log("Req for removing note ID " + req.body.id + " from Event ID " + req.body.eventid);
@@ -251,7 +259,7 @@ var allInventory = [{
 			});
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
-				{ $pull: {'notes': {'id': new mongo.ObjectID(req.body.id)} } }, 
+				{ $pull: {'notes': {'id': new mongo.ObjectID(req.body.id), 'user':username} } }, 
 				function(err, updated) {
 					if (err || !updated) {
 						console.log("Note not removed:" + err);
@@ -264,13 +272,6 @@ var allInventory = [{
 		});
 
 // STAFF
-var existingStaff = {
-			'mtrifunovski': 'Maksim Trifunovski (mtrifunovski)',
-			'tskim': 'Ted Kim (tskim)',
-			'hflores': 'Heric Flores (hflores)',
-			'ckorkut': 'Cumhur Korkut (ckorkut)',
-			'jdoe': 'John Doe (jdoe)',
-		};
 	//All event staff in IMS
 	app.get("/staff/all", function(req, res) {
 		//req.url
@@ -279,8 +280,14 @@ var existingStaff = {
 		res.writeHead(200, {
 			'Content-Type': 'application/json'
 		});
-		res.write(JSON.stringify(existingStaff).toString("utf-8"));
-		res.end();
+		db.staff.find({}, function(err, allStaff) {
+			if (err || !allStaff) {
+				console.log("No staff found");
+			} else {
+				res.write(JSON.stringify(allStaff).toString("utf-8"));
+				res.end();
+			}
+		});
 	});
 	//Get the existing staff of an event
 	app.get("/staff/get/:id", function(req, res) {
@@ -290,8 +297,14 @@ var existingStaff = {
 		res.writeHead(200, {
 			'Content-Type': 'application/json'
 		});
-		res.write(JSON.stringify(existingStaff).toString("utf-8"));
-		res.end();
+		db.events.find({_id: new mongo.ObjectID(req.params.id)}, function(err, events) {
+			if (err || !events) {
+				console.log("No events found");
+			} else {
+				res.write(JSON.stringify(events[0].shifts).toString("utf-8"));
+				res.end();
+			}
+		});
 	});
 	//Add staff/shift to an event (POST)
 

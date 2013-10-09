@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>
-      New NED
+      spec
     </title>
     <link href="fullcalendar/fullcalendar.css" rel="stylesheet">
     <link href="fullcalendar/fullcalendar.print.css" rel="stylesheet" media="print">
@@ -61,8 +61,6 @@
  	<div id="context-menu" class="front">
  		<ul class="dropdown-menu">
  			<li><a href="#staffEvent" data-toggle="modal"><i class="icon-plus"></i> Staff this event</a></li>
- 			<!--<li class="divider"></li>
-		    <li><a href="#split" data-toggle="modal"><i class="icon-resize-full"></i> Split Event</a></li>-->
 	  	</ul>
  	</div>
 
@@ -137,6 +135,7 @@
 	<div id="popup" class="popover">
 	    <div class="arrow"></div>
 	    <h3 class="popover-title">
+
 		    <span id="popupTitle">Event Title</span> 
 
 		    <span class="pull-right">
@@ -231,9 +230,8 @@
 	</script>
 
 	<script type="text/template" id="staff_template">
-	    This is the staff rendering with ID <%= eventid %> and this is rendered by Backbone.js
-	    <%= staff %>
-	    <% _.each( staff, function( item, i ){ %>
+	    This is the staff rendering with ID <%= event['_id'] %> and this is rendered by Backbone.js
+	    <% _.each( shifts, function( item, i ){ %>
 		   <%= item %>
 		<% }); %>
 	</script>
