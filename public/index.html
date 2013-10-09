@@ -233,7 +233,7 @@
 				<td><%= item.staffname %> (<%= item.staff %>)</td>
 				<td><%= formatAMPM(new Date(Date.parse(item.start))) %></td>
 				<td><%= formatAMPM(new Date(Date.parse(item.end))) %></td>
-				<td><button class="btn btn-danger btn-mini" type="button"><i class="icon-remove icon-white"></i></button></td>
+				<td><span class="btn btn-danger btn-mini removeStaff" type="button" href="<%= item.id %>"><i class="icon-remove icon-white"></i></span></td>
 			</tr>
 	</script>
 

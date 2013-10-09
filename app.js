@@ -309,7 +309,25 @@ var allInventory = [{
 	//Add staff/shift to an event (POST)
 
 	//Remove staff/shift from an event (POST)
-
+		app.post("/staff/remove", function(req, res) {
+			//req.url
+			console.log("Req for removing shift ID " + req.body.id + " from Event ID " + req.body.eventid);
+			res.writeHead(200, {
+				'Content-Type': 'application/json'
+			});
+			db.events.update(
+				{_id: new mongo.ObjectID(req.body.eventid)},
+				{ $pull: {'shifts': {'id': new mongo.ObjectID(req.body.id)} } }, 
+				function(err, updated) {
+					if (err || !updated) {
+						console.log("Shift not removed:" + err);
+					} else {
+						console.log("Shift removed");
+						res.write(JSON.stringify(true).toString("utf-8"));
+						res.end();
+					}
+				});
+		});
 
 //Main Page Rendering
 	/*app.get('/', function (req, res) {

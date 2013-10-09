@@ -195,7 +195,7 @@ EachNoteView = Backbone.View.extend({
             this.render();
             var removedItem;
             $('.removeNote').unbind( "click" );
-			$('.removeNote').on('click', function(e) {
+			$('.removeNote').on('click', function(e) { //this is in EachNoteView because it should be binded to notes added by user later on too
 				removedItem = this;
 				var noteid = $(this).attr('href');
 				$.ajax({
@@ -250,6 +250,22 @@ EachStaffView = Backbone.View.extend({
             var template = _.template( $("#each_staff_template").html(), variables );
             // Load the compiled HTML into the Backbone "el"
             $("#staffEvent .modal-body tbody").prepend( template );
+            $('.removeStaff').on('click', function(e) {
+				removedItem = this;
+				var shiftid = $(this).attr('href');
+				$.ajax({
+					type: "POST",
+					url: "staff/remove",
+					data: {
+						'id': shiftid,
+						'eventid': lastClickedEvent['_id']
+					}
+				}).done(function(msg) {
+					console.log('staff removed from event ID ' + lastClickedEvent.id + ', ID: ' + shiftid);
+					$(removedItem).parent().parent().remove();
+				});
+				return false;
+			});
         }
     });
 

@@ -34,6 +34,7 @@ var events = [{
 		date: new Date(y, m, d, 7 - diff, 45)
 	}, ],
 	shifts:[{
+		id: new mongo.ObjectID(),
 		start: new Date(y, m, d, 9 - diff, 45),
 		end: new Date(y, m, d, 13 - diff, 30),
 		staff:'ckorkut'
@@ -62,6 +63,7 @@ var events = [{
 		date: new Date(y, m, d, 7 - diff, 45)
 	}, ],
 	shifts:[{
+		id: new mongo.ObjectID(),
 		start: new Date(y, m, d, 13 - diff, 0),
 		end: new Date(y, m, d, 18 - diff, 0),
 		staff:'tskim'
@@ -91,11 +93,13 @@ var events = [{
 		date: new Date(y, m, d, 7 - diff, 45)
 	}, ],
 	shifts:[{
+		id: new mongo.ObjectID(),
 		start: new Date(y, m, d, 13 - diff, 15),
 		end: new Date(y, m, d, 14 - diff, 30),
 		staff:'ckorkut'
 	},
 	{
+		id: new mongo.ObjectID(),
 		start: new Date(y, m, d, 13 - diff, 15),
 		end: new Date(y, m, d, 14 - diff, 30),
 		staff:'mdietz'
@@ -124,6 +128,7 @@ var events = [{
 		date: new Date(y, m, d, 7 - diff, 45)
 	}, ],
 	shifts:[{
+		id: new mongo.ObjectID(),
 		start: new Date(y, m, d + 1, 10 - diff, 30),
 		end: new Date(y, m, d + 1, 12 - diff, 30),
 		staff:'hflores'
@@ -152,6 +157,7 @@ var events = [{
 		date: new Date(y, m, d, 7 - diff, 45)
 	}, ],
 	shifts:[{
+		id: new mongo.ObjectID(),
 		start: new Date(y, m, d, 12, 0),
 		end: new Date(y, m, d, 14, 0),
 		staff:'hflores'
