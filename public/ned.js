@@ -511,12 +511,8 @@ function NewRowInit(lastShift) {
 		if($('.combobox').val() == '') {
 			$.bootstrapGrowl("You must choose a staff to add a valid shift.", {
 			  type: 'error',
-			  offset: {from: 'top', amount: 20},
 			  align: 'center',
-			  width: 250,
 			  delay: 2000,
-			  allow_dismiss: true,
-			  stackup_spacing: 10
 			});
 			return false;		
 		} else {
