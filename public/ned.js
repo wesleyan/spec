@@ -508,6 +508,40 @@ function NewRowInit(lastShift) {
 				.text(person.name + ' (' + person.username + ')'));
 	});
 	$('#addNewStaff').click(function(e) {
-		console.log('New row add request by the user.')
-	});
+		if($('.combobox').val() == '') {
+			$.bootstrapGrowl("You must choose a staff to add a valid shift.", {
+			  type: 'error',
+			  offset: {from: 'top', amount: 20},
+			  align: 'center',
+			  width: 250,
+			  delay: 2000,
+			  allow_dismiss: true,
+			  stackup_spacing: 10
+			});
+			return false;		
+		} else {
+			var chosenStaff = $('.combobox').val().match(/\(([^)]+)\)/)[1];
+		}
+		$.ajax({
+			type: "POST",
+			url: "staff/add",
+			data: {
+				'staff': chosenStaff,
+				'start': $('#timepicker5').val(),
+				'end': $('#timepicker5').val(),
+				'eventid': lastClickedEvent['_id']
+			}
+		}).done(function(res) {
+			console.log('staff added to event ID ' + lastClickedEvent['_id'] + ': ' + res.id);
+			var each_staff_view2 = new EachStaffView({ //Backbone new note view used
+				'item': {
+					'id': res.id,
+					'start': $('#timepicker5').val(),
+					'end': $('#timepicker5').val(),
+					'staff': chosenStaff,
+				}
+			});
+			$('.combobox').html('');
+		}); //done function
+	}); 	//click event
 }
