@@ -204,16 +204,6 @@
 		<thead><th><i class="icon-user"></i>  Staff</th><th><i class="icon-time"></i> From</th><th><i class="icon-time"></i> To</th>
 		<th><i class="icon-edit"></i></th></thead>
 		<tbody>
-			<% _.each( shifts, function( item, i ){ %>
-				<tr>
-					<td><%= item.staffname %> (<%= item.staff %>)</td>
-					<td><%= formatAMPM(new Date(Date.parse(item.start))) %></td>
-					<td><%= formatAMPM(new Date(Date.parse(item.end))) %></td>
-					<td><button class="btn btn-danger btn-mini" type="button"><i class="icon-remove icon-white"></i></button></td>
-				</tr>
-			   
-			<% }); %>
-			
 			<tr> <!-- rows that have been updated/fetched on the database should come before this-->
 				<td>
 					<select class="combobox input-medium" name="normal">
@@ -229,7 +219,7 @@
 			            <input id="timepicker6" type="text" class="input-small">
 			        </div>
 			    </td>
-			    <td><button class="btn btn-primary btn-mini" type="button"><i class="icon-plus icon-white"></i></button></td>
+			    <td><button class="btn btn-primary btn-mini" type="button" id="addNewStaff"><i class="icon-plus icon-white"></i></button></td>
 
 		    </tr>
 
@@ -237,6 +227,14 @@
 		</table>
 
 	    </p>
+	</script>
+	<script type="text/template" id="each_staff_template">
+			<tr>
+				<td><%= item.staffname %> (<%= item.staff %>)</td>
+				<td><%= formatAMPM(new Date(Date.parse(item.start))) %></td>
+				<td><%= formatAMPM(new Date(Date.parse(item.end))) %></td>
+				<td><button class="btn btn-danger btn-mini" type="button"><i class="icon-remove icon-white"></i></button></td>
+			</tr>
 	</script>
 
   </body>

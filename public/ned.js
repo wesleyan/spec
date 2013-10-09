@@ -1,4 +1,74 @@
 var storeAllStaff;
+var lastClick, lastRightClick;
+//User info must be imported for this part
+var username = 'ckorkut';
+
+// BACKBONE.JS ROUTER SECTION
+var AppRouter = Backbone.Router.extend({
+	routes: {
+		"printToday": "printToday",
+		"recentVideo": "recentVideo",
+		"*filter": "all"
+	}
+});
+
+var app = new AppRouter;
+
+app.on('route:printToday', function() {
+	console.log('printToday');
+});
+app.on('route:recentVideo', function() {
+	console.log('recentVideo');
+});
+
+app.on('route:all', function(filter) {
+	dropdownActiveFix();
+	if (filter == null) {
+		//Show all of events
+		$('#calendar').fullCalendar('clientEvents', function(event) {
+			event.className = _.without(event.className, 'hide');
+			$('#calendar').fullCalendar('updateEvent', event);
+		});
+		console.log('all');
+
+	} else if (filter == 'hideCancelled') {
+
+		$('#calendar').fullCalendar('clientEvents', function(event) {
+			event.className = _.without(event.className, 'hide');
+			if (event.valid == false) {
+				event.className.push('hide');
+			}
+			$('#calendar').fullCalendar('updateEvent', event);
+		});
+		console.log(filter);
+	} else if (filter == 'unstaffed') {
+		$('#calendar').fullCalendar('clientEvents', function(event) {
+			event.className = _.without(event.className, 'hide');
+			if (event.staffAdded == event.staffNeeded || event.valid == false) {
+				event.className.push('hide');
+			}
+			$('#calendar').fullCalendar('updateEvent', event);
+		});
+		console.log(filter);
+	} else if (filter == 'onlyMine') {
+		$('#calendar').fullCalendar('clientEvents', function(event) {
+			event.className = _.without(event.className, 'hide');
+			var people = [];
+			event.shifts.forEach(function(shift) {
+				people.push(shift.staff);
+			})
+			if (people.indexOf(username) == -1) {
+				event.className.push('hide');
+			}
+			$('#calendar').fullCalendar('updateEvent', event);
+		});
+		console.log(filter);
+	}
+});
+
+Backbone.history.start();
+
+
 function changePopupColor(event) { //changes the events object
 	$("#popupTitleButton").removeClass("btn-success btn-inverse btn-warning btn-danger");
 	if (event.valid == false) {
@@ -105,78 +175,7 @@ $('.modal').on('show', function() {
 	$('#popup').css('opacity', 1);
 });
 
-// The functions above are mostly done
-var lastClick, lastRightClick;
-
-// BACKBONE.JS ROUTER SECTION
-var AppRouter = Backbone.Router.extend({
-	routes: {
-		"printToday": "printToday",
-		"recentVideo": "recentVideo",
-		"*filter": "all"
-	}
-});
-
-
-//User info must be imported for this part: work on BACKBONE JS SESSION
-var username = 'ckorkut';
-
-var app = new AppRouter;
-
-app.on('route:printToday', function() {
-	console.log('printToday');
-});
-app.on('route:recentVideo', function() {
-	console.log('recentVideo');
-});
-
-app.on('route:all', function(filter) {
-	dropdownActiveFix();
-	if (filter == null) {
-		//Show all of events
-		$('#calendar').fullCalendar('clientEvents', function(event) {
-			event.className = _.without(event.className, 'hide');
-			$('#calendar').fullCalendar('updateEvent', event);
-		});
-		console.log('all');
-
-	} else if (filter == 'hideCancelled') {
-
-		$('#calendar').fullCalendar('clientEvents', function(event) {
-			event.className = _.without(event.className, 'hide');
-			if (event.valid == false) {
-				event.className.push('hide');
-			}
-			$('#calendar').fullCalendar('updateEvent', event);
-		});
-		console.log(filter);
-	} else if (filter == 'unstaffed') {
-		$('#calendar').fullCalendar('clientEvents', function(event) {
-			event.className = _.without(event.className, 'hide');
-			if (event.staffAdded == event.staffNeeded || event.valid == false) {
-				event.className.push('hide');
-			}
-			$('#calendar').fullCalendar('updateEvent', event);
-		});
-		console.log(filter);
-	} else if (filter == 'onlyMine') {
-		$('#calendar').fullCalendar('clientEvents', function(event) {
-			event.className = _.without(event.className, 'hide');
-			var people = [];
-			event.shifts.forEach(function(shift) {
-				people.push(shift.staff);
-			})
-			if (people.indexOf(username) == -1) {
-				event.className.push('hide');
-			}
-			$('#calendar').fullCalendar('updateEvent', event);
-		});
-		console.log(filter);
-	}
-});
-
-Backbone.history.start();
-
+// BACKBONE.JS VIEWS
 NotesView = Backbone.View.extend({
         initialize: function(){
             this.render();
@@ -194,8 +193,6 @@ NotesView = Backbone.View.extend({
 EachNoteView = Backbone.View.extend({
         initialize: function(){
             this.render();
-
-            //Note deleting (I couldn't understand why I have to bind this again after each note addition, PROBLEM!!)
             var removedItem;
             $('.removeNote').unbind( "click" );
 			$('.removeNote').on('click', function(e) {
@@ -214,8 +211,7 @@ EachNoteView = Backbone.View.extend({
 				});
 				return false;
 			});
-
-        }, //end of initialize
+        },
         render: function(){
             var variables = { eventid: this.options.eventid, 'note': this.options.note };
             var template = _.template( $("#each_note_template").html(), variables );
@@ -223,7 +219,6 @@ EachNoteView = Backbone.View.extend({
         }
     });
 
-//incomplete
 StaffView = Backbone.View.extend({
         initialize: function(){
             this.render();
@@ -235,10 +230,26 @@ StaffView = Backbone.View.extend({
             var template = _.template( $("#staff_template").html(), variables );
             // Load the compiled HTML into the Backbone "el"
             $("#staffEvent .modal-body").html( template );
+            this.options.shifts.forEach(function(shift) {
+            	var each_note_view = new EachStaffView({ 'item': shift });
+            });
             NewRowInit(this.options.shifts.slice(-1)[0]);
             $('.combobox').combobox({
 				placeholder: 'Choose a staff'
 			});
+        }
+    });
+EachStaffView = Backbone.View.extend({
+        initialize: function(){
+            this.render();
+        },
+        render: function(){
+            //Pass variables in using Underscore.js Template
+            var variables = {'item': this.options.item };
+            // Compile the template using underscore
+            var template = _.template( $("#each_staff_template").html(), variables );
+            // Load the compiled HTML into the Backbone "el"
+            $("#staffEvent .modal-body tbody").prepend( template );
         }
     });
 
@@ -267,7 +278,11 @@ $('a[href="#staffEvent"]').click(function(e) {
 			var staffProfile = storeAllStaff.filter(function(staff) {
 				return staff.username == shifts[i].staff;
 			})[0];
-			shifts[i].staffname = staffProfile.name;
+			if(staffProfile == undefined) {
+				shifts[i].staffname = '';
+			} else {
+				shifts[i].staffname = staffProfile.name;
+			}
 		}
 		var staff_view = new StaffView({'shifts': shifts });
 		/*$.each(staff, function(key, value) {
@@ -468,12 +483,15 @@ function NewRowInit(lastShift) {
 		defaultTime: endTime
 	});
 	$('.combobox').html('');
-			storeAllStaff.forEach(function(person) {
-				if(person.name == false) {return;}
-				$('.combobox')
-					.append($('<option>', {
-							'value': person.username
-						})
-						.text(person.name + ' (' + person.username + ')'));
-			});
+	storeAllStaff.forEach(function(person) {
+		if(person.name == false) {return;}
+		$('.combobox')
+			.append($('<option>', {
+					'value': person.username
+				})
+				.text(person.name + ' (' + person.username + ')'));
+	});
+	$('#addNewStaff').click(function(e) {
+		console.log('New row add request by the user.')
+	});
 }
