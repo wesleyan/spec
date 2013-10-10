@@ -372,6 +372,7 @@ $(document).ready(function() {
 			center: 'title',
 			right: 'month,agendaWeek,agendaDay'
 		},
+		//defaultView: 'agendaWeek',
 		editable: false,
 		allDaySlot: false,
 		allDayDefault: false,
@@ -382,13 +383,13 @@ $(document).ready(function() {
 		},
 		eventClick: function(calEvent, jsEvent, view) {
 			//This function should contain specific stuff like opening the event-based selection/description box etc
-			
+			$('#popup').modalPopover('hide');
 			//front-end eye-candy stuff
 			symbol = '';
 			if (calEvent.video == true) {
 				symbol += '<i class="icon-facetime-video"></i> ';
 			}
-			$('#popup').modalPopover('show');
+			
 			$('#eventButton').removeClass('disabled');
 			changePopupColor(calEvent);
 
@@ -411,6 +412,7 @@ $(document).ready(function() {
 				type: "GET",
 				url: "notes/existing/" + calEvent['_id'],
 			}).done(function(notes) {
+				$('#popup').modalPopover('show');
 				var note_view = new NotesView({ 'eventid': calEvent['_id'], 'notes':notes });
 			});
 			lastClickedEvent = calEvent;
