@@ -316,8 +316,8 @@ var allInventory = [{
 				'Content-Type': 'application/json'
 			});
 			var generatedID = new mongo.ObjectID();
-			var startDate = new Date(Date.parse(eventStart.getFullYear() + "-" + eventStart.getMonth() + "-" + eventStart.getDate() + " " +req.body.start));
-			var endDate = new Date(Date.parse(eventEnd.getFullYear() + "-" + eventEnd.getMonth() + "-" + eventEnd.getDate() + " " +req.body.end));
+			var startDate = new Date(Date.parse(eventStart.getFullYear() + "-" + (eventStart.getMonth()+1) + "-" + eventStart.getDate() + " " +req.body.start));
+			var endDate = new Date(Date.parse(eventEnd.getFullYear() + "-" + (eventStart.getMonth()+1) + "-" + eventEnd.getDate() + " " +req.body.end));
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
 				{ $addToSet: {'shifts': {'id': generatedID, 'start': startDate,'end': endDate, 'staff': req.body.staff}} }, 
