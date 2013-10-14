@@ -1,7 +1,9 @@
-var storeAllStaff;
-var lastClick, lastRightClick;
+var Spec = { //the only global variable that is supposed to be used in this.
+	storeAllStaff: [],
+	username: 'ckorkut',
+	lastClickedEvent: {}
+};
 //User info must be imported for this part
-var username = 'ckorkut';
 
 // BACKBONE.JS ROUTER SECTION
 var AppRouter = Backbone.Router.extend({
@@ -57,7 +59,7 @@ app.on('route:all', function(filter) {
 			event.shifts.forEach(function(shift) {
 				people.push(shift.staff);
 			})
-			if (people.indexOf(username) == -1) {
+			if (people.indexOf(Spec.username) == -1) {
 				event.className.push('hide');
 			}
 			$('#calendar').fullCalendar('updateEvent', event);
@@ -108,13 +110,13 @@ $('#eventButton').click(function(e) {
 			url: "notes/add",
 			data: {
 				'note': note,
-				eventid: lastClickedEvent['_id']
+				eventid: Spec.lastClickedEvent['_id']
 			}
 		}).done(function(res) {
-			console.log('note added to event ID ' + lastClickedEvent['_id'] + ': ' + note);
+			console.log('note added to event ID ' + Spec.lastClickedEvent['_id'] + ': ' + note);
 			//console.log(msg);
 			var each_note_view = new EachNoteView({ //Backbone new note view used
-				'eventid': lastClickedEvent.id,
+				'eventid': Spec.lastClickedEvent.id,
 				'note': {
 					'id': res.id,
 					'text': note,
@@ -180,7 +182,7 @@ NotesView = Backbone.View.extend({
         initialize: function(){
             this.render();
             this.options.notes.forEach(function(note) {
-            	var each_note_view = new EachNoteView({ 'eventid': lastClickedEvent.id, 'note':note });
+            	var each_note_view = new EachNoteView({ 'eventid': Spec.lastClickedEvent.id, 'note':note });
             });
         },
         render: function(){
@@ -203,10 +205,10 @@ EachNoteView = Backbone.View.extend({
 					url: "notes/remove",
 					data: {
 						'id': noteid,
-						eventid: lastClickedEvent['_id']
+						eventid: Spec.lastClickedEvent['_id']
 					}
 				}).done(function(msg) {
-					console.log('note removed from event ID ' + lastClickedEvent.id + ', ID: ' + noteid);
+					console.log('note removed from event ID ' + Spec.lastClickedEvent.id + ', ID: ' + noteid);
 					$(removedItem).parent().parent().remove();
 				});
 				return false;
@@ -258,10 +260,10 @@ EachStaffView = Backbone.View.extend({
 					url: "staff/remove",
 					data: {
 						'id': shiftid,
-						'eventid': lastClickedEvent['_id']
+						'eventid': Spec.lastClickedEvent['_id']
 					}
 				}).done(function(msg) {
-					console.log('staff removed from event ID ' + lastClickedEvent['_id'] + ', ID: ' + shiftid);
+					console.log('staff removed from event ID ' + Spec.lastClickedEvent['_id'] + ', ID: ' + shiftid);
 					$(removedItem).parent().parent().remove();
 				});
 				return false;
@@ -280,18 +282,18 @@ function formatAMPM(date) {
   return strTime;
 }
 
-var lastClickedEvent;
+
 $('a[href="#staffEvent"]').click(function(e) {
 	//This part should get the event data and update staff adding modal box
-	//$('.eventName').html(lastClickedEvent.title);
+	//$('.eventName').html(Spec.lastClickedEvent.title);
 	$.ajax({
 		type: "GET",
-		url: "staff/get/" + lastClickedEvent['_id'],
+		url: "staff/get/" + Spec.lastClickedEvent['_id'],
 	}).done(function(shifts) {
 		//staff rendering will happen here
 		//foreach new Date(Date.parse(shift.date));
 		for(i = 0; i < shifts.length; i++) {
-			var staffProfile = storeAllStaff.filter(function(staff) {
+			var staffProfile = Spec.storeAllStaff.filter(function(staff) {
 				return staff.username == shifts[i].staff;
 			})[0];
 			if(staffProfile == undefined) {
@@ -324,7 +326,7 @@ var _inventoryProto = {
 			type: "POST",
 			url: "inventory/remove",
 			data: {
-				eventid: lastClickedEvent['_id'],
+				eventid: Spec.lastClickedEvent['_id'],
 				inventoryid:pill.data('tag-id')
 			}
 		}).done(function(msg) {
@@ -342,7 +344,7 @@ var _inventoryProto = {
 			type: "POST",
 			url: "inventory/add",
 			data: {
-				eventid: lastClickedEvent['_id'],
+				eventid: Spec.lastClickedEvent['_id'],
 				inventoryid: pill.data('tag-id')
 			}
 		}).done(function(msg) {
@@ -415,11 +417,11 @@ $(document).ready(function() {
 				$('#popup').modalPopover('show');
 				var note_view = new NotesView({ 'eventid': calEvent['_id'], 'notes':notes });
 			});
-			lastClickedEvent = calEvent;
+			Spec.lastClickedEvent = calEvent;
 		},
 		eventRightClick: function(calEvent, jsEvent, view) {
 			jsEvent.preventDefault(); //Right click event only prevents default because context menu is binded in eventRender
-			lastClickedEvent = calEvent;
+			Spec.lastClickedEvent = calEvent;
 		},
 		eventRender: function(event, element) {
 			//Adding all events to an array for event filtering with Backbone.js router
@@ -468,7 +470,7 @@ $(document).ready(function() {
 			type: "GET",
 			url: "staff/all/",
 		}).done(function(staff) {
-			storeAllStaff = staff;
+			Spec.storeAllStaff = staff;
 		});
 });
 $(document).ajaxStart(function() {
@@ -482,8 +484,8 @@ $(document).ajaxStop(function() {
 
 function NewRowInit(lastShift) {
 	if(lastShift == undefined) {
-		var startTime = formatAMPM(lastClickedEvent.start);
-		var endTime = formatAMPM(lastClickedEvent.end);
+		var startTime = formatAMPM(Spec.lastClickedEvent.start);
+		var endTime = formatAMPM(Spec.lastClickedEvent.end);
 	} else {
 		var startTime = formatAMPM(new Date(Date.parse(lastShift.start)));
 		var endTime = formatAMPM(new Date(Date.parse(lastShift.end)));
@@ -501,7 +503,7 @@ function NewRowInit(lastShift) {
 		defaultTime: endTime
 	});
 	$('.combobox').html('');
-	storeAllStaff.forEach(function(person) {
+	Spec.storeAllStaff.forEach(function(person) {
 		if(person.name == false) {return;}
 		$('.combobox')
 			.append($('<option>', {
@@ -527,12 +529,12 @@ function NewRowInit(lastShift) {
 				'staff': chosenStaff,
 				'start': $('#timepicker5').val(),
 				'end': $('#timepicker6').val(),
-				'eventid': lastClickedEvent['_id'],
-				'eventStart': lastClickedEvent.start,
-				'eventEnd': lastClickedEvent.end,
+				'eventid': Spec.lastClickedEvent['_id'],
+				'eventStart': Spec.lastClickedEvent.start,
+				'eventEnd': Spec.lastClickedEvent.end,
 			}
 		}).done(function(res) {
-			console.log('staff added to event ID ' + lastClickedEvent['_id'] + ': ' + res.id);
+			console.log('staff added to event ID ' + Spec.lastClickedEvent['_id'] + ': ' + res.id);
 			var each_staff_view2 = new EachStaffView({ //Backbone new note view used
 				'item': {
 					'id': res.id,

@@ -198,8 +198,8 @@
 	<script type="text/template" id="staff_template">
 
 
-		<p><b><%= lastClickedEvent.title %></b>
-	    <span class="pull-right"><%= formatAMPM(new Date(Date.parse(lastClickedEvent.start))) %> - <%= formatAMPM(new Date(Date.parse(lastClickedEvent.end))) %></span>
+		<p><b><%= Spec.lastClickedEvent.title %></b>
+	    <span class="pull-right"><%= formatAMPM(new Date(Date.parse(Spec.lastClickedEvent.start))) %> - <%= formatAMPM(new Date(Date.parse(Spec.lastClickedEvent.end))) %></span>
 
 	    <table class="table table-bordered table-hover table-condensed">
 		<thead><th><i class="icon-user"></i>  Staff</th><th><i class="icon-time"></i> From</th><th><i class="icon-time"></i> To</th>

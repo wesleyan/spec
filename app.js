@@ -3,7 +3,6 @@ var express = require('express');
 
 var app = express();
 var path = require('path');
-var sugar = require('sugar');
 
 var databaseUrl = "spec"; // "username:password@example.com/mydb"
 var collections = ['events','staff']
