@@ -9,7 +9,45 @@ var collections = ['events','staff']
 var db = require("mongojs").connect(databaseUrl, collections);
 var mongo = require('mongodb-wrapper');
 
-var username = 'ckorkut';
+function getBy(myArray, key, value) {
+	return myArray.filter(function(obj) {
+		if(obj['key'] === value) {
+		return obj;
+		}
+	});
+}
+var users;
+db.staff.find({}, function(err, data) {
+		if (err || !data) {
+			console.log("No events found");
+		} else {
+			users = data;
+		}
+	});
+
+//CAS Session Management will come here.
+var username = 'ckorkut'; //let's assume that the session variable is this for now
+
+function inSession() { //boolean returning function to detect if logged in or user in staff list
+	return true;
+	//this is the actual code for the future:
+	if(getBy(users,'username',req.session.cas_user).length < 1) {
+		return false;
+	} else {
+		return true;
+	}
+}
+
+function permission() { //returns the permission level of the user in session
+	return 10;
+	var userObj = getBy(users,'username',req.session.cas_user);
+	if(userObj.length < 1) {
+		return false;
+	} else {
+		return userObj[0].level;
+	}
+}
+//CAS Session Management ends here.
 
 var date = new Date();
 //var diff = date.getTimezoneOffset()/60;
@@ -139,13 +177,13 @@ var allInventory = [{
 		/*var selectedEvent = events.filter(function(event) {
 			return event.id == req.params.id;
 		})[0];*/
-		db.events.find({_id: new mongo.ObjectID(req.params.id)}, function(err, events) {
-			if (err || !events) {
+		db.events.find({_id: new mongo.ObjectID(req.params.id)}, function(err, data) {
+			if (err || !data) {
 				console.log("No events found");
 			} else {
 				//events[0].inventory
 				var existingList = [];
-				events[0].inventory.forEach(function(id) {
+				data[0].inventory.forEach(function(id) {
 					existingList.push(allInventory.filter(function(tool) {
 						return tool.id == id;
 					})[0]);

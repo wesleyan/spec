@@ -508,6 +508,14 @@ var staff = [{
 	"name": false,
 	"text": 0,
 	"class_year": 0
+},
+{
+	"username": "ckorkut",
+	"level": 10,
+	"phone": false,
+	"name": 'Cumhur K.',
+	"text": 0,
+	"class_year": 2017
 }];
 
 staff.forEach(function(event) {
