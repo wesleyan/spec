@@ -1,7 +1,58 @@
 var Spec = { //the only global variable that is supposed to be used in this.
 	storeAllStaff: [],
 	username: 'ckorkut',
-	lastClickedEvent: {}
+	lastClickedEvent: {},
+	dropdownActiveFix: function() {
+		$('a').removeClass('drop-active');
+		$('a[href="#' + Backbone.history.fragment + '"]').addClass('drop-active');
+	},
+	changePopupColor: function (event) { //changes the events object
+		$("#popupTitleButton").removeClass("btn-success btn-inverse btn-warning btn-danger");
+		if (event.valid == false) {
+			$("#popupTitleButton").addClass("btn-inverse");
+		} else if (event.staffAdded == 0) {
+			$("#popupTitleButton").addClass("btn-danger");
+		} else if (event.staffAdded < event.staffNeeded) {
+			$("#popupTitleButton").addClass("btn-warning");
+		} else if (event.staffAdded == event.staffNeeded) {
+			$("#popupTitleButton").addClass("btn-success");
+		}
+	},
+	resizeMap: function() {
+		var column_height = $(window).height();
+		$('#calendar').fullCalendar('option', 'height', column_height - 40); //$("#calendar").css("height", + "px")
+	}, //end resizeMap
+
+	setTimeline: function(view) { //this is borrowed from stackoverflow
+		var parentDiv = jQuery(".fc-agenda-slots:visible").parent();
+		var timeline = parentDiv.children(".timeline");
+		if (timeline.length == 0) { //if timeline isn't there, add it
+			timeline = jQuery("<hr>").addClass("timeline");
+			parentDiv.prepend(timeline);
+		}
+		var curTime = new Date();
+		var curCalView = jQuery("#calendar").fullCalendar('getView');
+		if (curCalView.visStart < curTime && curCalView.visEnd > curTime) {
+			timeline.show();
+		} else {
+			timeline.hide();
+			return;
+		}
+		var curSeconds = (curTime.getHours() * 60 * 60) + (curTime.getMinutes() * 60) + curTime.getSeconds();
+		var percentOfDay = curSeconds / 86400; //24 * 60 * 60 = 86400, # of seconds in a day
+		var topLoc = Math.floor(parentDiv.height() * percentOfDay);
+		timeline.css("top", topLoc + "px");
+		if (curCalView.name == "agendaWeek") { //week view, don't want the timeline to go the whole way across
+			var dayCol = jQuery(".fc-today:visible");
+			var left = dayCol.position().left + 1;
+			var width = dayCol.width() - 2;
+			timeline.css({
+				left: left + "px",
+				width: width + "px"
+			});
+		}
+	}, //end setTimeline
+
 };
 //User info must be imported for this part
 
@@ -71,19 +122,6 @@ app.on('route:all', function(filter) {
 Backbone.history.start();
 
 
-Spec.changePopupColor = function (event) { //changes the events object
-	$("#popupTitleButton").removeClass("btn-success btn-inverse btn-warning btn-danger");
-	if (event.valid == false) {
-		$("#popupTitleButton").addClass("btn-inverse");
-	} else if (event.staffAdded == 0) {
-		$("#popupTitleButton").addClass("btn-danger");
-	} else if (event.staffAdded < event.staffNeeded) {
-		$("#popupTitleButton").addClass("btn-warning");
-	} else if (event.staffAdded == event.staffNeeded) {
-		$("#popupTitleButton").addClass("btn-success");
-	}
-}
-
 $('#eventButton').click(function(e) {
 	$('#eventButton').addClass('disabled');
 	$('#popup').modalPopover('hide');
@@ -130,46 +168,8 @@ $('#eventButton').click(function(e) {
 
 	//$('.removeNote').on('click',function(e) {alert('hpkajsna');});
 
-Spec.resizeMap = function() {
-	var column_height = $(window).height();
-	$('#calendar').fullCalendar('option', 'height', column_height - 40);
-	//$("#calendar").css("height", + "px")
-};
 
-Spec.setTimeline = function(view) { //this is borrowed from stackoverflow
-	var parentDiv = jQuery(".fc-agenda-slots:visible").parent();
-	var timeline = parentDiv.children(".timeline");
-	if (timeline.length == 0) { //if timeline isn't there, add it
-		timeline = jQuery("<hr>").addClass("timeline");
-		parentDiv.prepend(timeline);
-	}
-	var curTime = new Date();
-	var curCalView = jQuery("#calendar").fullCalendar('getView');
-	if (curCalView.visStart < curTime && curCalView.visEnd > curTime) {
-		timeline.show();
-	} else {
-		timeline.hide();
-		return;
-	}
-	var curSeconds = (curTime.getHours() * 60 * 60) + (curTime.getMinutes() * 60) + curTime.getSeconds();
-	var percentOfDay = curSeconds / 86400; //24 * 60 * 60 = 86400, # of seconds in a day
-	var topLoc = Math.floor(parentDiv.height() * percentOfDay);
-	timeline.css("top", topLoc + "px");
-	if (curCalView.name == "agendaWeek") { //week view, don't want the timeline to go the whole way across
-		var dayCol = jQuery(".fc-today:visible");
-		var left = dayCol.position().left + 1;
-		var width = dayCol.width() - 2;
-		timeline.css({
-			left: left + "px",
-			width: width + "px"
-		});
-	}
-}
 
-Spec.dropdownActiveFix =  function() {
-	$('a').removeClass('drop-active');
-	$('a[href="#' + Backbone.history.fragment + '"]').addClass('drop-active');
-}
 
 $('.modal').on('show', function() {
 	$('#popup').css('opacity', 0.7);
@@ -177,24 +177,25 @@ $('.modal').on('show', function() {
 	$('#popup').css('opacity', 1);
 });
 
+ _.templateSettings.variable = "op";
 // BACKBONE.JS VIEWS Spec.View.*
 NotesView = Backbone.View.extend({
-        initialize: function(){
-            this.render();
-            this.options.notes.forEach(function(note) {
-            	var each_note_view = new EachNoteView({ 'eventid': Spec.lastClickedEvent.id, 'note':note });
+        initialize: function(options){
+            this.render(options);
+            options.notes.forEach(function(note) {
+            	var each_note_view = new EachNoteView(note);
             });
         },
-        render: function(){
-            var variables = { eventid: this.options.eventid, notes: this.options.notes };
+        render: function(options){
+            var variables = { eventid: Spec.lastClickedEvent['_id'], notes: options.notes };
             var template = _.template( $("#notes_template").html(), variables );
             $("#notes").html( template );
         }
     });
 
 EachNoteView = Backbone.View.extend({
-        initialize: function(){
-            this.render();
+        initialize: function(note){
+            this.render(note);
             var removedItem;
             $('.removeNote').unbind( "click" );
 			$('.removeNote').on('click', function(e) { //this is in EachNoteView because it should be binded to notes added by user later on too
@@ -214,40 +215,40 @@ EachNoteView = Backbone.View.extend({
 				return false;
 			});
         },
-        render: function(){
-            var variables = { eventid: this.options.eventid, 'note': this.options.note };
+        render: function(note){
+            var variables = { eventid: Spec.lastClickedEvent['_id'], 'note': note };
             var template = _.template( $("#each_note_template").html(), variables );
             $("#notesBody").append( template );
         }
     });
 
 StaffView = Backbone.View.extend({
-        initialize: function(){
-            this.render();
+        initialize: function(options){
+            this.render(options);
         },
-        render: function(){
+        render: function(options){
             //Pass variables in using Underscore.js Template
-            var variables = {'shifts': this.options.shifts };
+            var variables = {'shifts': options.shifts };
             // Compile the template using underscore
             var template = _.template( $("#staff_template").html(), variables );
             // Load the compiled HTML into the Backbone "el"
             $("#staffEvent .modal-body").html( template );
-            this.options.shifts.forEach(function(shift) {
+            options.shifts.forEach(function(shift) {
             	var each_note_view = new EachStaffView({ 'item': shift });
             });
-            Spec.newRowInit(this.options.shifts.slice(-1)[0]);
+            Spec.newRowInit(options.shifts.slice(-1)[0]);
             $('.combobox').combobox({
 				placeholder: 'Choose a staff'
 			});
         }
     });
 EachStaffView = Backbone.View.extend({
-        initialize: function(){
-            this.render();
+        initialize: function(options){
+            this.render(options);
         },
-        render: function(){
+        render: function(options){
             //Pass variables in using Underscore.js Template
-            var variables = {'item': this.options.item };
+            var variables = {'item': options.item };
             // Compile the template using underscore
             var template = _.template( $("#each_staff_template").html(), variables );
             // Load the compiled HTML into the Backbone "el"
@@ -415,7 +416,7 @@ $(document).ready(function() {
 				url: "notes/existing/" + calEvent['_id'],
 			}).done(function(notes) {
 				$('#popup').modalPopover('show');
-				var note_view = new NotesView({ 'eventid': calEvent['_id'], 'notes':notes });
+				var note_view = new NotesView({'notes':notes });
 			});
 			Spec.lastClickedEvent = calEvent;
 		},

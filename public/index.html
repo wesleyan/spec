@@ -182,14 +182,14 @@
 	    </table>
 	</script>
 	<script type="text/template" id="each_note_template">
-	     	<% note.date = new Date(Date.parse(note.date));	%>
+	     	<% op.note.date = new Date(Date.parse(op.note.date));	%>
 	     	<tr>
 	     		<td class="notesTable">
-	     			<%= note.text %>
+	     			<%= op.note.text %>
 	     			<br>
-	     			<span class="label"><%= note.user %> | <%= defaults.monthNamesShort[note.date.getMonth()] %> <%= note.date.getDate() %></span>
-					<% if(note.user == username) { %>
-	     				<span class="pull-right btn btn-mini btn-danger removeNote" href="<%= note.id %>"><i class="icon-remove icon-white"></i></span>
+	     			<span class="label"><%= op.note.user %> | <%= defaults.monthNamesShort[op.note.date.getMonth()] %> <%= op.note.date.getDate() %></span>
+					<% if(op.note.user == Spec.username) { %>
+	     				<span class="pull-right btn btn-mini btn-danger removeNote" href="<%= op.note.id %>"><i class="icon-remove icon-white"></i></span>
 	     			<% } %>
 	     		</td>
 		   	</tr>
@@ -231,10 +231,10 @@
 	</script>
 	<script type="text/template" id="each_staff_template">
 			<tr>
-				<td><%= item.staffname %> (<%= item.staff %>)</td>
-				<td><%= Spec.formatAMPM(new Date(Date.parse(item.start))) %></td>
-				<td><%= Spec.formatAMPM(new Date(Date.parse(item.end))) %></td>
-				<td><span class="btn btn-danger btn-mini removeStaff" type="button" href="<%= item.id %>"><i class="icon-remove icon-white"></i></span></td>
+				<td><%= op.item.staffname %> (<%= op.item.staff %>)</td>
+				<td><%= Spec.formatAMPM(new Date(Date.parse(op.item.start))) %></td>
+				<td><%= Spec.formatAMPM(new Date(Date.parse(op.item.end))) %></td>
+				<td><span class="btn btn-danger btn-mini removeStaff" type="button" href="<%= op.item.id %>"><i class="icon-remove icon-white"></i></span></td>
 			</tr>
 	</script>
 
