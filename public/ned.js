@@ -24,7 +24,7 @@ app.on('route:recentVideo', function() {
 });
 
 app.on('route:all', function(filter) {
-	dropdownActiveFix();
+	Spec.dropdownActiveFix();
 	if (filter == null) {
 		//Show all of events
 		$('#calendar').fullCalendar('clientEvents', function(event) {
@@ -71,7 +71,7 @@ app.on('route:all', function(filter) {
 Backbone.history.start();
 
 
-function changePopupColor(event) { //changes the events object
+Spec.changePopupColor = function (event) { //changes the events object
 	$("#popupTitleButton").removeClass("btn-success btn-inverse btn-warning btn-danger");
 	if (event.valid == false) {
 		$("#popupTitleButton").addClass("btn-inverse");
@@ -130,13 +130,13 @@ $('#eventButton').click(function(e) {
 
 	//$('.removeNote').on('click',function(e) {alert('hpkajsna');});
 
-resizeMap = function() {
+Spec.resizeMap = function() {
 	var column_height = $(window).height();
 	$('#calendar').fullCalendar('option', 'height', column_height - 40);
 	//$("#calendar").css("height", + "px")
 };
 
-function setTimeline(view) { //this is borrowed from stackoverflow
+Spec.setTimeline = function(view) { //this is borrowed from stackoverflow
 	var parentDiv = jQuery(".fc-agenda-slots:visible").parent();
 	var timeline = parentDiv.children(".timeline");
 	if (timeline.length == 0) { //if timeline isn't there, add it
@@ -166,7 +166,7 @@ function setTimeline(view) { //this is borrowed from stackoverflow
 	}
 }
 
-function dropdownActiveFix() {
+Spec.dropdownActiveFix =  function() {
 	$('a').removeClass('drop-active');
 	$('a[href="#' + Backbone.history.fragment + '"]').addClass('drop-active');
 }
@@ -177,7 +177,7 @@ $('.modal').on('show', function() {
 	$('#popup').css('opacity', 1);
 });
 
-// BACKBONE.JS VIEWS
+// BACKBONE.JS VIEWS Spec.View.*
 NotesView = Backbone.View.extend({
         initialize: function(){
             this.render();
@@ -235,7 +235,7 @@ StaffView = Backbone.View.extend({
             this.options.shifts.forEach(function(shift) {
             	var each_note_view = new EachStaffView({ 'item': shift });
             });
-            NewRowInit(this.options.shifts.slice(-1)[0]);
+            Spec.newRowInit(this.options.shifts.slice(-1)[0]);
             $('.combobox').combobox({
 				placeholder: 'Choose a staff'
 			});
@@ -271,7 +271,7 @@ EachStaffView = Backbone.View.extend({
         }
     });
 
-function formatAMPM(date) {
+Spec.formatAMPM = function(date) {
   var hours = date.getHours();
   var minutes = date.getMinutes();
   var ampm = hours >= 12 ? 'PM' : 'AM';
@@ -316,7 +316,7 @@ $('#collapseTwo').on('click shown keydown', function() {
 		$(this).css('overflow', 'hidden');
 	});
 
-var _inventoryProto = {
+Spec._inventoryProto = {
 	only_suggestions: true,
 	suggestion_url: "inventory/all",
 	//These methods below have to send AJAX requests to update the inventory.
@@ -381,7 +381,7 @@ $(document).ready(function() {
 		firstDay: date.getDay(),
 		eventBorderColor: 'black',
 		windowResize: function(view) {
-			resizeMap();
+			Spec.resizeMap();
 		},
 		eventClick: function(calEvent, jsEvent, view) {
 			//This function should contain specific stuff like opening the event-based selection/description box etc
@@ -393,7 +393,7 @@ $(document).ready(function() {
 			}
 			
 			$('#eventButton').removeClass('disabled');
-			changePopupColor(calEvent);
+			Spec.changePopupColor(calEvent);
 
 			//Popover update with event information (can be hidden in a Backbone view)
 			$('#popupTitle').html(symbol + calEvent.title);
@@ -405,7 +405,7 @@ $(document).ready(function() {
 			var inventoryOptions = {
 				values_url: 'inventory/existing/' + calEvent['_id'],
 			};
-			$.extend(inventoryOptions,_inventoryProto);
+			$.extend(inventoryOptions,Spec._inventoryProto);
 			$('#inventory').html('');
 			$('#inventory').tags(inventoryOptions);
 
@@ -438,7 +438,7 @@ $(document).ready(function() {
 		viewRender: function(view, element) {
 			//console.log(view.name);
 			try {
-				setTimeline();
+				Spec.setTimeline();
 			} catch (err) {}
 		},
 		newEventsComplete: function() { //after each ajax request to the server, new events also filtered by this way
@@ -461,7 +461,7 @@ $(document).ready(function() {
 	//Important: especially not using defaultView option of FullCalendar, for efficient use of lazyFetching.
 	$('#calendar').fullCalendar('changeView', 'agendaWeek');
 	//Loads the whole month events, and shows them from memory, instead of a new request for each prev/next click.
-	resizeMap();
+	Spec.resizeMap();
 	$('#leftGroup').prependTo('.fc-header-left');
 	$('#rightGroup').appendTo('.fc-header-right');
 
@@ -482,13 +482,13 @@ $(document).ajaxStop(function() {
 	$("#eventButton i").addClass('icon-book');
 });
 
-function NewRowInit(lastShift) {
+Spec.newRowInit = function (lastShift) {
 	if(lastShift == undefined) {
-		var startTime = formatAMPM(Spec.lastClickedEvent.start);
-		var endTime = formatAMPM(Spec.lastClickedEvent.end);
+		var startTime = Spec.formatAMPM(Spec.lastClickedEvent.start);
+		var endTime = Spec.formatAMPM(Spec.lastClickedEvent.end);
 	} else {
-		var startTime = formatAMPM(new Date(Date.parse(lastShift.start)));
-		var endTime = formatAMPM(new Date(Date.parse(lastShift.end)));
+		var startTime = Spec.formatAMPM(new Date(Date.parse(lastShift.start)));
+		var endTime = Spec.formatAMPM(new Date(Date.parse(lastShift.end)));
 	}
  	$('#timepicker5').timepicker({
 		template: false,

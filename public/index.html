@@ -199,7 +199,7 @@
 
 
 		<p><b><%= Spec.lastClickedEvent.title %></b>
-	    <span class="pull-right"><%= formatAMPM(new Date(Date.parse(Spec.lastClickedEvent.start))) %> - <%= formatAMPM(new Date(Date.parse(Spec.lastClickedEvent.end))) %></span>
+	    <span class="pull-right"><%= Spec.formatAMPM(new Date(Date.parse(Spec.lastClickedEvent.start))) %> - <%= Spec.formatAMPM(new Date(Date.parse(Spec.lastClickedEvent.end))) %></span>
 
 	    <table class="table table-bordered table-hover table-condensed">
 		<thead><th><i class="icon-user"></i>  Staff</th><th><i class="icon-time"></i> From</th><th><i class="icon-time"></i> To</th>
@@ -232,8 +232,8 @@
 	<script type="text/template" id="each_staff_template">
 			<tr>
 				<td><%= item.staffname %> (<%= item.staff %>)</td>
-				<td><%= formatAMPM(new Date(Date.parse(item.start))) %></td>
-				<td><%= formatAMPM(new Date(Date.parse(item.end))) %></td>
+				<td><%= Spec.formatAMPM(new Date(Date.parse(item.start))) %></td>
+				<td><%= Spec.formatAMPM(new Date(Date.parse(item.end))) %></td>
 				<td><span class="btn btn-danger btn-mini removeStaff" type="button" href="<%= item.id %>"><i class="icon-remove icon-white"></i></span></td>
 			</tr>
 	</script>
