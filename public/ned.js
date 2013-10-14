@@ -478,13 +478,10 @@ $(document).ready(function() {
 			console.log('note added to event ID ' + Spec.lastClickedEvent['_id'] + ': ' + note);
 			//console.log(msg);
 			var each_note_view = new Spec.View.EachNote({ //Backbone new note view used
-				'eventid': Spec.lastClickedEvent.id,
-				'note': {
 					'id': res.id,
 					'text': note,
 					'user': res.user,
 					'date': new Date()
-				}
 			});
 		});
 		$('#newNote textarea').val('');
