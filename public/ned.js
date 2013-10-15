@@ -100,6 +100,13 @@ Spec = {
 			return pill; //has to return pill
 		}
 	}, //end _inventoryProto
+	decodeEntities: function(s){
+	    var str, temp = document.createElement('p');
+	    temp.innerHTML= s;
+	    str = temp.textContent || temp.innerText;
+	    temp =null;
+	    return str;
+	}, //end decodeEntries
 };
 //User info must be imported for this part
 
@@ -331,7 +338,6 @@ Spec.newRowInit = function (lastShift) {
 	}); 	//click event
 }
 
-
 $(document).ready(function() {
 	var date = new Date();
 	var d = date.getDate();
@@ -371,10 +377,10 @@ $(document).ready(function() {
 			Spec.changePopupColor(calEvent);
 
 			//Popover update with event information (can be hidden in a Backbone view)
-			$('#popupTitle').html(symbol + calEvent.title);
+			$('#popupTitle').html(symbol + Spec.decodeEntities(calEvent.title));
 			$('#popupStaffInfo').html(calEvent.staffAdded + '/' + calEvent.staffNeeded);
-			$('#popupContentInside').html(calEvent.desc);
-			$('#popupContentHeader').html('<b>' + defaults.dayNames[calEvent.start.getDay()] + ' | ' + calEvent.loc + '</b>');
+			$('#popupContentInside').html(Spec.decodeEntities(calEvent.desc));
+			$('#popupContentHeader').html('<b>' + defaults.dayNames[calEvent.start.getDay()] + ' | ' + Spec.decodeEntities(calEvent.loc) + '</b>');
 			
 			//Inventory update
 			var inventoryOptions = {
