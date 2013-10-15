@@ -190,16 +190,35 @@
     </script>
 
 	<script type="text/template" id="edit_template">
-	    <p>This is the edit template rendered by Backbone.</p>
-	    <div>
-	        <span>Username:</span>
-	        <a href="#" id="username" data-type="text" data-placement="right" data-title="Enter username">superuser</a>
-	      </div>
+	    <p>This is the edit template rendered by Backbone.
 	      
 	      <div>
 	        <span>Status:</span>
-	        <a href="#" id="status"></a>
+	        
 	      </div>
+
+	       <table class="table table-bordered table-striped" style="clear: both">
+                <tbody> 
+                    <tr>         
+                        <td width="35%">Simple text field</td>
+                        <td width="65%"><a href="#" id="username" data-type="text" data-placement="right" data-title="Enter username">superuser</a></td>
+                    </tr>
+                    <tr>         
+                        <td>Status</td>
+                        <td><a href="#" id="status"></a></td>
+                    </tr>
+                    <tr>         
+                        <td>Needed staff</td>
+                        <td>
+                        	<button class="btn btn-primary btn-mini" type="button"><i class="icon-white icon-minus"></i></button>
+                        	<input type="text" class="input-mini" id="neededStaff" value="<%= op.event.staffNeeded %>">
+                        	<button class="btn btn-primary btn-mini" type="button"><i class="icon-white icon-plus"></i></button>
+                        </td>
+                    </tr>
+                </tbody> 
+            </table>
+
+	      </p>
 	</script>
 	<script type="text/template" id="remove_template">
 		  <div class="modal-header">
