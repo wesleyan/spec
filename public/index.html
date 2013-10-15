@@ -61,22 +61,23 @@
  	<div id="context-menu" class="front">
  		<ul class="dropdown-menu">
  			<li><a href="#staffEvent" data-toggle="modal"><i class="icon-plus"></i> Staff this event</a></li>
+ 			<li class="divider"></li>
+ 			<li><a href="#editEvent" data-toggle="modal"><i class="icon-pencil"></i> Edit this event</a></li>
+ 			<li><a href="#removeEvent" data-toggle="modal"><i class="icon-remove"></i> Remove this event</a></li>
 	  	</ul>
  	</div>
 
 	<div id="staffEvent" class="modal front hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	  <div class="modal-header">
 	    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-	    <h3 id="myModalLabel">Staff This Event</h3>
+	    <h3 id="myModalLabel">Staff this event</h3>
 	  </div>
 	  <div class="modal-body">
-
 	  </div>
 	  <div class="modal-footer">
 	    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
 	  </div>
 	</div>
-
 
 	<div id="newNote" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	  <div class="modal-header">
@@ -94,8 +95,21 @@
 	  </div>
 	</div>
 
+	<div id="editEvent" class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+	  <div class="modal-header">
+	    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+	    <h3 id="myModalLabel">Edit this event</h3>
+	  </div>
+	  <div class="modal-body">
+	  </div>
+	  <div class="modal-footer">
+	    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+	    <button class="btn btn-primary">Save changes</button>
+	  </div>
+	</div>
+	<div id="removeEvent" class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
 
-
+	</div>
 
 	<div id="popup" class="popover">
 	    <div class="arrow"></div>
@@ -173,7 +187,22 @@
     <script src="ned.js"></script>
     </script>
 
-
+	<script type="text/template" id="edit_template">
+	    <p>This is the edit template rendered by Backbone.</p>
+	</script>
+	<script type="text/template" id="remove_template">
+		  <div class="modal-header">
+		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		    <h3 id="myModalLabel">Removing this event</h3>
+		  </div>
+		  <div class="modal-body">
+		  	 <p>Are you sure that you want to remove the event <b><%= op.event.title %></b> ?</p>
+		  </div>
+		  <div class="modal-footer">
+		  	<button class="btn btn-danger">Remove</button>
+		    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+		  </div>
+	</script>
 	<script type="text/template" id="notes_template">
 	    <table class="table table-hover table-condensed">
 		    <tbody id="notesBody">
@@ -194,7 +223,6 @@
 	     		</td>
 		   	</tr>
 	</script>
-
 	<script type="text/template" id="staff_template">
 
 

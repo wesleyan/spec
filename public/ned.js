@@ -151,6 +151,28 @@ Backbone.history.start();
 // BACKBONE.JS VIEWS Spec.View.*
 _.templateSettings.variable = "op";
 
+Spec.View.Edit = Backbone.View.extend({
+        initialize: function(){
+            this.render();
+        },
+        render: function(){
+            var variables = { event: Spec.lastClickedEvent};
+            var template = _.template( $("#edit_template").html(), variables );
+            $("#editEvent .modal-body").html( template );
+        }
+    });
+
+Spec.View.Remove = Backbone.View.extend({
+        initialize: function(){
+            this.render();
+        },
+        render: function(){
+            var variables = { event: Spec.lastClickedEvent};
+            var template = _.template( $("#remove_template").html(), variables );
+            $("#removeEvent").html( template );
+        }
+    });
+
 Spec.View.Notes = Backbone.View.extend({
         initialize: function(options){
             this.render(options);
@@ -490,6 +512,14 @@ $(document).ready(function() {
 			/*$.each(staff, function(key, value) {
 			});*/
 		});
+	});
+	$('a[href="#editEvent"]').click(function(e) {
+		//This part should get the event data and update the event editing modal box
+		var edit_view = new Spec.View.Edit();
+	});
+	$('a[href="#removeEvent"]').click(function(e) {
+		//This part should get the event data and update the event editing modal box
+		var remove_view = new Spec.View.Remove();
 	});
 
 	// Solves Bootstrap typeahead dropdown overflow problem
