@@ -4,6 +4,7 @@ Spec = {
 	username: 'ckorkut',
 	lastClickedEvent: {},
 	View: {},
+	filter: '',
 	dropdownActiveFix: function() {
 		$('a').removeClass('drop-active');
 		$('a[href="#' + Backbone.history.fragment + '"]').addClass('drop-active');
@@ -107,6 +108,13 @@ Spec = {
 	    temp =null;
 	    return str;
 	}, //end decodeEntries
+	eventSource: function() { 
+		return {
+				url: 'events/?filter=' + Spec.filter, // Shows all events BUT need it to show only events to certain location
+				ignoreTimezone: false
+			};
+		},
+
 };
 //User info must be imported for this part
 
@@ -130,47 +138,12 @@ Spec.app.on('route:recentVideo', function() {
 
 Spec.app.on('route:all', function(filter) {
 	Spec.dropdownActiveFix();
-	if (filter == null) {
-		//Show all of events
-		$('#calendar').fullCalendar('clientEvents', function(event) {
-			event.className = _.without(event.className, 'hide');
-			$('#calendar').fullCalendar('updateEvent', event);
-		});
-		console.log('all');
-
-	} else if (filter == 'hideCancelled') {
-
-		$('#calendar').fullCalendar('clientEvents', function(event) {
-			event.className = _.without(event.className, 'hide');
-			if (event.valid == false) {
-				event.className.push('hide');
-			}
-			$('#calendar').fullCalendar('updateEvent', event);
-		});
-		console.log(filter);
-	} else if (filter == 'unstaffed') {
-		$('#calendar').fullCalendar('clientEvents', function(event) {
-			event.className = _.without(event.className, 'hide');
-			if (event.staffAdded == event.staffNeeded || event.valid == false) {
-				event.className.push('hide');
-			}
-			$('#calendar').fullCalendar('updateEvent', event);
-		});
-		console.log(filter);
-	} else if (filter == 'onlyMine') {
-		$('#calendar').fullCalendar('clientEvents', function(event) {
-			event.className = _.without(event.className, 'hide');
-			var people = [];
-			event.shifts.forEach(function(shift) {
-				people.push(shift.staff);
-			})
-			if (people.indexOf(Spec.username) == -1) {
-				event.className.push('hide');
-			}
-			$('#calendar').fullCalendar('updateEvent', event);
-		});
-		console.log(filter);
-	}
+	Spec.filter = filter;
+	$('#calendar').fullCalendar('changeView', 'month');
+	$('#calendar').fullCalendar('removeEvents'); //for fetching the whole month events
+	$('#calendar').fullCalendar('addEventSource', Spec.eventSource());
+	$('#calendar').fullCalendar('changeView', 'agendaWeek');
+	console.log(filter);
 });
 
 Backbone.history.start();
@@ -422,7 +395,7 @@ $(document).ready(function() {
 				Spec.setTimeline();
 			} catch (err) {}
 		},
-		newEventsComplete: function() { //after each ajax request to the server, new events also filtered by this way
+		/*newEventsComplete: function() { //after each ajax request to the server, new events also filtered by this way
 			var currentUrl = Backbone.history.fragment;
 			if (currentUrl != '') {
 				Spec.app.navigate('', {
@@ -432,11 +405,8 @@ $(document).ready(function() {
 					trigger: true
 				});
 			}
-		},
-		eventSources: [{
-			url: 'events/', // Shows all events BUT need it to show only events to certain location
-			ignoreTimezone: false
-		}],
+		},*/
+		eventSources: [Spec.eventSource()]
 	});
 
 	//Important: especially not using defaultView option of FullCalendar, for efficient use of lazyFetching.

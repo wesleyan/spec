@@ -98,8 +98,15 @@ app.get("/events", function(req, res) {
 	//86400s = 1d
 	var start = new Date(req.query.start * 1000);
 	var end = new Date(req.query.end * 1000);
-
-	db.events.find({}, function(err, events) {
+	var query = {};
+	if(req.query.filter == 'hideCancelled') {
+		query = {valid: true};
+	} else if(req.query.filter == 'unstaffed') {
+		query = { $where: "this.staffNeeded > this.staffAdded", valid: true };
+	} else if(req.query.filter == 'onlyMine') {
+		query = {shifts: { $elemMatch: { staff: username } }};
+	}
+	db.events.find(query, function(err, events) {
 		if (err || !events) {
 			console.log("No events found");
 		} else {
