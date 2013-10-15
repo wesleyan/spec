@@ -13,6 +13,7 @@
     <link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css" rel="stylesheet">
     <link href="ned.css" rel="stylesheet">
     <link href="lib/bootstrap-timepicker.css" rel="stylesheet">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.4.6/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet"/>
   </head>
   <body>
   	<span id="leftGroup">
@@ -184,11 +185,21 @@
     <script src="lib/bootstrap-tags.js"></script>
     <script src="lib/bootstrap-combobox.js"></script>
     <script src="lib/jquery.bootstrap-growl.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.4.6/bootstrap-editable/js/bootstrap-editable.min.js"></script>
     <script src="ned.js"></script>
     </script>
 
 	<script type="text/template" id="edit_template">
 	    <p>This is the edit template rendered by Backbone.</p>
+	    <div>
+	        <span>Username:</span>
+	        <a href="#" id="username" data-type="text" data-placement="right" data-title="Enter username">superuser</a>
+	      </div>
+	      
+	      <div>
+	        <span>Status:</span>
+	        <a href="#" id="status"></a>
+	      </div>
 	</script>
 	<script type="text/template" id="remove_template">
 		  <div class="modal-header">
