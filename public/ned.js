@@ -223,6 +223,20 @@ Spec.View.Edit = Backbone.View.extend({
 Spec.View.Remove = Backbone.View.extend({
         initialize: function(){
             this.render();
+            $('#removeEvent .btn-danger').click(function(e) {
+				$.ajax({
+					type: "POST",
+					url: "event/remove",
+					data: {
+						eventid: Spec.lastClickedEvent['_id']
+					}
+				}).done(function(msg) {
+					console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' removed');
+					$('#calendar').fullCalendar('refetchEvents');
+					$('#popup').modalPopover('hide');
+					$('#removeEvent').modal('hide');
+				});
+			});
         },
         render: function(){
             var variables = { event: Spec.lastClickedEvent};

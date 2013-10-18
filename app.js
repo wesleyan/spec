@@ -126,7 +126,7 @@ app.get("/events", function(req, res) {
 
 		app.post("/event/cancel", function(req, res) {
 			//req.url
-			console.log("Req for cancel toggle from Event ID " + req.body.eventid);
+			console.log("Req for cancel toggle Event ID " + req.body.eventid);
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
@@ -143,7 +143,24 @@ app.get("/events", function(req, res) {
 					}
 				});
 		});
-
+		app.post("/event/remove", function(req, res) {
+			//req.url
+			console.log("Req for remove Event ID " + req.body.eventid);
+			res.writeHead(200, {
+				'Content-Type': 'application/json'
+			});
+			db.events.remove(
+				{_id: new mongo.ObjectID(req.body.eventid)},
+				function(err, removed) {
+					if (err || !removed) {
+						console.log("Event not removed:" + err);
+					} else {
+						console.log("Event removed");
+						res.write(JSON.stringify(true).toString("utf-8"));
+						res.end();
+					}
+				});
+		});
 
 app.get('/printtoday', function(req, res) {
 	res.render('printtoday');
