@@ -77,6 +77,14 @@ Spec = {
 	  var strTime = hours + ':' + minutes + ' ' + ampm;
 	  return strTime;
 	}, //end formatAMPM
+	getFormattedDate: function(date) {
+	  var year = date.getFullYear();
+	  var month = (1 + date.getMonth()).toString();
+	  month = month.length > 1 ? month : '0' + month;
+	  var day = date.getDate().toString();
+	  day = day.length > 1 ? day : '0' + day;
+	  return month + '/' + day + '/' + year;
+	},
 	_inventoryProto: {
 		only_suggestions: true,
 		suggestion_url: "inventory/all",
@@ -172,6 +180,13 @@ Spec.View.Edit = Backbone.View.extend({
 		        rows: 4
 		    });
 		    $('#loc').editable();
+		     $('#startDate').editable({
+		        format: 'yyyy-mm-dd',    
+		        viewformat: 'mm/dd/yyyy',    
+		        datepicker: {
+		                weekStart: 1
+		           }
+			});
 	     	$('.bootstrap-timepicker input').timepicker({
 				template: false,
 				showInputs: true,
