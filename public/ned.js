@@ -168,22 +168,11 @@ Spec.View.Edit = Backbone.View.extend({
 		        rows: 4
 		    });
 		    $('#loc').editable();
-		    $('#status').editable({
-		        type: 'select',
-		        title: 'Select status',
-		        placement: 'right',
-		        value: 2,
-		        source: [
-		            {value: 1, text: 'status 1'},
-		            {value: 2, text: 'status 2'},
-		            {value: 3, text: 'status 3'}
-		        ]
-		    });
-		     	$('.bootstrap-timepicker input').timepicker({
-					template: false,
-					showInputs: true,
-					minuteStep: 5
-				});
+	     	$('.bootstrap-timepicker input').timepicker({
+				template: false,
+				showInputs: true,
+				minuteStep: 5
+			});
 			$('#MySpinner').spinner();
 
         },
