@@ -538,6 +538,7 @@ $(document).ready(function() {
 				'eventid': Spec.lastClickedEvent['_id']
 			}
 		}).done(function(msg) {
+			$('#calendar').fullCalendar('refetchEvents');
 			console.log('staff removed from event ID ' + Spec.lastClickedEvent['_id'] + ', ID: ' + shiftid);
 			$(removedItem).parent().parent().remove();
 		});
@@ -566,6 +567,7 @@ $(document).ready(function() {
 				'eventEnd': Spec.lastClickedEvent.end,
 			}
 		}).done(function(res) {
+			$('#calendar').fullCalendar('refetchEvents');
 			console.log('staff added to event ID ' + Spec.lastClickedEvent['_id'] + ': ' + res.id);
 			var each_staff_view2 = new Spec.View.EachStaff({ //Backbone new note view used
 				'item': {

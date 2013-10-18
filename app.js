@@ -72,11 +72,11 @@ function addBackgroundColor(events) { //changes the events object
 		}
 		if (event.valid == false) {
 			events[index]['backgroundColor'] = color.gray;
-		} else if (event.staffAdded == 0) {
+		} else if (event.shifts.length == 0) {
 			events[index]['backgroundColor'] = color.red;
-		} else if (event.staffAdded < event.staffNeeded) {
+		} else if (event.shifts.length < event.staffNeeded) {
 			events[index]['backgroundColor'] = color.yellow;
-		} else if (event.staffAdded == event.staffNeeded) {
+		} else if (event.shifts.length == event.staffNeeded) {
 			events[index]['backgroundColor'] = color.green;
 		}
 	}
@@ -102,7 +102,7 @@ app.get("/events", function(req, res) {
 	if(req.query.filter == 'hideCancelled') {
 		query = {valid: true};
 	} else if(req.query.filter == 'unstaffed') {
-		query = { $where: "this.staffNeeded > this.staffAdded", valid: true };
+		query = { $where: "this.shifts.length < this.staffNeeded", valid: true };
 	} else if(req.query.filter == 'onlyMine') {
 		query = {shifts: { $elemMatch: { staff: username } }};
 	}
