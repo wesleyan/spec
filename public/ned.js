@@ -1,3 +1,11 @@
+/*
+  ____                     
+ / ___|  _ __    ___   ___ 
+ \___ \ | '_ \  / _ \ / __|
+  ___) || |_) ||  __/| (__ 
+ |____/ | .__/  \___| \___|
+        |_|                
+*/
 var Spec = {}; //the only global variable that is supposed to be used in this application.
 Spec = { 
 	storeAllStaff: [],
@@ -150,16 +158,16 @@ Backbone.history.start();
 
 // BACKBONE.JS VIEWS Spec.View.*
 _.templateSettings.variable = "op";
-
+$.fn.editable.defaults.mode = 'inline';   //toggle `popup` / `inline` mode
 Spec.View.Edit = Backbone.View.extend({
         initialize: function(){
             this.render();
-            //toggle `popup` / `inline` mode
-		    $.fn.editable.defaults.mode = 'inline';     
-		    
-		    //make username editable
-		    $('#username').editable();
-		    
+		    $('#title').editable();
+		    $('#desc').editable({
+		        title: 'Description',
+		        rows: 4
+		    });
+		    $('#loc').editable();
 		    //make status editable
 		    $('#status').editable({
 		        type: 'select',
@@ -177,6 +185,13 @@ Spec.View.Edit = Backbone.View.extend({
 		        ,url: '/post'
 		        */
 		    });
+		     	$('.bootstrap-timepicker input').timepicker({
+					template: false,
+					showInputs: true,
+					minuteStep: 5
+				});
+			$('#MySpinner').spinner();
+
         },
         render: function(){
             var variables = { event: Spec.lastClickedEvent};

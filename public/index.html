@@ -64,6 +64,8 @@
  			<li><a href="#staffEvent" data-toggle="modal"><i class="icon-plus"></i> Staff this event</a></li>
  			<li class="divider"></li>
  			<li><a href="#editEvent" data-toggle="modal"><i class="icon-pencil"></i> Edit this event</a></li>
+ 			 <li><a href="#cancelEvent" data-toggle="modal"><i class="icon-off"></i> Cancel this event</a></li>
+ 			 <li class="divider"></li>
  			<li><a href="#removeEvent" data-toggle="modal"><i class="icon-remove"></i> Remove this event</a></li>
 	  	</ul>
  	</div>
@@ -104,8 +106,8 @@
 	  <div class="modal-body">
 	  </div>
 	  <div class="modal-footer">
-	    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
 	    <button class="btn btn-primary">Save changes</button>
+	    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
 	  </div>
 	</div>
 	<div id="removeEvent" class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
@@ -185,6 +187,7 @@
     <script src="lib/bootstrap-tags.js"></script>
     <script src="lib/bootstrap-combobox.js"></script>
     <script src="lib/jquery.bootstrap-growl.js"></script>
+     <script src="lib/spinner.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.4.6/bootstrap-editable/js/bootstrap-editable.min.js"></script>
     <script src="ned.js"></script>
     </script>
@@ -200,24 +203,67 @@
 	       <table class="table table-bordered table-striped" style="clear: both">
                 <tbody> 
                     <tr>         
-                        <td width="35%">Simple text field</td>
-                        <td width="65%"><a href="#" id="username" data-type="text" data-placement="right" data-title="Enter username">superuser</a></td>
+                        <td width="35%">Event Name</td>
+                        <td width="65%" colspan="2"><a href="#" id="title" data-type="text" data-placement="right" data-title="Enter title"><%= op.event.title %></a></td>
                     </tr>
+                     <tr>         
+                        <td>Description</td>
+                        <td colspan="2"><a href="#" id="desc" data-type="textarea" data-pk="1"><small><%= op.event.desc %></small></a></td>
+                    </tr>
+                    <tr>         
+                        <td>Location</td>
+                        <td colspan="2"><a href="#" id="loc" data-type="text" data-placement="right" data-title="Enter location"><%= Spec.decodeEntities(op.event.loc) %></a></td>
+                    </tr>
+
                     <tr>         
                         <td>Status</td>
-                        <td><a href="#" id="status"></a></td>
+                        <td colspan="2"><a href="#" id="status"></a></td>
                     </tr>
                     <tr>         
+                        <td>Reserved</td>
+                        <td style="width:30%"> 
+                        	<div class="bootstrap-timepicker">
+					            <input id="timepickerResStart" type="text" class="input-small" value="<%= Spec.formatAMPM(new Date(Date.parse(op.event.reservedStart))) %>">
+					        </div>
+					    </td>
+					    <td>
+                        	<div class="bootstrap-timepicker">
+					            <input id="timepickerResEnd" type="text" class="input-small" value="<%= Spec.formatAMPM(new Date(Date.parse(op.event.reservedEnd))) %>">
+					        </div>
+			        	</td>
+                    </tr>
+                    <tr>         
+                        <td>Event Starting</td>
+                        <td> 
+                        	<div class="bootstrap-timepicker">
+					            <input id="timepickerEventStart" type="text" class="input-small" value="<%= Spec.formatAMPM(new Date(Date.parse(op.event.eventStart))) %>">
+					        </div>
+					    </td>
+					    <td>
+					        <div class="bootstrap-timepicker">
+					            <input id="timepickerEventEnd" type="text" class="input-small" value="<%= Spec.formatAMPM(new Date(Date.parse(op.event.eventEnd))) %>">
+					        </div>
+			        	</td>
+                    </tr>                   
+                    <tr>         
                         <td>Needed staff</td>
-                        <td>
-                        	<button class="btn btn-primary btn-mini" type="button"><i class="icon-white icon-minus"></i></button>
-                        	<input type="text" class="input-mini" id="neededStaff" value="<%= op.event.staffNeeded %>">
-                        	<button class="btn btn-primary btn-mini" type="button"><i class="icon-white icon-plus"></i></button>
+                        <td colspan="2">
+                        	<div id="MySpinner" class="spinner fuelux">
+								<input type="text" class="input-mini spinner-input" value="<%= op.event.staffNeeded %>">
+								<div class="spinner-buttons	btn-group btn-group-vertical">
+									<button type="button" class="btn spinner-up">
+										<i class="icon-chevron-up"></i>
+									</button>
+									<button type="button" class="btn spinner-down">
+										<i class="icon-chevron-down"></i>
+									</button>
+								</div>
+							</div>
                         </td>
                     </tr>
                 </tbody> 
             </table>
-
+            The changes you have made will be ignored unless you save them.
 	      </p>
 	</script>
 	<script type="text/template" id="remove_template">
