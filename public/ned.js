@@ -18,17 +18,21 @@ Spec = {
 		$('a').removeClass('drop-active');
 		$('a[href="#' + Backbone.history.fragment + '"]').addClass('drop-active');
 	},
-	changePopupColor: function (event) { //changes the events object
-		$("#popupTitleButton").removeClass("btn-success btn-inverse btn-warning btn-danger");
+	changePopupColor: function (event) {
+		$("#popupTitleButton").removeClass("btn-success btn-inverse btn-warning btn-danger btn-info");
 		if (event.valid == false) {
 			$("#popupTitleButton").addClass("btn-inverse");
-		} else if (event.staffAdded == 0) {
+		} else if (event.shifts.length == 0) {
 			$("#popupTitleButton").addClass("btn-danger");
-		} else if (event.staffAdded < event.staffNeeded) {
+		} else if (event.shifts.length < event.staffNeeded) {
 			$("#popupTitleButton").addClass("btn-warning");
-		} else if (event.staffAdded == event.staffNeeded) {
+		} else if (event.shifts.length == event.staffNeeded) {
 			$("#popupTitleButton").addClass("btn-success");
+		} else if (event.shifts.length > event.staffNeeded) {
+			$("#popupTitleButton").addClass("btn-info");
 		}
+
+		$('#popupStaffInfo').html(event.shifts.length + '/' + event.staffNeeded);
 	},
 	resizeMap: function() {
 		var column_height = $(window).height();
@@ -319,7 +323,7 @@ $(document).ready(function() {
 
 			//Popover update with event information (can be hidden in a Backbone view)
 			$('#popupTitle').html(symbol + Spec.decodeEntities(calEvent.title));
-			$('#popupStaffInfo').html(calEvent.staffAdded + '/' + calEvent.staffNeeded);
+			
 			$('#popupContentInside').html(Spec.decodeEntities(calEvent.desc));
 			$('#popupContentHeader').html('<b>' + defaults.dayNames[calEvent.start.getDay()] + ' | ' + Spec.decodeEntities(calEvent.loc) + '</b>');
 			
@@ -527,6 +531,8 @@ $(document).ready(function() {
 				'eventid': Spec.lastClickedEvent['_id']
 			}
 		}).done(function(msg) {
+			Spec.lastClickedEvent.shifts.pop();
+			Spec.changePopupColor(Spec.lastClickedEvent);
 			$('#calendar').fullCalendar('refetchEvents');
 			console.log('staff removed from event ID ' + Spec.lastClickedEvent['_id'] + ', ID: ' + shiftid);
 			$(removedItem).parent().parent().remove();
@@ -557,6 +563,8 @@ $(document).ready(function() {
 			}
 		}).done(function(res) {
 			$('#calendar').fullCalendar('refetchEvents');
+			Spec.lastClickedEvent.shifts.push({});
+			Spec.changePopupColor(Spec.lastClickedEvent);
 			console.log('staff added to event ID ' + Spec.lastClickedEvent['_id'] + ': ' + res.id);
 			var each_staff_view2 = new Spec.View.EachStaff({ //Backbone new note view used
 				'item': {
