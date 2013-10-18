@@ -223,12 +223,12 @@
                         <td>Reserved</td>
                         <td style="width:30%"> 
                         	<div class="bootstrap-timepicker">
-					            <input id="timepickerResStart" type="text" class="input-small" value="<%= Spec.formatAMPM(new Date(Date.parse(op.event.reservedStart))) %>">
+					            <input id="timepickerResStart" type="text" class="input-small" value="<%= Spec.formatAMPM(new Date(Date.parse(op.event.start))) %>">
 					        </div>
 					    </td>
 					    <td>
                         	<div class="bootstrap-timepicker">
-					            <input id="timepickerResEnd" type="text" class="input-small" value="<%= Spec.formatAMPM(new Date(Date.parse(op.event.reservedEnd))) %>">
+					            <input id="timepickerResEnd" type="text" class="input-small" value="<%= Spec.formatAMPM(new Date(Date.parse(op.event.end))) %>">
 					        </div>
 			        	</td>
                     </tr>
