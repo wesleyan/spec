@@ -168,7 +168,6 @@ Spec.View.Edit = Backbone.View.extend({
 		        rows: 4
 		    });
 		    $('#loc').editable();
-		    //make status editable
 		    $('#status').editable({
 		        type: 'select',
 		        title: 'Select status',
@@ -179,11 +178,6 @@ Spec.View.Edit = Backbone.View.extend({
 		            {value: 2, text: 'status 2'},
 		            {value: 3, text: 'status 3'}
 		        ]
-		        /*
-		        //uncomment these lines to send data on server
-		        ,pk: 1
-		        ,url: '/post'
-		        */
 		    });
 		     	$('.bootstrap-timepicker input').timepicker({
 					template: false,
@@ -203,20 +197,6 @@ Spec.View.Edit = Backbone.View.extend({
 Spec.View.Remove = Backbone.View.extend({
         initialize: function(){
             this.render();
-            $('#removeEvent .btn-danger').click(function(e) {
-				$.ajax({
-					type: "POST",
-					url: "event/remove",
-					data: {
-						eventid: Spec.lastClickedEvent['_id']
-					}
-				}).done(function(msg) {
-					console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' removed');
-					$('#calendar').fullCalendar('refetchEvents');
-					$('#popup').modalPopover('hide');
-					$('#removeEvent').modal('hide');
-				});
-			});
         },
         render: function(){
             var variables = { event: Spec.lastClickedEvent};
@@ -243,23 +223,6 @@ Spec.View.EachNote = Backbone.View.extend({
         initialize: function(note){
             this.render(note);
             var removedItem;
-            $('.removeNote').unbind( "click" );
-			$('.removeNote').on('click', function(e) { //this is in Spec.View.EachNote because it should be binded to notes added by user later on too
-				removedItem = this;
-				var noteid = $(this).attr('href');
-				$.ajax({
-					type: "POST",
-					url: "notes/remove",
-					data: {
-						'id': noteid,
-						eventid: Spec.lastClickedEvent['_id']
-					}
-				}).done(function(msg) {
-					console.log('note removed from event ID ' + Spec.lastClickedEvent.id + ', ID: ' + noteid);
-					$(removedItem).parent().parent().remove();
-				});
-				return false;
-			});
         },
         render: function(note){
             var variables = { eventid: Spec.lastClickedEvent['_id'], 'note': note };
@@ -271,14 +234,10 @@ Spec.View.EachNote = Backbone.View.extend({
 Spec.View.Staff = Backbone.View.extend({
         initialize: function(options){
             this.render(options);
-
         },
         render: function(options){
-            //Pass variables in using Underscore.js Template
             var variables = {'shifts': options.shifts };
-            // Compile the template using underscore
             var template = _.template( $("#staff_template").html(), variables );
-            // Load the compiled HTML into the Backbone "el"
             $("#staffEvent .modal-body").html( template );
             options.shifts.forEach(function(shift) {
             	var each_note_view = new Spec.View.EachStaff({ 'item': shift });
@@ -294,28 +253,9 @@ Spec.View.EachStaff = Backbone.View.extend({
             this.render(options);
         },
         render: function(options){
-            //Pass variables in using Underscore.js Template
             var variables = {'item': options.item };
-            // Compile the template using underscore
             var template = _.template( $("#each_staff_template").html(), variables );
-            // Load the compiled HTML into the Backbone "el"
             $("#staffEvent .modal-body tbody").prepend( template );
-            $('.removeStaff').on('click', function(e) {
-				removedItem = this;
-				var shiftid = $(this).attr('href');
-				$.ajax({
-					type: "POST",
-					url: "staff/remove",
-					data: {
-						'id': shiftid,
-						'eventid': Spec.lastClickedEvent['_id']
-					}
-				}).done(function(msg) {
-					console.log('staff removed from event ID ' + Spec.lastClickedEvent['_id'] + ', ID: ' + shiftid);
-					$(removedItem).parent().parent().remove();
-				});
-				return false;
-			});
         }
     });
 
@@ -348,42 +288,6 @@ Spec.newRowInit = function (lastShift) {
 				})
 				.text(person.name + ' (' + person.username + ')'));
 	});
-	$('#addNewStaff').click(function(e) {
-		if($('.combobox').val() == '') {
-			$.bootstrapGrowl("You must choose a staff to add a valid shift.", {
-			  type: 'error',
-			  align: 'center',
-			  delay: 2000,
-			});
-			return false;		
-		} else {
-			var chosenStaff = $('.combobox').val().match(/\(([^)]+)\)/)[1];
-		}
-		$.ajax({
-			type: "POST",
-			url: "staff/add",
-			data: {
-				'staff': chosenStaff,
-				'start': $('#timepicker5').val(),
-				'end': $('#timepicker6').val(),
-				'eventid': Spec.lastClickedEvent['_id'],
-				'eventStart': Spec.lastClickedEvent.start,
-				'eventEnd': Spec.lastClickedEvent.end,
-			}
-		}).done(function(res) {
-			console.log('staff added to event ID ' + Spec.lastClickedEvent['_id'] + ': ' + res.id);
-			var each_staff_view2 = new Spec.View.EachStaff({ //Backbone new note view used
-				'item': {
-					'id': res.id,
-					'start': res.start,
-					'end': res.end,
-					'staff': chosenStaff,
-					'staffname': $('.combobox').val().substring(0, $('.combobox').val().indexOf('(')-1),
-				}
-			});
-			$('.combobox').val('');
-		}); //done function
-	}); 	//click event
 }
 
 $(document).ready(function() {
@@ -475,17 +379,6 @@ $(document).ready(function() {
 				Spec.setTimeline();
 			} catch (err) {}
 		},
-		/*newEventsComplete: function() { //after each ajax request to the server, new events also filtered by this way
-			var currentUrl = Backbone.history.fragment;
-			if (currentUrl != '') {
-				Spec.app.navigate('', {
-					trigger: true
-				});
-				Spec.app.navigate(currentUrl, {
-					trigger: true
-				});
-			}
-		},*/
 		eventSources: [Spec.eventSource()]
 	});
 
@@ -549,13 +442,11 @@ $(document).ready(function() {
 	});
 	$('a[href="#staffEvent"]').click(function(e) {
 		//This part should get the event data and update staff adding modal box
-		//$('.eventName').html(Spec.lastClickedEvent.title);
 		$.ajax({
 			type: "GET",
 			url: "staff/get/" + Spec.lastClickedEvent['_id'],
 		}).done(function(shifts) {
 			//staff rendering will happen here
-			//foreach new Date(Date.parse(shift.date));
 			for(i = 0; i < shifts.length; i++) {
 				var staffProfile = Spec.storeAllStaff.filter(function(staff) {
 					return staff.username == shifts[i].staff;
@@ -567,8 +458,6 @@ $(document).ready(function() {
 				}
 			}
 			var staff_view = new Spec.View.Staff({'shifts': shifts });
-			/*$.each(staff, function(key, value) {
-			});*/
 		});
 	});
 	$('a[href="#editEvent"]').click(function(e) {
@@ -593,12 +482,7 @@ $(document).ready(function() {
 		});
 	});
 
-	// Solves Bootstrap typeahead dropdown overflow problem
-	$('#collapseTwo').on('click shown keydown', function() {
-			$(this).css('overflow', 'visible');
-		}).on('hide', function() {
-			$(this).css('overflow', 'hidden');
-		});
+
 	$('body').on('click','.toggleDuration',function(e) {
 		$.ajax({
 			type: "POST",
@@ -613,7 +497,94 @@ $(document).ready(function() {
 			$('#calendar').fullCalendar('refetchEvents');
 		});
 	});
-
+	$('body').on('click','.removeNote', function(e) {
+		removedItem = this;
+		var noteid = $(this).attr('href');
+		$.ajax({
+			type: "POST",
+			url: "notes/remove",
+			data: {
+				'id': noteid,
+				eventid: Spec.lastClickedEvent['_id']
+			}
+		}).done(function(msg) {
+			console.log('note removed from event ID ' + Spec.lastClickedEvent.id + ', ID: ' + noteid);
+			$(removedItem).parent().parent().remove();
+		});
+		return false;
+	});
+    $('body').on('click','#removeEvent .btn-danger',function(e) {
+		$.ajax({
+			type: "POST",
+			url: "event/remove",
+			data: {
+				eventid: Spec.lastClickedEvent['_id']
+			}
+		}).done(function(msg) {
+			console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' removed');
+			$('#calendar').fullCalendar('refetchEvents');
+			$('#popup').modalPopover('hide');
+			$('#removeEvent').modal('hide');
+		});
+	});
+    $('body').on('click','.removeStaff', function(e) {
+		removedItem = this;
+		var shiftid = $(this).attr('href');
+		$.ajax({
+			type: "POST",
+			url: "staff/remove",
+			data: {
+				'id': shiftid,
+				'eventid': Spec.lastClickedEvent['_id']
+			}
+		}).done(function(msg) {
+			console.log('staff removed from event ID ' + Spec.lastClickedEvent['_id'] + ', ID: ' + shiftid);
+			$(removedItem).parent().parent().remove();
+		});
+		return false;
+	});
+	$('body').on('click','#addNewStaff',function(e) {
+		if($('.combobox').val() == '') {
+			$.bootstrapGrowl("You must choose a staff to add a valid shift.", {
+			  type: 'error',
+			  align: 'center',
+			  delay: 2000,
+			});
+			return false;		
+		} else {
+			var chosenStaff = $('.combobox').val().match(/\(([^)]+)\)/)[1];
+		}
+		$.ajax({
+			type: "POST",
+			url: "staff/add",
+			data: {
+				'staff': chosenStaff,
+				'start': $('#timepicker5').val(),
+				'end': $('#timepicker6').val(),
+				'eventid': Spec.lastClickedEvent['_id'],
+				'eventStart': Spec.lastClickedEvent.start,
+				'eventEnd': Spec.lastClickedEvent.end,
+			}
+		}).done(function(res) {
+			console.log('staff added to event ID ' + Spec.lastClickedEvent['_id'] + ': ' + res.id);
+			var each_staff_view2 = new Spec.View.EachStaff({ //Backbone new note view used
+				'item': {
+					'id': res.id,
+					'start': res.start,
+					'end': res.end,
+					'staff': chosenStaff,
+					'staffname': $('.combobox').val().substring(0, $('.combobox').val().indexOf('(')-1),
+				}
+			});
+			$('.combobox').val('');
+		}); //done function
+	}); 	//click event
+	// Solves Bootstrap typeahead dropdown overflow problem
+	$('#collapseTwo').on('click shown keydown', function() {
+		$(this).css('overflow', 'visible');
+	}).on('hide', function() {
+		$(this).css('overflow', 'hidden');
+	});
 });
 
 $(document).ajaxStart(function() {
