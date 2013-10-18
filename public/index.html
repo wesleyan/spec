@@ -34,7 +34,7 @@
 		   <i class="icon-folder-open"></i> <span class="caret"></span>
 		  </button>
 		  <ul class="dropdown-menu front">
-		    <li><a href="#printToday"><i class="icon-print"></i> Events of today</a></li>
+		    <li><a href="/printToday"><i class="icon-print"></i> Events of today</a></li>
 		    <li><a href="#recentVideo"><i class="icon-film"></i> Recent video events</a></li>
 		  </ul>
 		</span>
@@ -194,13 +194,7 @@
     </script>
 
 	<script type="text/template" id="edit_template">
-	    <p>This is the edit template rendered by Backbone.
-	      
-	      <div>
-	        <span>Status:</span>
-	        
-	      </div>
-
+	    <p>	      
 	       <table class="table table-bordered table-striped" style="clear: both">
                 <tbody> 
                     <tr>         
@@ -244,7 +238,7 @@
                     <tr>         
                         <td>Needed staff</td>
                         <td colspan="2">
-                        	<div id="MySpinner" class="spinner fuelux">
+                        	<div id="MySpinner" class="spinner">
 								<input type="text" class="input-mini spinner-input" value="<%= op.event.staffNeeded %>">
 								<div class="spinner-buttons	btn-group btn-group-vertical">
 									<button type="button" class="btn spinner-up">
@@ -310,6 +304,18 @@
 	     	<a class="badge toggleDuration"><i class="icon-adjust icon-white"></i> </a>
 	      <% } %>
 	     </p>
+
+	                             	<div id="MySpinner" class="spinner pull-right">
+								<input type="text" class="input-mini spinner-input" value="<%= Spec.lastClickedEvent.staffNeeded %>">
+								<div class="spinner-buttons	btn-group btn-group-vertical">
+									<button type="button" class="btn spinner-up">
+										<i class="icon-chevron-up"></i>
+									</button>
+									<button type="button" class="btn spinner-down">
+										<i class="icon-chevron-down"></i>
+									</button>
+								</div>
+							</div>
 	    <table class="table table-bordered table-hover table-condensed">
 		<thead><th><i class="icon-user"></i>  Staff</th><th><i class="icon-time"></i> From</th><th><i class="icon-time"></i> To</th>
 		<th><i class="icon-edit"></i></th></thead>

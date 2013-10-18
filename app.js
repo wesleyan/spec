@@ -142,6 +142,25 @@ app.get("/events", function(req, res) {
 					}
 				});
 		});
+		app.post("/event/edit", function(req, res) {
+			//req.url
+			console.log("Req for event edit Event ID " + req.body.eventid);
+			res.writeHead(200, {
+				'Content-Type': 'application/json'
+			});
+			db.events.update(
+				{_id: new mongo.ObjectID(req.body.eventid)},
+				{ $set: {'duration': eval(req.body.make) } },  //this line consists of editing stuff
+				function(err, updated) {
+					if (err || !updated) {
+						console.log("Event not edited:" + err);
+					} else {
+						console.log("Event edited");
+						res.write(JSON.stringify(true).toString("utf-8"));
+						res.end();
+					}
+				});
+		});
 		app.post("/event/cancel", function(req, res) {
 			//req.url
 			console.log("Req for cancel toggle Event ID " + req.body.eventid);

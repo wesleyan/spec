@@ -577,6 +577,20 @@ $(document).ready(function() {
 			});
 			$('.combobox').val('');
 		}); //done function
+
+		$('body').on('click','#editEvent .modal-footer .btn-primary',function(e) {
+			$.ajax({
+				type: "POST",
+				url: "event/edit",
+				data: {
+					'eventid': Spec.lastClickedEvent['_id'],
+				}
+			}).done(function(res) {
+				$('#calendar').fullCalendar('refetchEvents');
+				$('#editEvent').modal('hide');
+			}); //done function
+		});
+
 	}); 	//click event
 	// Solves Bootstrap typeahead dropdown overflow problem
 	$('#collapseTwo').on('click shown keydown', function() {
