@@ -10,6 +10,7 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
 Spec = { 
 	storeAllStaff: [],
 	username: 'ckorkut',
+	permission:10, //this is only for practical reasons, backend will always check for permission with session information
 	lastClickedEvent: {},
 	View: {},
 	filter: '',
@@ -122,27 +123,6 @@ Spec = {
 				ignoreTimezone: false
 			};
 		},
-	addSingleBackgroundColor: function(event) { //changes the event object
-		var color = {
-			'green': '#097054',
-			'red': '#9E3B33',
-			'yellow': '#E48743',
-			'gray': '#666666'
-		};
-		if(event.duration == false) {
-			event['className'] = ['striped']; //handles the setup and breakdown events as well
-		}
-		if (event.valid == false) {
-			event['backgroundColor'] = color.gray;
-		} else if (event.staffAdded == 0) {
-			event['backgroundColor'] = color.red;
-		} else if (event.staffAdded < event.staffNeeded) {
-			event['backgroundColor'] = color.yellow;
-		} else if (event.staffAdded == event.staffNeeded) {
-			event['backgroundColor'] = color.green;
-		}
-		return event;
-	}
 };
 //User info must be imported for this part
 
@@ -291,6 +271,7 @@ Spec.View.EachNote = Backbone.View.extend({
 Spec.View.Staff = Backbone.View.extend({
         initialize: function(options){
             this.render(options);
+
         },
         render: function(options){
             //Pass variables in using Underscore.js Template
@@ -618,6 +599,21 @@ $(document).ready(function() {
 		}).on('hide', function() {
 			$(this).css('overflow', 'hidden');
 		});
+	$('body').on('click','.toggleDuration',function(e) {
+		$.ajax({
+			type: "POST",
+			url: "event/duration",
+			data: {
+				eventid: Spec.lastClickedEvent['_id'],
+				make: !Spec.lastClickedEvent['duration']
+			}
+		}).done(function(msg) {
+			Spec.lastClickedEvent['duration'] = !Spec.lastClickedEvent['duration'];
+			console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' duration toggled');
+			$('#calendar').fullCalendar('refetchEvents');
+		});
+	});
+
 });
 
 $(document).ajaxStart(function() {

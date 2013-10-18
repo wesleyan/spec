@@ -62,10 +62,11 @@
  	<div id="context-menu" class="front">
  		<ul class="dropdown-menu">
  			<li><a href="#staffEvent" data-toggle="modal"><i class="icon-plus"></i> Staff this event</a></li>
+ 			<li><a href="#toggleDurationEvent" data-toggle="modal" class="toggleDuration"><i class="icon-flag"></i> Toggle duration</a></li>
  			<li class="divider"></li>
  			<li><a href="#editEvent" data-toggle="modal"><i class="icon-pencil"></i> Edit this event</a></li>
- 			 <li><a href="#cancelEvent" data-toggle="modal"><i class="icon-off"></i> <span>Cancel this event</span></a></li>
- 			 <li class="divider"></li>
+ 			<li><a href="#cancelEvent" data-toggle="modal"><i class="icon-off"></i> <span>Cancel this event</span></a></li>
+ 			<li class="divider"></li>
  			<li><a href="#removeEvent" data-toggle="modal"><i class="icon-remove"></i> Remove this event</a></li>
 	  	</ul>
  	</div>
@@ -304,7 +305,16 @@
 
 		<p><b><%= Spec.lastClickedEvent.title %></b>
 	    <span class="pull-right"><%= Spec.formatAMPM(new Date(Date.parse(Spec.lastClickedEvent.start))) %> - <%= Spec.formatAMPM(new Date(Date.parse(Spec.lastClickedEvent.end))) %></span>
-
+	    <p>Technician needed for 
+	    <% if(Spec.lastClickedEvent.duration == false) { %>
+	    	<b>setup and breakdown</b> only.
+	    <% } else { %>
+	    	<b>duration of event</b>.
+	     <% } %>
+	     <% if(Spec.permission == 10) { %>
+	     	<a class="badge toggleDuration"><i class="icon-adjust icon-white"></i> </a>
+	      <% } %>
+	     </p>
 	    <table class="table table-bordered table-hover table-condensed">
 		<thead><th><i class="icon-user"></i>  Staff</th><th><i class="icon-time"></i> From</th><th><i class="icon-time"></i> To</th>
 		<th><i class="icon-edit"></i></th></thead>

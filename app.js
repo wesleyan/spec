@@ -123,7 +123,25 @@ app.get("/events", function(req, res) {
 	});
 	
 });
-
+		app.post("/event/duration", function(req, res) {
+			//req.url
+			console.log("Req for duration toggle Event ID " + req.body.eventid);
+			res.writeHead(200, {
+				'Content-Type': 'application/json'
+			});
+			db.events.update(
+				{_id: new mongo.ObjectID(req.body.eventid)},
+				{ $set: {'duration': eval(req.body.make) } }, 
+				function(err, updated) {
+					if (err || !updated) {
+						console.log("Event not duration toggled:" + err);
+					} else {
+						console.log("Event duration toggled");
+						res.write(JSON.stringify(true).toString("utf-8"));
+						res.end();
+					}
+				});
+		});
 		app.post("/event/cancel", function(req, res) {
 			//req.url
 			console.log("Req for cancel toggle Event ID " + req.body.eventid);
