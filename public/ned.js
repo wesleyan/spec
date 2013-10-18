@@ -122,7 +122,27 @@ Spec = {
 				ignoreTimezone: false
 			};
 		},
-
+	addSingleBackgroundColor: function(event) { //changes the event object
+		var color = {
+			'green': '#097054',
+			'red': '#9E3B33',
+			'yellow': '#E48743',
+			'gray': '#666666'
+		};
+		if(event.duration == false) {
+			event['className'] = ['striped']; //handles the setup and breakdown events as well
+		}
+		if (event.valid == false) {
+			event['backgroundColor'] = color.gray;
+		} else if (event.staffAdded == 0) {
+			event['backgroundColor'] = color.red;
+		} else if (event.staffAdded < event.staffNeeded) {
+			event['backgroundColor'] = color.yellow;
+		} else if (event.staffAdded == event.staffNeeded) {
+			event['backgroundColor'] = color.green;
+		}
+		return event;
+	}
 };
 //User info must be imported for this part
 
@@ -435,6 +455,11 @@ $(document).ready(function() {
 		},
 		eventRightClick: function(calEvent, jsEvent, view) {
 			jsEvent.preventDefault(); //Right click event only prevents default because context menu is binded in eventRender
+			if(calEvent.valid == true) {
+				$('a[href="#cancelEvent"] span').text("Cancel this event");
+			} else {
+				$('a[href="#cancelEvent"] span').text("Uncancel this event");
+			}
 			Spec.lastClickedEvent = calEvent;
 		},
 		eventRender: function(event, element) {
@@ -558,6 +583,19 @@ $(document).ready(function() {
 	$('a[href="#removeEvent"]').click(function(e) {
 		//This part should get the event data and update the event editing modal box
 		var remove_view = new Spec.View.Remove();
+	});
+	$('a[href="#cancelEvent"]').click(function(e) {
+		$.ajax({
+			type: "POST",
+			url: "event/cancel",
+			data: {
+				eventid: Spec.lastClickedEvent['_id'],
+				make: !Spec.lastClickedEvent['valid']
+			}
+		}).done(function(msg) {
+			console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' cancel toggled');
+			$('#calendar').fullCalendar('refetchEvents');
+		});
 	});
 
 	// Solves Bootstrap typeahead dropdown overflow problem

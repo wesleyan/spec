@@ -124,6 +124,27 @@ app.get("/events", function(req, res) {
 	
 });
 
+		app.post("/event/cancel", function(req, res) {
+			//req.url
+			console.log("Req for cancel toggle from Event ID " + req.body.eventid);
+			res.writeHead(200, {
+				'Content-Type': 'application/json'
+			});
+			db.events.update(
+				{_id: new mongo.ObjectID(req.body.eventid)},
+				{ $set: {'valid': eval(req.body.make) } }, 
+				function(err, updated) {
+					if (err || !updated) {
+						console.log("Event not cancel toggled:" + err);
+					} else {
+						console.log("Event cancel toggled");
+						res.write(JSON.stringify(true).toString("utf-8"));
+						res.end();
+					}
+				});
+		});
+
+
 app.get('/printtoday', function(req, res) {
 	res.render('printtoday');
 });
