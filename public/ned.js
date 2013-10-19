@@ -646,6 +646,15 @@ $(document).ready(function() {
 			$('#calendar').fullCalendar('refetchEvents');
 			$('#editEvent').modal('hide');
 			$('#popup').modalPopover('hide');
+			var title = Spec.storeEdited.title;
+			if(title == undefined) {
+				title = Spec.lastClickedEvent.title;
+			}
+			$.bootstrapGrowl("The event <b>" + title + '</b> is edited and saved.' , {
+			  type: 'info',
+			  align: 'center',
+			  delay: 2000,
+			});
 			Spec.storeEdited = {};
 		}); //done function
 	});
