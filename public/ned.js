@@ -181,6 +181,7 @@ $.fn.editable.defaults.mode = 'inline';   //toggle `popup` / `inline` mode
 Spec.View.Edit = Backbone.View.extend({
         initialize: function(){
             this.render();
+            Spec.storeEdited = {};
 		    $('#title').editable();
 		    $('#desc').editable({
 		        title: 'Description',
@@ -194,12 +195,19 @@ Spec.View.Edit = Backbone.View.extend({
 		                weekStart: 1
 		           }
 			});
-	     	/*$('.bootstrap-timepicker input').timepicker({
-				template: false,
-				showInputs: true,
-				minuteStep: 5
-			});*/
+	     	$('.bootstrap-timepicker input').timepicker({
+			});
+			$('.bootstrap-timepicker input').on('show.timepicker', function(e) {
+				$(this).prev().toggle();
+			});
 			$('#editSpinner').spinner();
+
+
+			$('.x-edit-event').on('save', function(e, params) {
+				var result = {};
+				result[this.id] = params.newValue;
+			    $.extend(Spec.storeEdited, result)
+			});
 
         },
         render: function(){
@@ -614,21 +622,31 @@ $(document).ready(function() {
 			});
 			$('.combobox').val('');
 		}); //done function
-
-		$('body').on('click','#editEvent .modal-footer .btn-primary',function(e) {
-			$.ajax({
-				type: "POST",
-				url: "event/edit",
-				data: {
-					'eventid': Spec.lastClickedEvent['_id'],
-				}
-			}).done(function(res) {
-				$('#calendar').fullCalendar('refetchEvents');
-				$('#editEvent').modal('hide');
-			}); //done function
-		});
-
 	}); 	//click event
+
+	$('#editEvent .modal-footer .btn-primary').click(function(e) {
+		var editTimepickers = [$('#timepickerResStart'), $('#timepickerResEnd'), $('#timepickerEventStart'), $('#timepickerEventEnd')];
+		editTimepickers.forEach(function (pick) {
+			if(!(pick.val() == pick.prop('defaultValue') || pick.val().substr(1) == pick.prop('defaultValue'))) {
+				var result = {};
+				result[pick.prop('id')] = pick.val();
+				$.extend(Spec.storeEdited,result);
+			}
+		});
+		$.ajax({
+			type: "POST",
+			url: "event/edit",
+			data: {
+				'eventid': Spec.lastClickedEvent['_id'],
+				'changedData': Spec.storeEdited
+			}
+		}).done(function(res) {
+			$('#calendar').fullCalendar('refetchEvents');
+			$('#editEvent').modal('hide');
+		}); //done function
+	});
+
+
 	// Solves Bootstrap typeahead dropdown overflow problem
 	$('#collapseTwo').on('click shown keydown', function() {
 		$(this).css('overflow', 'visible');

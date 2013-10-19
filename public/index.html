@@ -200,19 +200,19 @@
                 <tbody> 
                     <tr>         
                         <td width="35%">Event Name</td>
-                        <td width="65%" colspan="2"><a href="#" id="title" data-type="text" data-placement="right" data-title="Enter title"><%= op.event.title %></a></td>
+                        <td width="65%" colspan="2"><a href="#" class="x-edit-event" id="title" data-type="text" data-placement="right" data-title="Enter title"><%= op.event.title %></a></td>
                     </tr>
                      <tr>         
                         <td>Description</td>
-                        <td colspan="2"><a href="#" id="desc" data-type="textarea" data-pk="1"><small><%= op.event.desc %></small></a></td>
+                        <td colspan="2"><a href="#" class="x-edit-event" id="desc" data-type="textarea" data-pk="1"><small><%= op.event.desc %></small></a></td>
                     </tr>
                     <tr>         
                         <td>Location</td>
-                        <td colspan="2"><a href="#" id="loc" data-type="text" data-placement="right" data-title="Enter location"><%= Spec.decodeEntities(op.event.loc) %></a></td>
+                        <td colspan="2"><a href="#" class="x-edit-event" id="loc" data-type="text" data-placement="right" data-title="Enter location"><%= Spec.decodeEntities(op.event.loc) %></a></td>
                     </tr>
                     <tr>         
                         <td>Date</td>
-                        <td colspan="2"><a href="#" id="startDate" data-type="date" data-pk="1" data-title="Select date">
+                        <td colspan="2"><a href="#" class="x-edit-event" id="startDate" data-type="date" data-pk="1" data-title="Select date">
                         <%= Spec.getFormattedDate(new Date(Date.parse(op.event.start)))  %>
                         </a>
                         </td>
@@ -220,26 +220,31 @@
                     <tr>         
                         <td>Reserved</td>
                         <td style="width:30%"> 
-                        	<div class="bootstrap-timepicker">
+
+                        	<div class="input-append bootstrap-timepicker">
 					            <input id="timepickerResStart" type="text" class="input-small" value="<%= Spec.formatAMPM(new Date(Date.parse(op.event.start))) %>">
+					             <span class="add-on"><i class="icon-time"></i></span>
 					        </div>
 					    </td>
 					    <td>
-                        	<div class="bootstrap-timepicker">
+                        	<div class="input-append bootstrap-timepicker">
 					            <input id="timepickerResEnd" type="text" class="input-small" value="<%= Spec.formatAMPM(new Date(Date.parse(op.event.end))) %>">
+					             <span class="add-on"><i class="icon-time"></i></span>
 					        </div>
 			        	</td>
                     </tr>
                     <tr>         
                         <td>Event Starting</td>
                         <td> 
-                        	<div class="bootstrap-timepicker">
+                        	<div class="input-append bootstrap-timepicker">
 					            <input id="timepickerEventStart" type="text" class="input-small" value="<%= Spec.formatAMPM(new Date(Date.parse(op.event.eventStart))) %>">
+					             <span class="add-on"><i class="icon-time"></i></span>
 					        </div>
 					    </td>
 					    <td>
-					        <div class="bootstrap-timepicker">
+					        <div class="input-append bootstrap-timepicker">
 					            <input id="timepickerEventEnd" type="text" class="input-small" value="<%= Spec.formatAMPM(new Date(Date.parse(op.event.eventEnd))) %>">
+					             <span class="add-on"><i class="icon-time"></i></span>
 					        </div>
 			        	</td>
                     </tr>                   
