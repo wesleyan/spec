@@ -105,6 +105,8 @@ app.get("/events", function(req, res) {
 		query = { $where: "this.shifts.length < this.staffNeeded", valid: true };
 	} else if(req.query.filter == 'onlyMine') {
 		query = {shifts: { $elemMatch: { staff: username } }};
+	} else if(req.query.filter == 'recentVideo') {
+		query = {video: true};
 	}
 	db.events.find(query, function(err, events) {
 		if (err || !events) {

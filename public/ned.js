@@ -155,7 +155,6 @@ Spec = {
 var AppRouter = Backbone.Router.extend({
 	routes: {
 		"printToday": "printToday",
-		"recentVideo": "recentVideo",
 		"*filter": "all"
 	}
 });
@@ -164,9 +163,6 @@ Spec.app = new AppRouter;
 
 Spec.app.on('route:printToday', function() {
 	console.log('printToday');
-});
-Spec.app.on('route:recentVideo', function() {
-	console.log('recentVideo');
 });
 
 Spec.app.on('route:all', function(filter) {
