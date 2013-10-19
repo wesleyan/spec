@@ -135,6 +135,13 @@ Spec = {
 				ignoreTimezone: false
 			};
 		},
+	techTemplateUpdate: function() {
+		if(Spec.lastClickedEvent.duration == false) {
+	    	$('#technician').html('<b>setup and breakdown</b> only.');
+	    } else {
+	    	$('#technician').html('<b>duration of event</b>.');
+	    }
+	}
 };
 //User info must be imported for this part
 
@@ -247,6 +254,7 @@ Spec.View.Staff = Backbone.View.extend({
             var variables = {'shifts': options.shifts };
             var template = _.template( $("#staff_template").html(), variables );
             $("#staffEvent .modal-body").html( template );
+            Spec.techTemplateUpdate();
             options.shifts.forEach(function(shift) {
             	var each_note_view = new Spec.View.EachStaff({ 'item': shift });
             });
@@ -513,9 +521,10 @@ $(document).ready(function() {
 				make: !Spec.lastClickedEvent['duration']
 			}
 		}).done(function(msg) {
-			Spec.lastClickedEvent['duration'] = !Spec.lastClickedEvent['duration'];
-			console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' duration toggled');
 			$('#calendar').fullCalendar('refetchEvents');
+			Spec.lastClickedEvent['duration'] = !Spec.lastClickedEvent['duration'];
+			Spec.techTemplateUpdate();
+			console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' duration toggled');
 		});
 	});
 	$('body').on('click','.removeNote', function(e) {

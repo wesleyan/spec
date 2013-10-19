@@ -303,12 +303,7 @@
 		<p><b><%= Spec.lastClickedEvent.title %></b>
 	    <span class="pull-right"><%= Spec.formatAMPM(new Date(Date.parse(Spec.lastClickedEvent.start))) %> - <%= Spec.formatAMPM(new Date(Date.parse(Spec.lastClickedEvent.end))) %></span>
 	  	<div>
-	   Technician needed for 
-	    <% if(Spec.lastClickedEvent.duration == false) { %>
-	    	<b>setup and breakdown</b> only.
-	    <% } else { %>
-	    	<b>duration of event</b>.
-	     <% } %>
+	   Technician needed for <span id="technician"> </span>
 	     <% if(Spec.permission == 10) { %>
 	     	<a class="badge toggleDuration"><i class="icon-adjust icon-white"></i> </a>
 	      <% } %>
