@@ -534,6 +534,21 @@ $(document).ready(function() {
 			console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' duration toggled');
 		});
 	});
+	$('body').on('click','.toggleVideo',function(e) {
+		$.ajax({
+			type: "POST",
+			url: "event/video",
+			data: {
+				eventid: Spec.lastClickedEvent['_id'],
+				make: !Spec.lastClickedEvent['video']
+			}
+		}).done(function(msg) {
+			Spec.refetchEvents();
+			Spec.lastClickedEvent['video'] = !Spec.lastClickedEvent['video'];
+			Spec.techTemplateUpdate();
+			console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' video toggled');
+		});
+	});
 	$('body').on('click','.removeNote', function(e) {
 		removedItem = this;
 		var noteid = $(this).attr('href');

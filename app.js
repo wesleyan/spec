@@ -85,7 +85,7 @@ function addBackgroundColor(events) { //changes the events object
 
 app.configure(function() {
 	app.set('views', __dirname + '/views');
-	app.set('view engine', 'jade');
+	app.set('view engine', 'ejs');
 	app.use(express.bodyParser());
 	app.use(express.methodOverride());
 	app.use(app.router);
@@ -139,6 +139,25 @@ app.get("/events", function(req, res) {
 						console.log("Event not duration toggled:" + err);
 					} else {
 						console.log("Event duration toggled");
+						res.write(JSON.stringify(true).toString("utf-8"));
+						res.end();
+					}
+				});
+		});
+		app.post("/event/video", function(req, res) {
+			//req.url
+			console.log("Req for duration toggle Event ID " + req.body.eventid);
+			res.writeHead(200, {
+				'Content-Type': 'application/json'
+			});
+			db.events.update(
+				{_id: new mongo.ObjectID(req.body.eventid)},
+				{ $set: {'video': JSON.parse(req.body.make) } }, 
+				function(err, updated) {
+					if (err || !updated) {
+						console.log("Event not video toggled:" + err);
+					} else {
+						console.log("Event video toggled");
 						res.write(JSON.stringify(true).toString("utf-8"));
 						res.end();
 					}
@@ -232,9 +251,39 @@ app.get("/events", function(req, res) {
 					}
 				});
 		});
+  app.locals.decodeEntities = function(s){
+      var str, temp = document.createElement('p');
+      temp.innerHTML= s;
+      str = temp.textContent || temp.innerText;
+      temp =null;
+      return str;
+  }
+  app.locals.formatAMPM = function(date) {
+	  var hours = date.getHours();
+	  var minutes = date.getMinutes();
+	  var ampm = hours >= 12 ? 'PM' : 'AM';
+	  hours = hours % 12;
+	  hours = hours ? hours : 12; // the hour '0' should be '12'
+	  minutes = minutes < 10 ? '0'+minutes : minutes;
+	  var strTime = hours + ':' + minutes + ' ' + ampm;
+	  return strTime;
+	} //end formatAMPM
 
 app.get('/printtoday', function(req, res) {
-	res.render('printtoday');
+	console.log('Req for seeing today\'s events list');
+	//var today = new Date();
+	//var tomorrow = new Date(date.getTime() + 24 * 60 * 60 * 1000);
+	var today = new Date(date.getTime() + 24 * 60 * 60 * 3000);
+	var tomorrow = new Date(date.getTime() + 24 * 60 * 60 * 4000);
+	db.events.find(
+		{start: {$gte: today, $lt: tomorrow}},
+		function(err, data) {
+				res.render('printtoday', {
+					events: data
+				});
+		});
+
+	
 });
 
 
