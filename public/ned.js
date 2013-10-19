@@ -84,7 +84,7 @@ Spec = {
 	  var day = date.getDate().toString();
 	  day = day.length > 1 ? day : '0' + day;
 	  return month + '/' + day + '/' + year;
-	},
+	}, //end getFormattedDate
 	_inventoryProto: {
 		only_suggestions: true,
 		suggestion_url: "inventory/all",
@@ -134,14 +134,20 @@ Spec = {
 				url: 'events/?filter=' + Spec.filter, // Shows all events BUT need it to show only events to certain location
 				ignoreTimezone: false
 			};
-		},
+	}, //end eventSource
+	refetchEvents: function() {
+		$('#calendar').fullCalendar('changeView', 'month');
+		$('#calendar').fullCalendar('removeEvents'); //for fetching the whole month events
+		$('#calendar').fullCalendar('addEventSource', Spec.eventSource());
+		$('#calendar').fullCalendar('changeView', 'agendaWeek');
+	}, //end refetchEvents
 	techTemplateUpdate: function() {
 		if(Spec.lastClickedEvent.duration == false) {
 	    	$('#technician').html('<b>setup and breakdown</b> only.');
 	    } else {
 	    	$('#technician').html('<b>duration of event</b>.');
 	    }
-	}
+	}, //end techTemplateUpdate
 };
 //User info must be imported for this part
 
@@ -166,10 +172,7 @@ Spec.app.on('route:recentVideo', function() {
 Spec.app.on('route:all', function(filter) {
 	Spec.dropdownActiveFix();
 	Spec.filter = filter;
-	$('#calendar').fullCalendar('changeView', 'month');
-	$('#calendar').fullCalendar('removeEvents'); //for fetching the whole month events
-	$('#calendar').fullCalendar('addEventSource', Spec.eventSource());
-	$('#calendar').fullCalendar('changeView', 'agendaWeek');
+	Spec.refetchEvents();
 	console.log(filter);
 });
 
@@ -280,7 +283,7 @@ Spec.View.Staff = Backbone.View.extend({
 						make: val
 					}
 				}).done(function(msg) {
-					$('#calendar').fullCalendar('refetchEvents');
+					Spec.refetchEvents();
 					Spec.lastClickedEvent.staffNeeded = parseInt(val);
 					Spec.changePopupColor(Spec.lastClickedEvent);
 					console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' staff number changed to ' + val);
@@ -515,7 +518,7 @@ $(document).ready(function() {
 			}
 		}).done(function(msg) {
 			console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' cancel toggled');
-			$('#calendar').fullCalendar('refetchEvents');
+			Spec.refetchEvents();
 		});
 	});
 
@@ -529,7 +532,7 @@ $(document).ready(function() {
 				make: !Spec.lastClickedEvent['duration']
 			}
 		}).done(function(msg) {
-			$('#calendar').fullCalendar('refetchEvents');
+			Spec.refetchEvents();
 			Spec.lastClickedEvent['duration'] = !Spec.lastClickedEvent['duration'];
 			Spec.techTemplateUpdate();
 			console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' duration toggled');
@@ -560,7 +563,7 @@ $(document).ready(function() {
 			}
 		}).done(function(msg) {
 			console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' removed');
-			$('#calendar').fullCalendar('refetchEvents');
+			Spec.refetchEvents();
 			$('#popup').modalPopover('hide');
 			$('#removeEvent').modal('hide');
 		});
@@ -578,7 +581,7 @@ $(document).ready(function() {
 		}).done(function(msg) {
 			Spec.lastClickedEvent.shifts.pop();
 			Spec.changePopupColor(Spec.lastClickedEvent);
-			$('#calendar').fullCalendar('refetchEvents');
+			Spec.refetchEvents();
 			console.log('staff removed from event ID ' + Spec.lastClickedEvent['_id'] + ', ID: ' + shiftid);
 			$(removedItem).parent().parent().remove();
 		});
@@ -607,7 +610,7 @@ $(document).ready(function() {
 				'eventEnd': Spec.lastClickedEvent.end,
 			}
 		}).done(function(res) {
-			$('#calendar').fullCalendar('refetchEvents');
+			Spec.refetchEvents();
 			Spec.lastClickedEvent.shifts.push({});
 			Spec.changePopupColor(Spec.lastClickedEvent);
 			console.log('staff added to event ID ' + Spec.lastClickedEvent['_id'] + ': ' + res.id);
@@ -643,7 +646,7 @@ $(document).ready(function() {
 				'changedData': Spec.storeEdited
 			}
 		}).done(function(res) {
-			$('#calendar').fullCalendar('refetchEvents');
+			Spec.refetchEvents();
 			$('#editEvent').modal('hide');
 			$('#popup').modalPopover('hide');
 			var title = Spec.storeEdited.title;
