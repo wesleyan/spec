@@ -187,12 +187,12 @@ Spec.View.Edit = Backbone.View.extend({
 		                weekStart: 1
 		           }
 			});
-	     	$('.bootstrap-timepicker input').timepicker({
+	     	/*$('.bootstrap-timepicker input').timepicker({
 				template: false,
 				showInputs: true,
 				minuteStep: 5
-			});
-			$('#MySpinner').spinner();
+			});*/
+			$('#editSpinner').spinner();
 
         },
         render: function(){
@@ -254,6 +254,22 @@ Spec.View.Staff = Backbone.View.extend({
             $('.combobox').combobox({
 				placeholder: 'Choose a staff'
 			});
+			$('#staffSpinner').spinner();
+			$('#staffSpinner').on('changed', function(e, val) {
+				$.ajax({
+					type: "POST",
+					url: "event/spinner",
+					data: {
+						eventid: Spec.lastClickedEvent['_id'],
+						make: val
+					}
+				}).done(function(msg) {
+					$('#calendar').fullCalendar('refetchEvents');
+					Spec.lastClickedEvent.staffNeeded = parseInt(val);
+					Spec.changePopupColor(Spec.lastClickedEvent);
+					console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' staff number changed to ' + val);
+				});
+			}); //end of staffSpinner
         }
     });
 Spec.View.EachStaff = Backbone.View.extend({
@@ -276,17 +292,14 @@ Spec.newRowInit = function (lastShift) {
 		var endTime = Spec.formatAMPM(new Date(Date.parse(lastShift.end)));
 	}
  	$('#timepicker5').timepicker({
-		template: false,
-		showInputs: false,
-		minuteStep: 5,
 		defaultTime: startTime
 	});
 	$('#timepicker6').timepicker({
-		template: false,
-		showInputs: false,
-		minuteStep: 5,
 		defaultTime: endTime
 	});
+	$('.bootstrap-timepicker input').on('show.timepicker', function(e) {
+		$(this).prev().toggle();
+  	});
 	$('.combobox').html('');
 	Spec.storeAllStaff.forEach(function(person) {
 		if(person.name == false) {return;}

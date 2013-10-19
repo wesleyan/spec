@@ -171,7 +171,6 @@
           
 	    </div>
 	</div>
-
 	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-dropdown.js"></script>
 	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-tooltip.js"></script>
     <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-modal.js"></script>
@@ -247,7 +246,7 @@
                     <tr>         
                         <td>Needed staff</td>
                         <td colspan="2">
-                        	<div id="MySpinner" class="spinner">
+                        	<div id="editSpinner" class="spinner">
 								<input type="text" class="input-mini spinner-input" value="<%= op.event.staffNeeded %>">
 								<div class="spinner-buttons	btn-group btn-group-vertical">
 									<button type="button" class="btn spinner-up">
@@ -303,7 +302,8 @@
 
 		<p><b><%= Spec.lastClickedEvent.title %></b>
 	    <span class="pull-right"><%= Spec.formatAMPM(new Date(Date.parse(Spec.lastClickedEvent.start))) %> - <%= Spec.formatAMPM(new Date(Date.parse(Spec.lastClickedEvent.end))) %></span>
-	    <p>Technician needed for 
+	  	<div>
+	   Technician needed for 
 	    <% if(Spec.lastClickedEvent.duration == false) { %>
 	    	<b>setup and breakdown</b> only.
 	    <% } else { %>
@@ -312,19 +312,20 @@
 	     <% if(Spec.permission == 10) { %>
 	     	<a class="badge toggleDuration"><i class="icon-adjust icon-white"></i> </a>
 	      <% } %>
-	     </p>
-
-	                             	<div id="MySpinner" class="spinner pull-right">
-								<input type="text" class="input-mini spinner-input" value="<%= Spec.lastClickedEvent.staffNeeded %>">
-								<div class="spinner-buttons	btn-group btn-group-vertical">
-									<button type="button" class="btn spinner-up">
-										<i class="icon-chevron-up"></i>
-									</button>
-									<button type="button" class="btn spinner-down">
-										<i class="icon-chevron-down"></i>
-									</button>
-								</div>
-							</div>
+			<span class="pull-right">
+	            <div id="staffSpinner" class="spinner">
+					<input type="text" class="input-mini spinner-input" value="<%= Spec.lastClickedEvent.staffNeeded %>">
+					<div class="spinner-buttons	btn-group btn-group-vertical">
+						<button type="button" class="btn spinner-up">
+							<i class="icon-chevron-up"></i>
+						</button>
+						<button type="button" class="btn spinner-down">
+							<i class="icon-chevron-down"></i>
+						</button>
+					</div>
+				</div>
+			</span>
+		</div>
 	    <table class="table table-bordered table-hover table-condensed">
 		<thead><th><i class="icon-user"></i>  Staff</th><th><i class="icon-time"></i> From</th><th><i class="icon-time"></i> To</th>
 		<th><i class="icon-edit"></i></th></thead>
@@ -335,13 +336,15 @@
 		              </select>
 				</td>
 				<td>
-					<div class="bootstrap-timepicker">
+					<div class="input-append bootstrap-timepicker">
 			            <input id="timepicker5" type="text" class="input-small">
+			            <span class="add-on"><i class="icon-time"></i></span>
 			        </div>
 			    </td>
 			    <td>
-	    		    <div class="bootstrap-timepicker">
+	    		    <div class="input-append bootstrap-timepicker">
 			            <input id="timepicker6" type="text" class="input-small">
+			            <span class="add-on"><i class="icon-time"></i></span>
 			        </div>
 			    </td>
 			    <td><button class="btn btn-primary btn-mini" type="button" id="addNewStaff"><i class="icon-plus icon-white"></i></button></td>
