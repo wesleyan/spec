@@ -2,7 +2,7 @@
 var express = require('express');
 
 var app = express();
-var path = require('path');
+var $ = require('jquery');
 
 var databaseUrl = "spec"; // "username:password@example.com/mydb"
 var collections = ['events','staff']
@@ -131,7 +131,7 @@ app.get("/events", function(req, res) {
 			});
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
-				{ $set: {'duration': eval(req.body.make) } }, 
+				{ $set: {'duration': JSON.parse(req.body.make) } }, 
 				function(err, updated) {
 					if (err || !updated) {
 						console.log("Event not duration toggled:" + err);
@@ -148,9 +148,22 @@ app.get("/events", function(req, res) {
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
+			var query = {};
+			$.each(req.body.changedData, function(key, value) {
+				if(key == 'title' || key == 'desc') {
+					query[key] = value;
+				}
+			});
+			var reqDate = new Date(Date.parse(req.body.changedData.date));
+			reqDate = (reqDate.getMonth() + 1) + '/' + reqDate.getDate() + '/' +  reqDate.getFullYear() + ' ';
+			query.start = new Date(Date.parse(reqDate + req.body.changedData.timepickerResStart));
+			query.end = new Date(Date.parse(reqDate + req.body.changedData.timepickerResEnd));
+			query.eventStart = new Date(Date.parse(reqDate + req.body.changedData.timepickerEventStart));
+			query.eventEnd = new Date(Date.parse(reqDate + req.body.changedData.timepickerEventEnd));
+			query.staffNeeded = parseInt(req.body.changedData.staffNeeded);
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
-				{ $set: {'duration': eval(req.body.make) } },  //this line consists of editing stuff
+				{ $set: query },  //this line consists of editing stuff
 				function(err, updated) {
 					if (err || !updated) {
 						console.log("Event not edited:" + err);
@@ -169,7 +182,7 @@ app.get("/events", function(req, res) {
 			});
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
-				{ $set: {'staffNeeded': eval(req.body.make) } }, 
+				{ $set: {'staffNeeded': parseInt(req.body.make) } }, 
 				function(err, updated) {
 					if (err || !updated) {
 						console.log("Event staffNeeded not changed:" + err);
@@ -188,7 +201,7 @@ app.get("/events", function(req, res) {
 			});
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
-				{ $set: {'valid': eval(req.body.make) } }, 
+				{ $set: {'valid': JSON.parse(req.body.make) } }, 
 				function(err, updated) {
 					if (err || !updated) {
 						console.log("Event not cancel toggled:" + err);

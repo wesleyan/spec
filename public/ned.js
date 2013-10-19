@@ -627,12 +627,14 @@ $(document).ready(function() {
 	$('#editEvent .modal-footer .btn-primary').click(function(e) {
 		var editTimepickers = [$('#timepickerResStart'), $('#timepickerResEnd'), $('#timepickerEventStart'), $('#timepickerEventEnd')];
 		editTimepickers.forEach(function (pick) {
-			if(!(pick.val() == pick.prop('defaultValue') || pick.val().substr(1) == pick.prop('defaultValue'))) {
+			//if(!(pick.val() == pick.prop('defaultValue') || pick.val().substr(1) == pick.prop('defaultValue'))) {
 				var result = {};
 				result[pick.prop('id')] = pick.val();
 				$.extend(Spec.storeEdited,result);
-			}
+			//}  //then decided to send all hour/min data all the time
 		});
+		Spec.storeEdited.date = new Date(Date.parse($.trim($('#startDate').text())));
+		Spec.storeEdited.staffNeeded = $('#editSpinner input').val();
 		$.ajax({
 			type: "POST",
 			url: "event/edit",
@@ -643,6 +645,7 @@ $(document).ready(function() {
 		}).done(function(res) {
 			$('#calendar').fullCalendar('refetchEvents');
 			$('#editEvent').modal('hide');
+			Spec.storeEdited = {};
 		}); //done function
 	});
 
