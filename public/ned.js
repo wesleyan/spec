@@ -645,6 +645,7 @@ $(document).ready(function() {
 		}).done(function(res) {
 			$('#calendar').fullCalendar('refetchEvents');
 			$('#editEvent').modal('hide');
+			$('#popup').modalPopover('hide');
 			Spec.storeEdited = {};
 		}); //done function
 	});
