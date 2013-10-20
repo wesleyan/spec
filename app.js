@@ -268,7 +268,15 @@ app.get('/printtoday', function(req, res) {
 	//var tomorrow = new Date(date.getTime() + 24 * 60 * 60 * 1000);
 	var today = new Date(date.getTime() + 24 * 60 * 60 * 3000);
 	var tomorrow = new Date(date.getTime() + 24 * 60 * 60 * 4000);
-	db.events.find({start: {$gte: today, $lt: tomorrow}}).sort({start: -1},
+		today.setHours(0);
+		today.setMinutes(0);
+		today.setSeconds(0);
+		today.setMilliseconds(0);
+		tomorrow.setHours(0);
+		tomorrow.setMinutes(0);
+		tomorrow.setSeconds(0);
+		tomorrow.setMilliseconds(0);
+	db.events.find({start: {$gte: today, $lt: tomorrow}}).sort({start: 1},
 		function(err, data) {
 				res.render('printtoday', {
 					events: data
@@ -466,15 +474,12 @@ var allInventory = [{
 		});
 
 // STAFF
-	//All event staff in IMS
+	//We can store all staff in memory, since it is not a big array and it will be used VERY frequently, will save time.
 	db.staff.find({}, function(err, allStaff) {
 	if (err || !allStaff) {
 		console.log("No staff found");
-	} else {
-		app.locals.storeStaff = allStaff;
-
-	}
-	
+	} else {app.locals.storeStaff = allStaff;}
+	//All event staff in IMS
 	app.get("/staff/all", function(req, res) {
 		//req.url
 		console.log("Req for all staff info");
