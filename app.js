@@ -35,7 +35,6 @@ function inSession() { //boolean returning function to detect if logged in or us
 function permission() { //returns the permission level of the user in session
 	//var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == req.session.cas_user; });
 	var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == username; });
-	console.log(userObj);
 	if(userObj.length < 1) {
 		return false;
 	} else {
@@ -640,11 +639,13 @@ var allInventory = [{
 		});
 
 //Main Page Rendering
-	/*app.get('/', function (req, res) {
+
+	app.get('/', function (req, res) {
+	if(!inSession()) {res.end();	return false;} //must be logged in
 	  res.render('index',
-	  { title : 'Home' }
+	  {}
 	  )
-	});*/
+	});
 
 
 app.listen(8080);

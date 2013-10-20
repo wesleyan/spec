@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      spec
+    </title>
+    <link href="fullcalendar/fullcalendar.css" rel="stylesheet">
+    <link href="fullcalendar/fullcalendar.print.css" rel="stylesheet" media="print">
+    <script src="lib/jquery.min.js"></script>
+    <script type="text/javascript" src="http://underscorejs.org/underscore-min.js"></script>
+  	<script type="text/javascript" src="http://backbonejs.org/backbone-min.js"></script>
+    <script src="fullcalendar/fullcalendar2.js"></script>
+    <link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css" rel="stylesheet">
+    <link href="ned.css" rel="stylesheet">
+    <link href="lib/bootstrap-timepicker.css" rel="stylesheet">
+    <link href="lib/bootstrap-datepicker.css" rel="stylesheet">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.4.6/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet"/>
+  </head>
+  <body>
+  	<span id="leftGroup">
+		<span class="btn-group">
+		  <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+		   <i class="icon-eye-open"></i> <span class="caret"></span>
+		  </button>
+		  <ul class="dropdown-menu front">
+		    <li><a href="#"><i class="icon-calendar"></i> All Events</a></li>
+		    <li><a href="#hideCancelled"><i class="icon-tasks"></i> Hide Cancelled Events</a></li>
+		    <li><a href="#unstaffed"><i class="icon-list-alt"></i> Unstaffed Events</a></li>
+		    <li><a href="#onlyMine"><i class="icon-filter"></i> Only Mine</a></li>
+		    <li class="divider"></li>
+		    <li><a href="#recentVideo"><i class="icon-film"></i> Recent video events</a></li>
+		  </ul>
+		</span>
+		<span class="btn-group">
+		  <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+		   <i class="icon-folder-open"></i> <span class="caret"></span>
+		  </button>
+		  <ul class="dropdown-menu front">
+		    <li><a href="/printToday"><i class="icon-print"></i> Events of today</a></li>
+		    <li class="divider"></li>
+		    <li><a href="/fileUpload"><i class="icon-upload"></i> File Upload</a></li>
+		    <li><a href="https://ims.wesleyan.edu/"><i class="icon-inbox"></i> Office Manager</a></li>
+		    <li><a href="/logout"><i class="icon-thumbs-down"></i> Log out</a></li>
+		  </ul>
+		</span>
+		<span class="btn-group">
+		  <button type="button" class="btn btn-danger disabled" id="eventButton">
+		  	<i class="icon-book icon-white"></i>
+		  </button>
+		</span>
+		
+	</span>
+  	<span id="rightGroup">
+  		<span class="btn-group">
+		  <a type="button" class="btn btn-info" href="#onlyMine">
+		  	<i class="icon-filter icon-white"></i>
+		  </a>
+		</span>
+		 
+	</span>
+
+    <div id="newHeader">
+    </div>
+    <div id="calendar">
+    </div>
+    
+ 	<div id="context-menu" class="front">
+ 		<ul class="dropdown-menu">
+ 			<li><a href="#staffEvent" data-toggle="modal"><i class="icon-plus"></i> Staff this event</a></li>
+ 			<li><a href="#toggleDurationEvent" data-toggle="modal" class="toggleDuration"><i class="icon-flag"></i> Toggle duration</a></li>
+ 			<li><a href="#toggleVideoEvent" data-toggle="modal" class="toggleVideo"><i class="icon-facetime-video"></i> Toggle video</a></li>
+ 			<li class="divider"></li>
+ 			<li><a href="#editEvent" data-toggle="modal"><i class="icon-pencil"></i> Edit this event</a></li>
+ 			<li><a href="#cancelEvent" data-toggle="modal"><i class="icon-off"></i> <span>Cancel this event</span></a></li>
+ 			<li class="divider"></li>
+ 			<li><a href="#removeEvent" data-toggle="modal"><i class="icon-remove"></i> Remove this event</a></li>
+	  	</ul>
+ 	</div>
+
+	<div id="staffEvent" class="modal front hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-header">
+	    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+	    <h3 id="myModalLabel">Staff this event</h3>
+	  </div>
+	  <div class="modal-body">
+	  </div>
+	  <div class="modal-footer">
+	    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+	  </div>
+	</div>
+
+	<div id="newNote" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-header">
+	    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+	    <h3 id="myModalLabel">Type your note below:</h3>
+	  </div>
+	  <div class="modal-body">
+	    <p>
+	    	<textarea rows="3"></textarea>
+	    </p>
+	  </div>
+	  <div class="modal-footer">
+	    <button class="btn btn-primary" id="noteSubmit">Add note</button>
+	    <button class="btn" aria-hidden="true" data-dismiss="modal">Cancel</button>
+	  </div>
+	</div>
+
+	<div id="editEvent" class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+	  <div class="modal-header">
+	    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+	    <h3 id="myModalLabel">Edit this event</h3>
+	  </div>
+	  <div class="modal-body">
+	  </div>
+	  <div class="modal-footer">
+	    <button class="btn btn-primary">Save changes</button>
+	    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+	  </div>
+	</div>
+	<div id="removeEvent" class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+
+	</div>
+
+	<div id="popup" class="popover">
+	    <div class="arrow"></div>
+	    <h3 class="popover-title">
+
+		    <span id="popupTitle">Event Title</span> 
+
+		    <span class="pull-right">
+		    <a id="popupTitleButton" class="btn btn-small" type="button" href="#staffEvent" data-toggle="modal"><i class="icon-plus icon-white"></i> <span id="popupStaffInfo"></span></a>
+		    </span>
+	    </h3>
+	    <div class="popover-content">
+   	        <p id="popupContentHeader">
+	        </p>
+	        <div id="popupContentInside">
+	        </div>
+
+	        <div class="accordion" id="popoverAccordion">
+			  <div class="accordion-group">
+			    <div class="accordion-heading drop-active">
+			      <a class="accordion-toggle" data-toggle="collapse" href="#collapseOne">
+			         <i class="icon-comment"></i> &nbsp;Notes
+			         <span class="pull-right"><button class="btn btn-mini btn-inverse" id="addNote"><i class="icon-plus icon-white"></i></button></span>
+			      </a>
+			      
+			    </div>
+			    <div id="collapseOne" class="accordion-body collapse">
+			      <div class="accordion-inner" id="notes">
+			        
+			      </div>
+			    </div>
+			  </div>
+			  <div class="accordion-group">
+			    <div class="accordion-heading drop-active">
+			      <a class="accordion-toggle" data-toggle="collapse" href="#collapseTwo">
+			        <i class="icon-wrench"></i> &nbsp;Inventory
+			      </a>
+			    </div>
+			    <div id="collapseTwo" class="accordion-body collapse">
+			      <div class="accordion-inner" id="inventory">
+			        
+			      </div>
+			    </div>
+			  </div>
+			</div>
+
+
+	        <!--<div class="collapse" id="viewdetails">
+	        	<input type="text" id="inventory" placeholder="The name of the item"/>
+	        	<div id="inventory"></div>
+
+	        </div>-->
+	       
+          
+	    </div>
+	</div>
+	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-dropdown.js"></script>
+	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-tooltip.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-modal.js"></script>
+	<script src="lib/bootstrap-contextmenu.js"></script>
+	<script src="lib/bootstrap-modal-popover.js"></script>
+	<script src="lib/bootstrap-timepicker.js"></script>
+	<script src="lib/bootstrap-datepicker.js"></script>
+	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-popover.js"></script>
+	<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-transition.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-alert.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-scrollspy.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-tab.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-button.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-collapse.js"></script>
+    <script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap-typeahead.js"></script>
+    <script src="lib/bootstrap-tags.js"></script>
+    <script src="lib/bootstrap-combobox.js"></script>
+    <script src="lib/jquery.bootstrap-growl.js"></script>
+     <script src="lib/spinner.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.4.6/bootstrap-editable/js/bootstrap-editable.min.js"></script>
+    <script src="ned.js"></script>
+    </script>
+
+	<script type="text/template" id="edit_template">
+	    <p>	      
+	       <table class="table table-bordered table-striped" style="clear: both">
+                <tbody> 
+                    <tr>         
+                        <td width="35%">Event Name</td>
+                        <td width="65%" colspan="2"><a href="#" class="x-edit-event" id="title" data-type="text" data-placement="right" data-title="Enter title"><%= op.event.title %></a></td>
+                    </tr>
+                     <tr>         
+                        <td>Description</td>
+                        <td colspan="2"><a href="#" class="x-edit-event" id="desc" data-type="textarea" data-pk="1"><small><%= op.event.desc %></small></a></td>
+                    </tr>
+                    <tr>         
+                        <td>Location</td>
+                        <td colspan="2"><a href="#" class="x-edit-event" id="loc" data-type="text" data-placement="right" data-title="Enter location"><%= Spec.decodeEntities(op.event.loc) %></a></td>
+                    </tr>
+                    <tr>         
+                        <td>Date</td>
+                        <td colspan="2"><a href="#" id="startDate" data-type="date" data-pk="1" data-title="Select date">
+                        <%= Spec.getFormattedDate(new Date(Date.parse(op.event.start)))  %>
+                        </a>
+                        </td>
+                    </tr>
+                    <tr>         
+                        <td>Reserved</td>
+                        <td style="width:30%"> 
+
+                        	<div class="input-append bootstrap-timepicker">
+					            <input id="timepickerResStart" type="text" class="input-small" value="<%= Spec.formatAMPM(new Date(Date.parse(op.event.start))) %>">
+					             <span class="add-on"><i class="icon-time"></i></span>
+					        </div>
+					    </td>
+					    <td>
+                        	<div class="input-append bootstrap-timepicker">
+					            <input id="timepickerResEnd" type="text" class="input-small" value="<%= Spec.formatAMPM(new Date(Date.parse(op.event.end))) %>">
+					             <span class="add-on"><i class="icon-time"></i></span>
+					        </div>
+			        	</td>
+                    </tr>
+                    <tr>         
+                        <td>Event Starting</td>
+                        <td> 
+                        	<div class="input-append bootstrap-timepicker">
+					            <input id="timepickerEventStart" type="text" class="input-small" value="<%= Spec.formatAMPM(new Date(Date.parse(op.event.eventStart))) %>">
+					             <span class="add-on"><i class="icon-time"></i></span>
+					        </div>
+					    </td>
+					    <td>
+					        <div class="input-append bootstrap-timepicker">
+					            <input id="timepickerEventEnd" type="text" class="input-small" value="<%= Spec.formatAMPM(new Date(Date.parse(op.event.eventEnd))) %>">
+					             <span class="add-on"><i class="icon-time"></i></span>
+					        </div>
+			        	</td>
+                    </tr>                   
+                    <tr>         
+                        <td>Needed staff</td>
+                        <td colspan="2">
+                        	<div id="editSpinner" class="spinner">
+								<input type="text" class="input-mini spinner-input" value="<%= op.event.staffNeeded %>">
+								<div class="spinner-buttons	btn-group btn-group-vertical">
+									<button type="button" class="btn spinner-up">
+										<i class="icon-chevron-up"></i>
+									</button>
+									<button type="button" class="btn spinner-down">
+										<i class="icon-chevron-down"></i>
+									</button>
+								</div>
+							</div>
+                        </td>
+                    </tr>
+                </tbody> 
+            </table>
+            The changes you have made will be ignored unless you save them.
+	      </p>
+	</script>
+	<script type="text/template" id="remove_template">
+		  <div class="modal-header">
+		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		    <h3 id="myModalLabel">Removing this event</h3>
+		  </div>
+		  <div class="modal-body">
+		  	 <p>Are you sure that you want to remove the event <b><%= op.event.title %></b> ?</p>
+		  </div>
+		  <div class="modal-footer">
+		  	<button class="btn btn-danger">Remove</button>
+		    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+		  </div>
+	</script>
+	<script type="text/template" id="notes_template">
+	    <table class="table table-hover table-condensed">
+		    <tbody id="notesBody">
+			    
+		    </tbody>
+	    </table>
+	</script>
+	<script type="text/template" id="each_note_template">
+	     	<% op.note.date = new Date(Date.parse(op.note.date));	%>
+	     	<tr>
+	     		<td class="notesTable">
+	     			<%= op.note.text %>
+	     			<br>
+	     			<span class="label"><%= op.note.user %> | <%= defaults.monthNamesShort[op.note.date.getMonth()] %> <%= op.note.date.getDate() %></span>
+					<% if(op.note.user == Spec.username) { %>
+	     				<span class="pull-right btn btn-mini btn-danger removeNote" href="<%= op.note.id %>"><i class="icon-remove icon-white"></i></span>
+	     			<% } %>
+	     		</td>
+		   	</tr>
+	</script>
+	<script type="text/template" id="staff_template">
+
+
+		<p><b><%= Spec.lastClickedEvent.title %></b>
+	    <span class="pull-right"><%= Spec.formatAMPM(new Date(Date.parse(Spec.lastClickedEvent.start))) %> - <%= Spec.formatAMPM(new Date(Date.parse(Spec.lastClickedEvent.end))) %></span>
+	  	<div>
+	   Technician needed for <span id="technician"> </span>
+	     <% if(Spec.permission == 10) { %>
+	     	<a class="badge toggleDuration"><i class="icon-adjust icon-white"></i> </a>
+	      <% } %>
+			<span class="pull-right">
+	            <div id="staffSpinner" class="spinner">
+					<input type="text" class="input-mini spinner-input" value="<%= Spec.lastClickedEvent.staffNeeded %>">
+					<div class="spinner-buttons	btn-group btn-group-vertical">
+						<button type="button" class="btn spinner-up">
+							<i class="icon-chevron-up"></i>
+						</button>
+						<button type="button" class="btn spinner-down">
+							<i class="icon-chevron-down"></i>
+						</button>
+					</div>
+				</div>
+			</span>
+		</div>
+	    <table class="table table-bordered table-hover table-condensed">
+		<thead><th><i class="icon-user"></i>  Staff</th><th><i class="icon-time"></i> From</th><th><i class="icon-time"></i> To</th>
+		<th><i class="icon-edit"></i></th></thead>
+		<tbody>
+			<tr>
+				<td>
+					<select class="combobox input-medium" name="normal">
+		              </select>
+				</td>
+				<td>
+					<div class="input-append bootstrap-timepicker">
+			            <input id="timepicker5" type="text" class="input-small">
+			            <span class="add-on"><i class="icon-time"></i></span>
+			        </div>
+			    </td>
+			    <td>
+	    		    <div class="input-append bootstrap-timepicker">
+			            <input id="timepicker6" type="text" class="input-small">
+			            <span class="add-on"><i class="icon-time"></i></span>
+			        </div>
+			    </td>
+			    <td><button class="btn btn-primary btn-mini" type="button" id="addNewStaff"><i class="icon-plus icon-white"></i></button></td>
+
+		    </tr>
+
+		</tbody>
+		</table>
+
+	    </p>
+	</script>
+	<script type="text/template" id="each_staff_template">
+			<tr>
+				<td><%= op.item.staffname %> (<%= op.item.staff %>)</td>
+				<td><%= Spec.formatAMPM(new Date(Date.parse(op.item.start))) %></td>
+				<td><%= Spec.formatAMPM(new Date(Date.parse(op.item.end))) %></td>
+				<td><span class="btn btn-danger btn-mini removeStaff" type="button" href="<%= op.item.id %>"><i class="icon-remove icon-white"></i></span></td>
+			</tr>
+	</script>
+
+  </body>
+</html>
