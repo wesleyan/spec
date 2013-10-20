@@ -9,27 +9,18 @@ var collections = ['events','staff']
 var db = require("mongojs").connect(databaseUrl, collections);
 var mongo = require('mongodb-wrapper');
 
-//We can store all staff in memory, since it is not a big array and it will be used VERY frequently, will save time.
-db.staff.find({}, function(err, data) {
-		if (err || !data) {
-			console.log("No events found");
-		} else {
-			app.locals.storeStaff = data;
-		}
-	});
-
 //CAS Session Management will come here.
 var username = 'ckorkut'; //let's assume that the session variable is this for now
 
 function inSession() { //boolean returning function to detect if logged in or user in staff list
 	return true;
 	//this is the actual code for the future:
-	var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == username; });
+	/*var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == username; });
 	if(userObj.length < 1) {
 		return false;
 	} else {
 		return true;
-	}
+	}*/
 }
 
 function permission() { //returns the permission level of the user in session
@@ -88,18 +79,25 @@ app.configure(function() {
 var ejs = require('ejs');
 ejs.open = '{{';
 ejs.close = '}}';
-
-	app.get("/user", function(req, res) {
-		if(!inSession()) {res.end();	return false;} //must be logged in
-		//req.url
-		console.log("Req for session user");
-		res.writeHead(200, {
-			'Content-Type': 'application/json'
-		});
-		//req.session.cas_user
-		res.write(JSON.stringify({'username':username, 'permission':permission()}).toString("utf-8"));
-		res.end();
+//We can store all staff in memory, since it is not a big array and it will be used VERY frequently, will save time.
+db.staff.find({}, function(err, data) {
+		if (err || !data) {
+			console.log("No events found");
+		} else {
+			app.locals.storeStaff = data;
+		}
 	});
+app.get("/user", function(req, res) {
+	if(!inSession()) {res.end();	return false;} //must be logged in
+	//req.url
+	console.log("Req for session user");
+	res.writeHead(200, {
+		'Content-Type': 'application/json'
+	});
+	//req.session.cas_user
+	res.write(JSON.stringify({'username':username, 'permission':permission()}).toString("utf-8"));
+	res.end();
+});
 
 //EVENTS
 //Event fetching should be filtered according to the time variables, still not done after MongoDB
@@ -318,12 +316,13 @@ app.get('/printtoday', function(req, res) {
 		tomorrow.setMinutes(0);
 		tomorrow.setSeconds(0);
 		tomorrow.setMilliseconds(0);
-	db.events.find({start: {$gte: today, $lt: tomorrow}, valid:true}).sort({start: 1},
-		function(err, data) {
-				res.render('printtoday', {
-					events: data
-				});
-		});
+		db.events.find({start: {$gte: today, $lt: tomorrow}, valid:true}).sort({start: 1},
+			function(err, data) {
+					res.render('printtoday', {
+						events: data
+					});
+			});
+	});
 
 var allInventory = [{
 		"id": 4,
@@ -345,8 +344,7 @@ var allInventory = [{
 		"id": 1,
 		"text": "Projector",
 		"title": "This item needs to be recorded."
-	},
-	{
+	},	{
 		"id": 2,
 		"text": "Macbook Pro 13",
 		"title": "This item needs to be recorded."
@@ -360,6 +358,7 @@ var allInventory = [{
 // INVENTORY
 	// All inventory
 	app.get("/inventory/all", function(req, res) {
+
 		if(!inSession()) {res.end();	return false;} //must be logged in
 		//req.url
 		console.log("Req for all inventory");
@@ -386,7 +385,6 @@ var allInventory = [{
 			if (err || !data) {
 				console.log("No events found");
 			} else {
-				//events[0].inventory
 				var existingList = [];
 				data[0].inventory.forEach(function(id) {
 					existingList.push(allInventory.filter(function(tool) {
@@ -397,8 +395,6 @@ var allInventory = [{
 				res.end();
 			}
 		});
-		/*res.write(JSON.stringify(selectedEvent.inventory).toString("utf-8"));
-		res.end();*/
 	});
 
 	//Inventory Update
@@ -562,7 +558,6 @@ var allInventory = [{
 		});
 		res.write(JSON.stringify(app.locals.storeStaff).toString("utf-8"));
 		res.end();
-		});
 	});
 	//Get the existing staff of an event
 	app.get("/staff/get/:id", function(req, res) {
@@ -622,7 +617,7 @@ var allInventory = [{
 				res.write(JSON.stringify(false).toString("utf-8"));
 				res.end();
 				return false;
-			}3
+			}
 			console.log("Req for removing shift ID " + req.body.id + " from Event ID " + req.body.eventid);
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
@@ -640,13 +635,13 @@ var allInventory = [{
 
 //Main Page Rendering
 
-	app.get('/', function (req, res) {
+app.get('/', function (req, res) {
 	if(!inSession()) {res.end();	return false;} //must be logged in
 	  res.render('index',
-	  {}
-	  )
+		{
+			permission: permission(),
+		});
 	});
-
 
 app.listen(8080);
 console.log('Listening on port 8080');
