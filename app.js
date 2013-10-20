@@ -40,7 +40,8 @@ function inSession() { //boolean returning function to detect if logged in or us
 
 function permission() { //returns the permission level of the user in session
 	return 10;
-	var userObj = getBy(users,'username',req.session.cas_user);
+	//var userObj = getBy(app.locals.storeStaff,'username',req.session.cas_user);
+	var userObj = getBy(app.locals.storeStaff,'username',username);
 	if(userObj.length < 1) {
 		return false;
 	} else {
@@ -95,6 +96,8 @@ app.configure(function() {
 //EVENTS
 //Event fetching should be filtered according to the time variables, still not done after MongoDB
 app.get("/events", function(req, res) {
+	if(!inSession()) {res.end();	return false;} //must be logged in
+
 	//86400s = 1d
 	var start = new Date(req.query.start * 1000);
 	var end = new Date(req.query.end * 1000);
@@ -126,11 +129,16 @@ app.get("/events", function(req, res) {
 	
 });
 		app.post("/event/duration", function(req, res) {
-			//req.url
-			console.log("Req for duration toggle Event ID " + req.body.eventid);
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
+			if(permission() != 10) {
+				res.write(JSON.stringify(false).toString("utf-8"));
+				res.end();
+				return false;
+			}
+			//req.url
+			console.log("Req for duration toggle Event ID " + req.body.eventid);
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
 				{ $set: {'duration': JSON.parse(req.body.make) } }, 
@@ -146,10 +154,15 @@ app.get("/events", function(req, res) {
 		});
 		app.post("/event/video", function(req, res) {
 			//req.url
-			console.log("Req for duration toggle Event ID " + req.body.eventid);
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
+			if(permission() != 10) {
+				res.write(JSON.stringify(false).toString("utf-8"));
+				res.end();
+				return false;
+			}
+			console.log("Req for duration toggle Event ID " + req.body.eventid);
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
 				{ $set: {'video': JSON.parse(req.body.make) } }, 
@@ -165,10 +178,15 @@ app.get("/events", function(req, res) {
 		});
 		app.post("/event/edit", function(req, res) {
 			//req.url
-			console.log("Req for event edit Event ID " + req.body.eventid);
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
+			if(permission() != 10) {
+				res.write(JSON.stringify(false).toString("utf-8"));
+				res.end();
+				return false;
+			}
+			console.log("Req for event edit Event ID " + req.body.eventid);
 			var query = {};
 			$.each(req.body.changedData, function(key, value) {
 				if(key == 'title' || key == 'desc') {
@@ -197,10 +215,15 @@ app.get("/events", function(req, res) {
 		});
 		app.post("/event/spinner", function(req, res) {
 			//req.url
-			console.log("Req for staffNeeded spinner for Event ID " + req.body.eventid);
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
+			if(permission() != 10) {
+				res.write(JSON.stringify(false).toString("utf-8"));
+				res.end();
+				return false;
+			}
+			console.log("Req for staffNeeded spinner for Event ID " + req.body.eventid);
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
 				{ $set: {'staffNeeded': parseInt(req.body.make) } }, 
@@ -216,10 +239,15 @@ app.get("/events", function(req, res) {
 		});
 		app.post("/event/cancel", function(req, res) {
 			//req.url
-			console.log("Req for cancel toggle Event ID " + req.body.eventid);
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
+			if(permission() != 10) {
+				res.write(JSON.stringify(false).toString("utf-8"));
+				res.end();
+				return false;
+			}
+			console.log("Req for cancel toggle Event ID " + req.body.eventid);
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
 				{ $set: {'valid': JSON.parse(req.body.make) } }, 
@@ -235,10 +263,15 @@ app.get("/events", function(req, res) {
 		});
 		app.post("/event/remove", function(req, res) {
 			//req.url
-			console.log("Req for remove Event ID " + req.body.eventid);
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
+			if(permission() != 10) {
+				res.write(JSON.stringify(false).toString("utf-8"));
+				res.end();
+				return false;
+			}
+			console.log("Req for remove Event ID " + req.body.eventid);
 			db.events.remove(
 				{_id: new mongo.ObjectID(req.body.eventid)},
 				function(err, removed) {
@@ -263,6 +296,7 @@ app.get("/events", function(req, res) {
 	} //end formatAMPM
 
 app.get('/printtoday', function(req, res) {
+	if(!inSession()) {res.end();	return false;} //must be logged in
 	console.log('Req for seeing today\'s events list');
 	//var today = new Date();
 	//var tomorrow = new Date(date.getTime() + 24 * 60 * 60 * 1000);
@@ -322,6 +356,7 @@ var allInventory = [{
 // INVENTORY
 	// All inventory
 	app.get("/inventory/all", function(req, res) {
+		if(!inSession()) {res.end();	return false;} //must be logged in
 		//req.url
 		console.log("Req for all inventory");
 		res.writeHead(200, {
@@ -333,6 +368,7 @@ var allInventory = [{
 
 	//Existing inventory for each event
 	app.get("/inventory/existing/:id", function(req, res) {
+		if(!inSession()) {res.end();	return false;} //must be logged in
 		//req.url
 		console.log("Req for inventory of Event ID " + req.params.id);
 		res.writeHead(200, {
@@ -365,11 +401,16 @@ var allInventory = [{
 		//Add inventory to an event (POST)
 		app.post("/inventory/add", function(req, res) {
 			//req.url
-			console.log("Req for adding inventory ID " + req.body.inventoryid + " to Event ID " + req.body.eventid);
-			//frontend checks for the same inventory adding, so no control needed for that
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
+			if(permission() < 1) {
+				res.write(JSON.stringify(false).toString("utf-8"));
+				res.end();
+				return false;
+			}
+			console.log("Req for adding inventory ID " + req.body.inventoryid + " to Event ID " + req.body.eventid);
+			//frontend checks for the same inventory adding, so no control needed for that
 			 //try to find the thing by its id and use the same data
 			var selectedInventory = allInventory.filter(function(thing) {
 				return thing.id == req.body.inventoryid;
@@ -392,10 +433,15 @@ var allInventory = [{
 		//Remove inventory from an event (POST)
 		app.post("/inventory/remove", function(req, res) {
 			//req.url
-			console.log("Req for removing inventory ID " + req.body.inventoryid + " from Event ID " + req.body.eventid);
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
+			if(permission() < 1) {
+				res.write(JSON.stringify(false).toString("utf-8"));
+				res.end();
+				return false;
+			}
+			console.log("Req for removing inventory ID " + req.body.inventoryid + " from Event ID " + req.body.eventid);
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
 				{ $pull: {'inventory': req.body.inventoryid } }, 
@@ -413,6 +459,7 @@ var allInventory = [{
 // NOTES
 	//Existing notes for each event
 	app.get("/notes/existing/:id", function(req, res) {
+		if(!inSession()) {res.end();	return false;} //must be logged in
 		//req.url
 		console.log("Req for fetching notes of Event ID " + req.params.id);
 		//Event filtering and inventory
@@ -433,10 +480,15 @@ var allInventory = [{
 		//Add inventory to an event (POST) - not tested // username is required
 		app.post("/notes/add", function(req, res) {
 			//req.url
-			console.log("Req for adding note \"" + req.body.note + "\" to Event ID " + req.body.eventid);
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
+			if(!inSession()) {
+				res.write(JSON.stringify(false).toString("utf-8"));
+				res.end();
+				return false;
+			}
+			console.log("Req for adding note \"" + req.body.note + "\" to Event ID " + req.body.eventid);
 			var generatedID = new mongo.ObjectID();
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
@@ -453,12 +505,18 @@ var allInventory = [{
 		});
 
 		//Remove inventory from an event (POST) - username is required for verification
+			//managers should be able to delete any comment, others should only be able to delete their own
 		app.post("/notes/remove", function(req, res) {
 			//req.url
-			console.log("Req for removing note ID " + req.body.id + " from Event ID " + req.body.eventid);
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
+			if(permission() != 10) {
+				res.write(JSON.stringify(false).toString("utf-8"));
+				res.end();
+				return false;
+			}
+			console.log("Req for removing note ID " + req.body.id + " from Event ID " + req.body.eventid);
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
 				{ $pull: {'notes': {'id': new mongo.ObjectID(req.body.id), 'user':username} } }, 
@@ -481,6 +539,7 @@ var allInventory = [{
 	} else {app.locals.storeStaff = allStaff;}
 	//All event staff in IMS
 	app.get("/staff/all", function(req, res) {
+		if(!inSession()) {res.end();	return false;} //must be logged in
 		//req.url
 		console.log("Req for all staff info");
 		// Filter the events/database and return the staff and shifts info (requires to decide on db structure)
@@ -493,6 +552,7 @@ var allInventory = [{
 	});
 	//Get the existing staff of an event
 	app.get("/staff/get/:id", function(req, res) {
+		if(!inSession()) {res.end();	return false;} //must be logged in
 		//req.url
 		console.log("Req for staff info of Event ID " + req.params.id);
 		// Filter the events/database and return the staff and shifts info (requires to decide on db structure)
@@ -511,12 +571,17 @@ var allInventory = [{
 	//Add staff/shift to an event (POST)
 		app.post("/staff/add", function(req, res) {
 			//req.url
-			console.log("Req for adding shift \"" + req.body.staff + "\" to Event ID " + req.body.eventid);
-			var eventStart = new Date(Date.parse(req.body.eventStart));
-			var eventEnd = new Date(Date.parse(req.body.eventEnd));
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
+			if(permission() != 10) {
+				res.write(JSON.stringify(false).toString("utf-8"));
+				res.end();
+				return false;
+			}
+			console.log("Req for adding shift \"" + req.body.staff + "\" to Event ID " + req.body.eventid);
+			var eventStart = new Date(Date.parse(req.body.eventStart));
+			var eventEnd = new Date(Date.parse(req.body.eventEnd));
 			var generatedID = new mongo.ObjectID();
 			var startDate = new Date(Date.parse(eventStart.getFullYear() + "-" + (eventStart.getMonth()+1) + "-" + eventStart.getDate() + " " +req.body.start));
 			var endDate = new Date(Date.parse(eventEnd.getFullYear() + "-" + (eventStart.getMonth()+1) + "-" + eventEnd.getDate() + " " +req.body.end));
@@ -536,10 +601,15 @@ var allInventory = [{
 	//Remove staff/shift from an event (POST)
 		app.post("/staff/remove", function(req, res) {
 			//req.url
-			console.log("Req for removing shift ID " + req.body.id + " from Event ID " + req.body.eventid);
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
+			if(permission() != 10) {
+				res.write(JSON.stringify(false).toString("utf-8"));
+				res.end();
+				return false;
+			}3
+			console.log("Req for removing shift ID " + req.body.id + " from Event ID " + req.body.eventid);
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
 				{ $pull: {'shifts': {'id': new mongo.ObjectID(req.body.id)} } }, 
