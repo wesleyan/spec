@@ -26,7 +26,7 @@ db.staff.find({}, function(err, data) {
 	});
 
 //CAS Session Management will come here.
-var username = 'ckorkut'; //let's assume that the session variable is this for now
+var username = 'kakoi'; //let's assume that the session variable is this for now
 
 function inSession() { //boolean returning function to detect if logged in or user in staff list
 	return true;
@@ -511,24 +511,39 @@ var allInventory = [{
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
-			if(permission() != 10) {
-				res.write(JSON.stringify(false).toString("utf-8"));
-				res.end();
-				return false;
-			}
 			console.log("Req for removing note ID " + req.body.id + " from Event ID " + req.body.eventid);
-			db.events.update(
-				{_id: new mongo.ObjectID(req.body.eventid)},
-				{ $pull: {'notes': {'id': new mongo.ObjectID(req.body.id), 'user':username} } }, 
-				function(err, updated) {
-					if (err || !updated) {
-						console.log("Note not removed:" + err);
+			var deleteNote = function() {
+				db.events.update(
+					{_id: new mongo.ObjectID(req.body.eventid)},
+					{ $pull: {'notes': {'id': new mongo.ObjectID(req.body.id), 'user':username} } }, 
+					function(err, updated) {
+						if (err || !updated) {
+							console.log("Note not removed:" + err);
+						} else {
+							console.log("Note removed");
+							res.write(JSON.stringify(true).toString("utf-8"));
+							res.end();
+						}
+					});
+			}
+			if(permission() == 10) { //remove the note if it's a manager
+				deleteNote();
+			} else {
+				db.events.find({_id: new mongo.ObjectID(req.params.eventid)}, function(err, note) {
+					if (err || !note) {
+						console.log("No such note found");
 					} else {
-						console.log("Note removed");
-						res.write(JSON.stringify(true).toString("utf-8"));
-						res.end();
+						var theNote = getBy(events[0].notes, '_id', req.params.id);
+						if(theNote.user == username) { //req.session.cas_user
+							deleteNote();
+						} else {
+							res.write(JSON.stringify(false).toString("utf-8"));
+							res.end();
+							return false;
+						}
 					}
 				});
+			}
 		});
 
 // STAFF
