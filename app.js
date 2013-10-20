@@ -467,6 +467,14 @@ var allInventory = [{
 
 // STAFF
 	//All event staff in IMS
+	db.staff.find({}, function(err, allStaff) {
+	if (err || !allStaff) {
+		console.log("No staff found");
+	} else {
+		app.locals.storeStaff = allStaff;
+
+	}
+	
 	app.get("/staff/all", function(req, res) {
 		//req.url
 		console.log("Req for all staff info");
@@ -474,13 +482,8 @@ var allInventory = [{
 		res.writeHead(200, {
 			'Content-Type': 'application/json'
 		});
-		db.staff.find({}, function(err, allStaff) {
-			if (err || !allStaff) {
-				console.log("No staff found");
-			} else {
-				res.write(JSON.stringify(allStaff).toString("utf-8"));
-				res.end();
-			}
+		res.write(JSON.stringify(app.locals.storeStaff).toString("utf-8"));
+		res.end();
 		});
 	});
 	//Get the existing staff of an event

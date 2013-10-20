@@ -84,7 +84,6 @@
         <% events.forEach(function(event) { %>
         <div class="media">
           
-            <i class="media-object icon-camera pull-left"></i>
           
           <div class="media-body"><span class="media-heading pull-right" style="font-size:18px"><%= formatAMPM(event.start) %> - <%= formatAMPM(event.end) %></span>
             <h4 class="media-heading"><%= event.title %></h4>
@@ -95,8 +94,9 @@
               <tbody>
                <% event.shifts.forEach(function(shift) { %>
                 <tr>
-                  <td>1</td>
-                  <td><%= shift.staff %></td>
+                  <td><%= storeStaff.filter(function(staff) {
+                            return staff.username == shift.staff;
+                          })[0].name %> (<%= shift.staff %>)</td>
                   <td><%= formatAMPM(shift.start) %></td>
                   <td><%= formatAMPM(shift.end) %></td>
                 </tr>
@@ -105,7 +105,6 @@
             </table>
           </div>
         </div>
-        <hr>
          <% }) %>
       </div>
 
