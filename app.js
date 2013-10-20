@@ -276,7 +276,7 @@ app.get('/printtoday', function(req, res) {
 		tomorrow.setMinutes(0);
 		tomorrow.setSeconds(0);
 		tomorrow.setMilliseconds(0);
-	db.events.find({start: {$gte: today, $lt: tomorrow}}).sort({start: 1},
+	db.events.find({start: {$gte: today, $lt: tomorrow}, valid:true}).sort({start: 1},
 		function(err, data) {
 				res.render('printtoday', {
 					events: data

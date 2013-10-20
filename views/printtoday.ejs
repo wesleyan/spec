@@ -151,11 +151,25 @@
         <div class="media">
           
           
-          <div class="media-body"><span class="media-heading pull-right" style="font-size:18px"><%= formatAMPM(event.start) %> - <%= formatAMPM(event.end) %></span>
+          <div class="media-body">
+          <span class="media-heading pull-right" style="font-size:18px">
+          <%= formatAMPM(event.start) %> - <%= formatAMPM(event.end) %>
+          <% if(event.duration == false) { %>
+           (setup and breakdown)
+            <% } else { %>
+            (duration)
+            <% } %>
+          </span>
             <h4 class="media-heading"><%= event.title %></h4>
             
             <%= event.desc %>
-            <span class="pull-right"><h4><%= event.staffNeeded %> staff needed</h4></span>
+            <span class="pull-right"><h4>
+            <% if(event.shifts.length < event.staffNeeded) { %>
+            <%= event.staffNeeded %> staff needed, has <%= event.shifts.length %>
+            <% } else { %>
+            <%= event.staffNeeded %> staff assigned
+            <% } %>
+            </h4></span>
             <h5>Event itself starts at <%= formatAMPM(event.eventStart) %> - <%= formatAMPM(event.eventEnd) %></h5>
          <table class="table table-striped table-bordered">
               <tbody>
