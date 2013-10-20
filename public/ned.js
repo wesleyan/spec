@@ -545,7 +545,7 @@ $(document).ready(function() {
 		}).done(function(msg) {
 			Spec.refetchEvents();
 			Spec.lastClickedEvent['video'] = !Spec.lastClickedEvent['video'];
-			Spec.techTemplateUpdate();
+			$('#popup').modalPopover('hide');
 			console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' video toggled');
 		});
 	});

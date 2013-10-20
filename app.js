@@ -251,13 +251,6 @@ app.get("/events", function(req, res) {
 					}
 				});
 		});
-  app.locals.decodeEntities = function(s){
-      var str, temp = document.createElement('p');
-      temp.innerHTML= s;
-      str = temp.textContent || temp.innerText;
-      temp =null;
-      return str;
-  }
   app.locals.formatAMPM = function(date) {
 	  var hours = date.getHours();
 	  var minutes = date.getMinutes();
@@ -275,8 +268,7 @@ app.get('/printtoday', function(req, res) {
 	//var tomorrow = new Date(date.getTime() + 24 * 60 * 60 * 1000);
 	var today = new Date(date.getTime() + 24 * 60 * 60 * 3000);
 	var tomorrow = new Date(date.getTime() + 24 * 60 * 60 * 4000);
-	db.events.find(
-		{start: {$gte: today, $lt: tomorrow}},
+	db.events.find({start: {$gte: today, $lt: tomorrow}}).sort({start: -1},
 		function(err, data) {
 				res.render('printtoday', {
 					events: data
