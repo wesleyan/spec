@@ -145,46 +145,46 @@
 
       <!-- Begin page content -->
       <div class="container">
-        <p class="lead">Events of <%= (new Date()).toDateString() %>:</p>
+        <p class="lead">Events of {{= (new Date()).toDateString() }}:</p>
 
-        <% events.forEach(function(event) { %>
+        {{ events.forEach(function(event) { }}
         <div class="media">
           
           
           <div class="media-body">
           <span class="media-heading pull-right" style="font-size:18px">
-          <%= formatAMPM(event.start) %> - <%= formatAMPM(event.end) %>
-          <% if(event.duration == false) { %>
+          {{= formatAMPM(event.start) }} - {{= formatAMPM(event.end) }}
+          {{ if(event.duration == false) { }}
            (setup and breakdown)
-            <% } else { %>
+            {{ } else { }}
             (duration)
-            <% } %>
+            {{ } }}
           </span>
-            <h4 class="media-heading"><%= event.title %></h4>
+            <h4 class="media-heading">{{= event.title }}</h4>
             
-            <%= event.desc %>
+            {{= event.desc }}
             <span class="pull-right"><h4>
-            <% if(event.shifts.length < event.staffNeeded) { %>
-            <%= event.staffNeeded %> staff needed, has <%= event.shifts.length %>
-            <% } else { %>
-            <%= event.staffNeeded %> staff assigned
-            <% } %>
+            {{ if(event.shifts.length < event.staffNeeded) { }}
+            {{= event.staffNeeded }} staff needed, has {{= event.shifts.length }}
+            {{ } else { }}
+            {{= event.staffNeeded }} staff assigned
+            {{ } }}
             </h4></span>
-            <h5>Event itself starts at <%= formatAMPM(event.eventStart) %> - <%= formatAMPM(event.eventEnd) %></h5>
+            <h5>Event itself starts at {{= formatAMPM(event.eventStart) }} - {{= formatAMPM(event.eventEnd) }}</h5>
          <table class="table table-striped table-bordered">
               <tbody>
-               <% event.shifts.forEach(function(shift) { %>
+               {{ event.shifts.forEach(function(shift) { }}
                 <tr>
-                  <td><%= storeStaff.filter(function(staff) {return staff.username == shift.staff;})[0].name %> (<%= shift.staff %>)</td>
-                  <td><%= formatAMPM(shift.start) %></td>
-                  <td><%= formatAMPM(shift.end) %></td>
+                  <td>{{= storeStaff.filter(function(staff) {return staff.username == shift.staff;})[0].name }} ({{= shift.staff }})</td>
+                  <td>{{= formatAMPM(shift.start) }}</td>
+                  <td>{{= formatAMPM(shift.end) }}</td>
                 </tr>
-                <% }) %>
+                {{ }) }}
               </tbody>
             </table>
           </div>
         </div>
-         <% }) %>
+         {{ }) }}
       </div>
 
       <div id="push"></div>

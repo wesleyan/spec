@@ -9,11 +9,20 @@
 var Spec = {}; //the only global variable that is supposed to be used in this application.
 Spec = { 
 	storeAllStaff: [],
-	username: 'ckorkut',
-	permission:10, //this is only for practical reasons, backend will always check for permission with session information
+	username: '',
+	permission:0, //this is only for practical reasons, backend will always check for permission with session information
 	lastClickedEvent: {},
 	View: {},
 	filter: '',
+	updateUser: function() {
+		$.ajax({
+			type: "GET",
+			url: "user/",
+		}).done(function(info) {
+			Spec.username = info.username;
+			Spec.permission = info.permission;
+		});
+	},
 	dropdownActiveFix: function() {
 		$('a').removeClass('drop-active');
 		$('a[href="#' + Backbone.history.fragment + '"]').addClass('drop-active');
@@ -327,6 +336,7 @@ Spec.newRowInit = function (lastShift) {
 }
 
 $(document).ready(function() {
+	Spec.updateUser();
 	var date = new Date();
 	var d = date.getDate();
 	var m = date.getMonth();

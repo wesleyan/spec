@@ -9,29 +9,23 @@ var collections = ['events','staff']
 var db = require("mongojs").connect(databaseUrl, collections);
 var mongo = require('mongodb-wrapper');
 
-function getBy(myArray, key, value) {
-	return myArray.filter(function(obj) {
-		if(obj['key'] === value) {
-		return obj;
-		}
-	});
-}
-var users;
+//We can store all staff in memory, since it is not a big array and it will be used VERY frequently, will save time.
 db.staff.find({}, function(err, data) {
 		if (err || !data) {
 			console.log("No events found");
 		} else {
-			users = data;
+			app.locals.storeStaff = data;
 		}
 	});
 
 //CAS Session Management will come here.
-var username = 'kakoi'; //let's assume that the session variable is this for now
+var username = 'ckorkut'; //let's assume that the session variable is this for now
 
 function inSession() { //boolean returning function to detect if logged in or user in staff list
 	return true;
 	//this is the actual code for the future:
-	if(getBy(users,'username',req.session.cas_user).length < 1) {
+	var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == username; });
+	if(userObj.length < 1) {
 		return false;
 	} else {
 		return true;
@@ -39,9 +33,9 @@ function inSession() { //boolean returning function to detect if logged in or us
 }
 
 function permission() { //returns the permission level of the user in session
-	return 10;
-	//var userObj = getBy(app.locals.storeStaff,'username',req.session.cas_user);
-	var userObj = getBy(app.locals.storeStaff,'username',username);
+	//var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == req.session.cas_user; });
+	var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == username; });
+	console.log(userObj);
 	if(userObj.length < 1) {
 		return false;
 	} else {
@@ -92,6 +86,21 @@ app.configure(function() {
 	app.use(app.router);
 	app.use(express.static(__dirname + '/public'));
 });
+var ejs = require('ejs');
+ejs.open = '{{';
+ejs.close = '}}';
+
+	app.get("/user", function(req, res) {
+		if(!inSession()) {res.end();	return false;} //must be logged in
+		//req.url
+		console.log("Req for session user");
+		res.writeHead(200, {
+			'Content-Type': 'application/json'
+		});
+		//req.session.cas_user
+		res.write(JSON.stringify({'username':username, 'permission':permission()}).toString("utf-8"));
+		res.end();
+	});
 
 //EVENTS
 //Event fetching should be filtered according to the time variables, still not done after MongoDB
@@ -317,10 +326,6 @@ app.get('/printtoday', function(req, res) {
 				});
 		});
 
-	
-});
-
-
 var allInventory = [{
 		"id": 4,
 		"text": "Video Camera",
@@ -533,7 +538,7 @@ var allInventory = [{
 					if (err || !note) {
 						console.log("No such note found");
 					} else {
-						var theNote = getBy(events[0].notes, '_id', req.params.id);
+						var theNote = $.grep(events[0].notes, function(e){ return e['_id'] == req.params.id; });
 						if(theNote.user == username) { //req.session.cas_user
 							deleteNote();
 						} else {
@@ -547,11 +552,6 @@ var allInventory = [{
 		});
 
 // STAFF
-	//We can store all staff in memory, since it is not a big array and it will be used VERY frequently, will save time.
-	db.staff.find({}, function(err, allStaff) {
-	if (err || !allStaff) {
-		console.log("No staff found");
-	} else {app.locals.storeStaff = allStaff;}
 	//All event staff in IMS
 	app.get("/staff/all", function(req, res) {
 		if(!inSession()) {res.end();	return false;} //must be logged in
