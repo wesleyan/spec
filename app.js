@@ -195,7 +195,7 @@ app.get("/events", function(req, res) {
 			console.log("Req for event edit Event ID " + req.body.eventid);
 			var query = {};
 			$.each(req.body.changedData, function(key, value) {
-				if(key == 'title' || key == 'desc') {
+				if(key == 'title' || key == 'desc' || key == 'loc') {
 					query[key] = value;
 				}
 			});
