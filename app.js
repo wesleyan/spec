@@ -649,6 +649,11 @@ app.get('/', function (req, res) {
 
 
 app.get('/fileUpload', function(req, res) {
+	if(permission() != 10) {
+		res.write(JSON.stringify(false).toString("utf-8"));
+		res.end();
+		return false;
+	}
   res.render('upload');
 });
 
@@ -656,6 +661,11 @@ var fs = require('fs');
 var parser = require('xml2json');
 
 app.post('/fileUpload', function(req, res) {
+	if(permission() != 10) {
+		res.write(JSON.stringify(false).toString("utf-8"));
+		res.end();
+		return false;
+	}
 	console.log('Upload and saving progress started');
 	//you should check if it's an xml file
 	try {
