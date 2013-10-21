@@ -40,7 +40,11 @@
 		  <ul class="dropdown-menu front">
 		    <li><a href="/printToday"><i class="icon-print"></i> Events of today</a></li>
 		    <li class="divider"></li>
+		    {{ if(permission == 10) { }}
 		    <li><a href="/fileUpload"><i class="icon-upload"></i> File Upload</a></li>
+		    <li><a href="/staffCheck"><i class="icon-user"></i> Staff Check</a></li>
+		   	<li class="divider"></li>
+		    {{ } }}
 		    <li><a href="https://ims.wesleyan.edu/"><i class="icon-inbox"></i> Office Manager</a></li>
 		    <li><a href="/logout"><i class="icon-thumbs-down"></i> Log out</a></li>
 		  </ul>
@@ -107,7 +111,7 @@
 	  </div>
 	</div>
 	{{ if(permission == 10) { }}
-{{ } }}
+
 	<div id="editEvent" class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
 	  <div class="modal-header">
 	    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -121,7 +125,6 @@
 	  </div>
 	</div>
 	<div id="removeEvent" class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
-	{{ if(permission == 10) { }}
 {{ } }}
 	<div id="popup" class="popover">
 	    <div class="arrow"></div>
