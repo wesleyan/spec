@@ -23,12 +23,17 @@ db.staff.find({}, function(err, data) {
 	});
 
 //CAS Session Management will come here.
-var username = 'ckorkut'; //let's assume that the session variable is this for now
+//var username = 'ckorkut'; //let's assume that the session variable is this for now
 
-function inSession() { //boolean returning function to detect if logged in or user in staff list
+function getUser(req) {
+	return 'ckorkut';
+	return req.session.cas_user;
+}
+
+function inSession(req) { //boolean returning function to detect if logged in or user in staff list
 	return true;
 	//this is the actual code for the future:
-	/*var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == username; });
+	/*var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == getUser(req); });
 	if(userObj.length < 1) {
 		return false;
 	} else {
@@ -36,9 +41,8 @@ function inSession() { //boolean returning function to detect if logged in or us
 	}*/
 }
 
-function permission() { //returns the permission level of the user in session
-	//var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == req.session.cas_user; });
-	var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == username; });
+function permission(req) { //returns the permission level of the user in session
+	var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == getUser(req); });
 	if(userObj.length < 1) {
 		return false;
 	} else {
@@ -96,21 +100,21 @@ ejs.close = '}}';
 
 
 app.get("/user", function(req, res) {
-	if(!inSession()) {res.end();	return false;} //must be logged in
+	if(!inSession(req)) {res.end();	return false;} //must be logged in
 	//req.url
 	console.log("Req for session user");
 	res.writeHead(200, {
 		'Content-Type': 'application/json'
 	});
 	//req.session.cas_user
-	res.write(JSON.stringify({'username':username, 'permission':permission()}).toString("utf-8"));
+	res.write(JSON.stringify({'username':getUser(req), 'permission':permission(req)}).toString("utf-8"));
 	res.end();
 });
 
 //EVENTS
 //Event fetching should be filtered according to the time variables, still not done after MongoDB
 app.get("/events", function(req, res) {
-	if(!inSession()) {res.end();	return false;} //must be logged in
+	if(!inSession(req)) {res.end();	return false;} //must be logged in
 
 	//86400s = 1d
 	var start = new Date(req.query.start * 1000);
@@ -121,7 +125,7 @@ app.get("/events", function(req, res) {
 	} else if(req.query.filter == 'unstaffed') {
 		query = { $where: "this.shifts.length < this.staffNeeded", valid: true };
 	} else if(req.query.filter == 'onlyMine') {
-		query = {shifts: { $elemMatch: { staff: username } }};
+		query = {shifts: { $elemMatch: { staff: getUser(req) } }};
 	} else if(req.query.filter == 'recentVideo') {
 		query = {video: true};
 	}
@@ -148,7 +152,7 @@ app.get("/events", function(req, res) {
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
-			if(permission() != 10) {
+			if(permission(req) != 10) {
 				res.write(JSON.stringify(false).toString("utf-8"));
 				res.end();
 				return false;
@@ -173,7 +177,7 @@ app.get("/events", function(req, res) {
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
-			if(permission() != 10) {
+			if(permission(req) != 10) {
 				res.write(JSON.stringify(false).toString("utf-8"));
 				res.end();
 				return false;
@@ -197,7 +201,7 @@ app.get("/events", function(req, res) {
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
-			if(permission() != 10) {
+			if(permission(req) != 10) {
 				res.write(JSON.stringify(false).toString("utf-8"));
 				res.end();
 				return false;
@@ -234,7 +238,7 @@ app.get("/events", function(req, res) {
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
-			if(permission() != 10) {
+			if(permission(req) != 10) {
 				res.write(JSON.stringify(false).toString("utf-8"));
 				res.end();
 				return false;
@@ -258,7 +262,7 @@ app.get("/events", function(req, res) {
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
-			if(permission() != 10) {
+			if(permission(req) != 10) {
 				res.write(JSON.stringify(false).toString("utf-8"));
 				res.end();
 				return false;
@@ -282,7 +286,7 @@ app.get("/events", function(req, res) {
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
-			if(permission() != 10) {
+			if(permission(req) != 10) {
 				res.write(JSON.stringify(false).toString("utf-8"));
 				res.end();
 				return false;
@@ -312,7 +316,7 @@ app.get("/events", function(req, res) {
 	} //end formatAMPM
 
 app.get('/printtoday', function(req, res) {
-	if(!inSession()) {res.end();	return false;} //must be logged in
+	if(!inSession(req)) {res.end();	return false;} //must be logged in
 	console.log('Req for seeing today\'s events list');
 	var today = new Date();
 	var tomorrow = new Date(date.getTime() + 24 * 60 * 60 * 1000);
@@ -369,7 +373,7 @@ var allInventory = [{
 	// All inventory
 	app.get("/inventory/all", function(req, res) {
 
-		if(!inSession()) {res.end();	return false;} //must be logged in
+		if(!inSession(req)) {res.end();	return false;} //must be logged in
 		//req.url
 		console.log("Req for all inventory");
 		res.writeHead(200, {
@@ -381,7 +385,7 @@ var allInventory = [{
 
 	//Existing inventory for each event
 	app.get("/inventory/existing/:id", function(req, res) {
-		if(!inSession()) {res.end();	return false;} //must be logged in
+		if(!inSession(req)) {res.end();	return false;} //must be logged in
 		//req.url
 		console.log("Req for inventory of Event ID " + req.params.id);
 		res.writeHead(200, {
@@ -414,7 +418,7 @@ var allInventory = [{
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
-			if(permission() < 1) {
+			if(permission(req) < 1) {
 				res.write(JSON.stringify(false).toString("utf-8"));
 				res.end();
 				return false;
@@ -446,7 +450,7 @@ var allInventory = [{
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
-			if(permission() < 1) {
+			if(permission(req) < 1) {
 				res.write(JSON.stringify(false).toString("utf-8"));
 				res.end();
 				return false;
@@ -469,7 +473,7 @@ var allInventory = [{
 // NOTES
 	//Existing notes for each event
 	app.get("/notes/existing/:id", function(req, res) {
-		if(!inSession()) {res.end();	return false;} //must be logged in
+		if(!inSession(req)) {res.end();	return false;} //must be logged in
 		//req.url
 		console.log("Req for fetching notes of Event ID " + req.params.id);
 		//Event filtering and inventory
@@ -493,7 +497,7 @@ var allInventory = [{
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
-			if(!inSession()) {
+			if(!inSession(req)) {
 				res.write(JSON.stringify(false).toString("utf-8"));
 				res.end();
 				return false;
@@ -502,13 +506,13 @@ var allInventory = [{
 			var generatedID = new mongo.ObjectID();
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
-				{ $addToSet: {'notes': {'id': generatedID, 'text': req.body.note,'user': username, 'date': new Date()}} }, 
+				{ $addToSet: {'notes': {'id': generatedID, 'text': req.body.note,'user': getUser(req), 'date': new Date()}} }, 
 				function(err, updated) {
 					if (err || !updated) {
 						console.log("Note not added:" + err);
 					} else {
 						console.log("Note added");
-						res.write(JSON.stringify({'id':generatedID.toString(), 'user':username}).toString("utf-8"));
+						res.write(JSON.stringify({'id':generatedID.toString(), 'user':getUser(req)}).toString("utf-8"));
 						res.end();
 					}
 				});
@@ -525,7 +529,7 @@ var allInventory = [{
 			var deleteNote = function() {
 				db.events.update(
 					{_id: new mongo.ObjectID(req.body.eventid)},
-					{ $pull: {'notes': {'id': new mongo.ObjectID(req.body.id), 'user':username} } }, 
+					{ $pull: {'notes': {'id': new mongo.ObjectID(req.body.id), 'user':getUser(req)} } }, 
 					function(err, updated) {
 						if (err || !updated) {
 							console.log("Note not removed:" + err);
@@ -536,7 +540,7 @@ var allInventory = [{
 						}
 					});
 			}
-			if(permission() == 10) { //remove the note if it's a manager
+			if(permission(req) == 10) { //remove the note if it's a manager
 				deleteNote();
 			} else {
 				db.events.find({_id: new mongo.ObjectID(req.params.eventid)}, function(err, note) {
@@ -544,7 +548,7 @@ var allInventory = [{
 						console.log("No such note found");
 					} else {
 						var theNote = $.grep(events[0].notes, function(e){ return e['_id'] == req.params.id; });
-						if(theNote.user == username) { //req.session.cas_user
+						if(theNote.user == getUser(req)) { //req.session.cas_user
 							deleteNote();
 						} else {
 							res.write(JSON.stringify(false).toString("utf-8"));
@@ -559,7 +563,7 @@ var allInventory = [{
 // STAFF
 	//All event staff in IMS
 	app.get("/staff/all", function(req, res) {
-		if(!inSession()) {res.end();	return false;} //must be logged in
+		if(!inSession(req)) {res.end();	return false;} //must be logged in
 		//req.url
 		console.log("Req for all staff info");
 		// Filter the events/database and return the staff and shifts info (requires to decide on db structure)
@@ -571,7 +575,7 @@ var allInventory = [{
 	});
 	//Get the existing staff of an event
 	app.get("/staff/get/:id", function(req, res) {
-		if(!inSession()) {res.end();	return false;} //must be logged in
+		if(!inSession(req)) {res.end();	return false;} //must be logged in
 		//req.url
 		console.log("Req for staff info of Event ID " + req.params.id);
 		// Filter the events/database and return the staff and shifts info (requires to decide on db structure)
@@ -593,7 +597,7 @@ var allInventory = [{
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
-			if(permission() != 10) {
+			if(permission(req) != 10) {
 				res.write(JSON.stringify(false).toString("utf-8"));
 				res.end();
 				return false;
@@ -623,7 +627,7 @@ var allInventory = [{
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
-			if(permission() != 10) {
+			if(permission(req) != 10) {
 				res.write(JSON.stringify(false).toString("utf-8"));
 				res.end();
 				return false;
@@ -645,7 +649,7 @@ var allInventory = [{
 
 		//this is determined by staff time checking, not shift time checking, therefore if 
 		app.get("/staff/available/today", function(req, res) {
-			if(!inSession()) {res.end();	return false;} //must be logged in
+			if(!inSession(req)) {res.end();	return false;} //must be logged in
 			var busyStaff = [];
 			//86400s = 1d
 			var start = new Date(req.query.start * 1000);
@@ -673,7 +677,7 @@ var allInventory = [{
 		});
 
 		app.get("/staff/check", function(req, res) {
-			if(permission() != 10) {
+			if(permission(req) != 10) {
 				res.write(JSON.stringify(false).toString("utf-8"));
 				res.end();
 				return false;
@@ -694,7 +698,7 @@ var allInventory = [{
 	});
 		});
 	app.get('/staffCheck', function (req, res) {
-		if(permission() != 10) {
+		if(permission(req) != 10) {
 			res.write(JSON.stringify(false).toString("utf-8"));
 			res.end();
 			return false;
@@ -709,19 +713,19 @@ var allInventory = [{
 //Main Page Rendering
 
 app.get('/', function (req, res) {
-	if(!inSession()) {res.end();	return false;} //must be logged in
+	if(!inSession(req)) {res.end();	return false;} //must be logged in
 	  res.render('index',
 		{
 			//user: req.session.cas_user,
-			username: username,
-			permission: permission(),
+			username: getUser(req),
+			permission: permission(req),
 		});
 	});
 
 
 
 app.get('/fileUpload', function(req, res) {
-	if(permission() != 10) {
+	if(permission(req) != 10) {
 		res.write(JSON.stringify(false).toString("utf-8"));
 		res.end();
 		return false;
@@ -733,7 +737,7 @@ var fs = require('fs');
 var parser = require('xml2json');
 
 app.post('/fileUpload', function(req, res) {
-	if(permission() != 10) {
+	if(permission(req) != 10) {
 		res.write(JSON.stringify(false).toString("utf-8"));
 		res.end();
 		return false;
