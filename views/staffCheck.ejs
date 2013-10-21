@@ -92,16 +92,19 @@
       $('#d1').datepicker('setValue', lastWeek);
       $('#d2').datepicker('setValue', today);
       $('#send').click(function(e) {
-        var user = $('.combobox').val().match(/\(([^)]+)\)/)[1];
+        try {
+          var user = $('.combobox').val().match(/\(([^)]+)\)/)[1];
+        } catch(err) {return false;}
         $.ajax({
           type: "GET",
           url: "../staff/check",
           data: {
-            'user':user,
-
+            'user': user,
+            'start': $('#d1').data('datepicker').date,
+            'end': $('#d2').data('datepicker').date,
           }
         }).done(function(msg) {
-
+          console.log(msg);
         });
       });
     });
@@ -334,12 +337,12 @@
             <option value="{{=staff.username}}">{{=staff.name}} ({{=staff.username}})</option>
           {{ }); }}
         </select>
-        <div class="input-append date" id="d1" data-date="12-02-2012" data-date-format="mm-dd-yyyy">
-          <input class="input-small" size="16" type="text" value="12-02-2012">
+        <div class="input-append date" id="d1" data-date="00-00-0000" data-date-format="mm-dd-yyyy">
+          <input class="input-small" size="16" type="text">
           <span class="add-on"><i class="icon-th"></i></span>
         </div>
-        <div class="input-append date" id="d2" data-date="12-02-2012" data-date-format="mm-dd-yyyy">
-          <input class="input-small" size="16" type="text" value="12-02-2012">
+        <div class="input-append date" id="d2" data-date="00-00-0000" data-date-format="mm-dd-yyyy">
+          <input class="input-small" size="16" type="text">
           <span class="add-on"><i class="icon-th"></i></span>
         </div>
         <button class="btn btn-primary" id="send" type="button">See hir events</button>

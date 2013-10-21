@@ -678,7 +678,20 @@ var allInventory = [{
 				res.end();
 				return false;
 			}
-			//gotta write this part some time, back end for ajax request by staffCheck
+			var start = new Date(Date.parse(req.query.start));
+			var end = new Date(Date.parse(req.query.end));
+			console.log(start);
+			console.log("Req for staff check for " + req.query.user);
+			db.events.find({'start': {$gte: start, $lt: end}, 'shifts':{$elemMatch: {'staff': req.query.user}},}, function(err, events) {
+			if (err || !events) {
+				console.log("No events found");
+				res.write(JSON.stringify(false).toString("utf-8"));
+				res.end();
+			} else {
+				res.write(JSON.stringify(events).toString("utf-8"));
+				res.end();
+			}
+	});
 		});
 	app.get('/staffCheck', function (req, res) {
 		if(permission() != 10) {
@@ -753,7 +766,6 @@ app.post('/fileUpload', function(req, res) {
 				title: data['Event_x0020_Name'],
 				desc: data['Notes'],
 				loc: data['Room_x0020_Description'],
-				staffAdded: 0,
 				staffNeeded: 1,
 				start: reservedStart,
 				end: reservedEnd,
