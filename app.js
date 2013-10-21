@@ -669,15 +669,27 @@ var allInventory = [{
 				}	
 			});
 		});
-app.get('/staffCheck', function (req, res) {
-	if(!inSession()) {res.end();	return false;} //must be logged in
-	  res.render('staffCheck',
-		{
-			//user: req.session.cas_user,
-			username: username,
-			permission: permission(),
+
+		app.get("/staff/check", function(req, res) {
+			if(permission() != 10) {
+				res.write(JSON.stringify(false).toString("utf-8"));
+				res.end();
+				return false;
+			}
+			//gotta write this part some time, back end for ajax request by staffCheck
 		});
-	});
+	app.get('/staffCheck', function (req, res) {
+		if(permission() != 10) {
+			res.write(JSON.stringify(false).toString("utf-8"));
+			res.end();
+			return false;
+		}
+		console.log("Req for staff check");
+		  res.render('staffCheck',
+			{
+				//users: app.locals.,
+			});
+		});
 
 //Main Page Rendering
 
