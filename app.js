@@ -80,13 +80,19 @@ var ejs = require('ejs');
 ejs.open = '{{';
 ejs.close = '}}';
 //We can store all staff in memory, since it is not a big array and it will be used VERY frequently, will save time.
+var staffUsernameArray = [];
 db.staff.find({}, function(err, data) {
 		if (err || !data) {
 			console.log("No events found");
 		} else {
 			app.locals.storeStaff = data;
+			app.locals.storeStaff.forEach(function(item) {
+				staffUsernameArray.push(item.username);
+			});
 		}
 	});
+
+
 app.get("/user", function(req, res) {
 	if(!inSession()) {res.end();	return false;} //must be logged in
 	//req.url
@@ -135,6 +141,7 @@ app.get("/events", function(req, res) {
 	});
 	
 });
+
 		app.post("/event/duration", function(req, res) {
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
@@ -633,6 +640,44 @@ var allInventory = [{
 					}
 				});
 		});
+
+		//this is determined by staff time checking, not shift time checking, therefore if 
+		app.get("/staff/available/today", function(req, res) {
+			if(!inSession()) {res.end();	return false;} //must be logged in
+			var busyStaff = [];
+			//86400s = 1d
+			var start = new Date(req.query.start * 1000);
+			var end = new Date(req.query.end * 1000);
+			console.log("Req for staff available starting at " + start.toDateString() + " and ending before " + end.toDateString());
+			res.writeHead(200, {
+				'Content-Type': 'application/json'
+			});
+			var query = {};
+			$.extend(query, {'start': {$gte: start, $lt: end}});
+			db.events.find(query, function(err, events) {
+				if (err || !events) {
+					console.log("No events found");
+				} else {
+					events.forEach(function(event) {
+						event.shifts.forEach(function(shift) {
+							busyStaff.push(shift.staff);
+						});
+					});
+					var availableStaff = $(staffUsernameArray).not(busyStaff).get();
+					res.write(JSON.stringify(availableStaff).toString("utf-8"));
+					res.end();
+				}	
+			});
+		});
+app.get('/staffCheck', function (req, res) {
+	if(!inSession()) {res.end();	return false;} //must be logged in
+	  res.render('staffCheck',
+		{
+			//user: req.session.cas_user,
+			username: username,
+			permission: permission(),
+		});
+	});
 
 //Main Page Rendering
 
