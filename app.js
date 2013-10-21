@@ -9,6 +9,19 @@ var collections = ['events','staff']
 var db = require("mongojs").connect(databaseUrl, collections);
 var mongo = require('mongodb-wrapper');
 
+
+var staffUsernameArray = [];
+db.staff.find({}, function(err, data) {
+		if (err || !data) {
+			console.log("No events found");
+		} else {
+			app.locals.storeStaff = data;
+			app.locals.storeStaff.forEach(function(item) {
+				staffUsernameArray.push(item.username);
+			});
+		}
+	});
+
 //CAS Session Management will come here.
 var username = 'ckorkut'; //let's assume that the session variable is this for now
 
@@ -80,17 +93,6 @@ var ejs = require('ejs');
 ejs.open = '{{';
 ejs.close = '}}';
 //We can store all staff in memory, since it is not a big array and it will be used VERY frequently, will save time.
-var staffUsernameArray = [];
-db.staff.find({}, function(err, data) {
-		if (err || !data) {
-			console.log("No events found");
-		} else {
-			app.locals.storeStaff = data;
-			app.locals.storeStaff.forEach(function(item) {
-				staffUsernameArray.push(item.username);
-			});
-		}
-	});
 
 
 app.get("/user", function(req, res) {
