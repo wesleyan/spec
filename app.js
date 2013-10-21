@@ -117,6 +117,7 @@ app.get("/events", function(req, res) {
 	} else if(req.query.filter == 'recentVideo') {
 		query = {video: true};
 	}
+	$.extend(query, {'start': {$gte: start, $lt: end}});
 	db.events.find(query, function(err, events) {
 		if (err || !events) {
 			console.log("No events found");

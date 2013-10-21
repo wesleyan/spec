@@ -629,9 +629,8 @@ $(document).ready(function() {
 			  delay: 2000,
 			});
 			return false;		
-		} else {
-			var chosenStaff = $('.combobox').val().match(/\(([^)]+)\)/)[1];
 		}
+			var chosenStaff = $('.combobox').val().match(/\(([^)]+)\)/)[1];
 		$.ajax({
 			type: "POST",
 			url: "staff/add",
@@ -645,18 +644,28 @@ $(document).ready(function() {
 			}
 		}).done(function(res) {
 			Spec.refetchEvents();
-			Spec.lastClickedEvent.shifts.push({});
-			Spec.changePopupColor(Spec.lastClickedEvent);
+
+
 			console.log('staff added to event ID ' + Spec.lastClickedEvent['_id'] + ': ' + res.id);
-			var each_staff_view2 = new Spec.View.EachStaff({ //Backbone new note view used
-				'item': {
+			var newShift = {
 					'id': res.id,
 					'start': res.start,
 					'end': res.end,
 					'staff': chosenStaff,
 					'staffname': $('.combobox').val().substring(0, $('.combobox').val().indexOf('(')-1),
-				}
+				};
+			var each_staff_view2 = new Spec.View.EachStaff({ //Backbone new note view used
+				'item': newShift
 			});
+			if($.grep(Spec.lastClickedEvent.shifts, function(e){ return e.staff == chosenStaff; }).length > 0) {
+				$.bootstrapGrowl("You have chosen this staff for another shift before, shift is added but you may want to check it again.", {
+				  type: 'info',
+				  align: 'center',
+				  delay: 20000,
+				});
+			}
+			Spec.lastClickedEvent.shifts.push(newShift);
+			Spec.changePopupColor(Spec.lastClickedEvent);
 			$('.combobox').val('');
 		}); //done function
 	}); 	//click event
