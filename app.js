@@ -71,7 +71,7 @@ function addBackgroundColor(events) { //changes the events object
 app.configure(function() {
 	app.set('views', __dirname + '/views');
 	app.set('view engine', 'ejs');
-	app.use(express.bodyParser());
+	app.use(express.bodyParser({keepExtensions: true, uploadDir:'uploads'}));
 	app.use(express.methodOverride());
 	app.use(app.router);
 	app.use(express.static(__dirname + '/public'));
@@ -645,6 +645,86 @@ app.get('/', function (req, res) {
 			permission: permission(),
 		});
 	});
+
+
+
+app.get('/fileUpload', function(req, res) {
+  res.render('upload');
+});
+
+var fs = require('fs');
+var parser = require('xml2json');
+
+app.post('/fileUpload', function(req, res) {
+	console.log('Upload and saving progress started');
+	//you should check if it's an xml file
+	try {
+		var xml = fs.readFileSync(req.files.myFile.path);
+		var parsed = parser.toJson(xml,{
+			object: true,
+			trim: true,
+			arrayNotation: true
+		});
+		parsed = parsed['CopyofIMSforExport']['Data'];
+
+		var processed = [];
+
+		parsed.forEach(function(data) {
+			var bookingDate = data['Booking_x0020_Date'].split(" ")[0]
+			var reservedStart = new Date(Date.parse(bookingDate + ' ' + data['Reserved_x0020_Start']));
+			var reservedEnd = new Date(Date.parse(bookingDate + ' ' + data['Reserved_x0020_End']));
+			var eventStart = new Date(Date.parse(bookingDate + ' ' + data['Event_x0020_Start']));
+			var eventEnd = new Date(Date.parse(bookingDate + ' ' + data['Event_x0020_End']));
+			if (data['Booking_x0020_Status'] == 'Cancelled') {
+				var valid = false;
+			} else {
+				var valid = true;
+			}
+			processed.push({
+				title: data['Event_x0020_Name'],
+				desc: data['Notes'],
+				loc: data['Room_x0020_Description'],
+				staffAdded: 0,
+				staffNeeded: 1,
+				start: reservedStart,
+				end: reservedEnd,
+				'eventStart': eventStart,
+				'eventEnd': eventEnd,
+				'valid': valid,
+				duration: true,
+				inventory: [],
+				notes: [],
+				shifts:[]
+			});
+		});
+
+		processed.forEach(function(event) {
+			db.events.save(event, function(err, saved) {
+				if (err || !saved) console.log("Event not saved");
+				else console.log("Event saved");
+			});
+		});
+
+		console.log("Upload and saving progress ended successfully");
+		res.writeHead(200);
+	} catch(err) {
+		res.writeHead(400);
+		console.log(err);
+	}
+  	deleteAfterUpload(req.files.myFile.path);
+  	res.end();
+});
+
+// Private functions
+
+var deleteAfterUpload = function(path) {
+  setTimeout( function(){
+    fs.unlink(path, function(err) {
+      if (err) console.log(err);
+      console.log('file successfully deleted');
+    });
+  }, 60 * 1000 * 4); //stays there for 4 minutes
+};
 
 app.listen(8080);
 console.log('Listening on port 8080');

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Spec: File Upload</title>
+    <link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css" rel="stylesheet">
+    <script src="lib/jquery.min.js"></script>
+  </head>
+  <body>
+
+    <div class="container">
+      <div class="row">
+        <div class="span12">
+
+      
+          <form method="post" action="/fileUpload">
+            <legend>Spec: File Upload</legend>
+            <input type="file" name="myFile" id="myFile"/>
+            <p></p>
+            <div class="form-actions">
+              <input type="submit" value="Submit" class="btn btn-primary"/>
+            </div>
+          </form>
+        </div>
+
+        <li>In EMS, under Reports, run the saved Query 'Copy of IMS For Export'. Select a 2 week time-period beginning today.</li>
+        <li>Select Export &rarr;  XML.</li>
+        <li>Import the XML to Ned using the Upload File button right up there &uarr;</li>
+      </div>
+      <hr/>
+      <div class="row">
+        <div class="span12">
+          <div class="progress progress-striped active hide">
+            <div style="width: 0%" class="bar"></div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="span12">
+          <div class="alert hide">
+            <button type="button" data-dismiss="alert" class="close">x</button><span><strong class="message"></strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+    $(function() {
+      var showInfo = function(message) {
+        $('div.progress').hide();
+        $('strong.message').text(message);
+        $('div.alert').show();
+      };
+      
+      $('input[type="submit"]').on('click', function(evt) {
+        evt.preventDefault();
+        $('div.progress').show();
+        var formData = new FormData();
+        var file = document.getElementById('myFile').files[0];
+        formData.append('myFile', file);
+        
+        var xhr = new XMLHttpRequest();
+        
+        xhr.open('post', '/fileUpload', true);
+        
+        xhr.upload.onprogress = function(e) {
+          if (e.lengthComputable) {
+            var percentage = (e.loaded / e.total) * 100;
+            $('div.progress div.bar').css('width', percentage + '%');
+          }
+        };
+        
+        xhr.onerror = function(e) {
+          showInfo('An error occurred while submitting the form. Maybe your file is too big');
+        };
+        
+        xhr.onload = function() {
+          showInfo(this.statusText);
+        };
+        
+        xhr.send(formData);
+        
+      });
+      
+    });
+    </script>
+
+  </body>
+</html>
