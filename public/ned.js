@@ -363,6 +363,7 @@ $(document).ready(function() {
 			Spec.resizeMap();
 		},
 		eventClick: function(calEvent, jsEvent, view) {
+			Spec.lastClickedEvent = calEvent;
 			//This function should contain specific stuff like opening the event-based selection/description box etc
 			$('#popup').modalPopover('hide');
 			//front-end eye-candy stuff
@@ -376,10 +377,22 @@ $(document).ready(function() {
 
 			//Popover update with event information (can be hidden in a Backbone view)
 			$('#popupTitle').html(symbol + Spec.decodeEntities(calEvent.title));
-			
-			$('#popupContentInside').html(Spec.decodeEntities(calEvent.desc));
-			$('#popupContentHeader').html('<b>' + defaults.dayNames[calEvent.start.getDay()] + ' | ' + Spec.decodeEntities(calEvent.loc) + '</b>');
-			
+			var inside = 
+			Spec.decodeEntities(calEvent.desc);
+			$('#popupContentInside').html(inside);
+			try {
+			$('#popupContentHeader').html('<b>' + defaults.dayNames[calEvent.start.getDay()] + ' | ' + Spec.decodeEntities(calEvent.loc) + '</b>'+
+				'<br><i class="icon-time"></i> <b>'+Spec.formatAMPM(calEvent.start)+'</b> ' + ' <i>'+ Spec.formatAMPM(new Date(Date.parse(calEvent.eventStart)))+'</i>' +
+				' <i class="icon-arrow-right"></i>   <i>'+ Spec.formatAMPM(new Date(Date.parse(calEvent.eventEnd)))+'</i>' + ' <b>'+Spec.formatAMPM(calEvent.end)+'</b>'
+				);
+			} catch(err) {
+				$('#popupContentHeader').html('<b>' + defaults.dayNames[calEvent.start.getDay()] + ' | ' + Spec.decodeEntities(calEvent.loc) + '</b>');
+				$.bootstrapGrowl("Time data of the event <b>" + Spec.lastClickedEvent.title + "</b> is improper. Please edit the event to make it's data type valid.", {
+				  type: 'error',
+				  align: 'center',
+				  delay: 40000,
+				});
+			}
 			//Inventory update
 			var inventoryOptions = {
 				values_url: 'inventory/existing/' + calEvent['_id'],
@@ -396,7 +409,7 @@ $(document).ready(function() {
 				$('#popup').modalPopover('show');
 				var note_view = new Spec.View.Notes({'notes':notes });
 			});
-			Spec.lastClickedEvent = calEvent;
+
 		},
 		eventRightClick: function(calEvent, jsEvent, view) {
 			jsEvent.preventDefault(); //Right click event only prevents default because context menu is binded in eventRender
