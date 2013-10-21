@@ -336,7 +336,7 @@ Spec.newRowInit = function (lastShift) {
 }
 
 $(document).ready(function() {
-	Spec.updateUser();
+	//Spec.updateUser();
 	var date = new Date();
 	var d = date.getDate();
 	var m = date.getMonth();

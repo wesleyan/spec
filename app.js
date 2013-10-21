@@ -639,6 +639,8 @@ app.get('/', function (req, res) {
 	if(!inSession()) {res.end();	return false;} //must be logged in
 	  res.render('index',
 		{
+			//user: req.session.cas_user,
+			username: username,
 			permission: permission(),
 		});
 	});
