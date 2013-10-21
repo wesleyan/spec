@@ -304,10 +304,10 @@ app.get("/events", function(req, res) {
 app.get('/printtoday', function(req, res) {
 	if(!inSession()) {res.end();	return false;} //must be logged in
 	console.log('Req for seeing today\'s events list');
-	//var today = new Date();
-	//var tomorrow = new Date(date.getTime() + 24 * 60 * 60 * 1000);
-	var today = new Date(date.getTime() + 24 * 60 * 60 * 3000);
-	var tomorrow = new Date(date.getTime() + 24 * 60 * 60 * 4000);
+	var today = new Date();
+	var tomorrow = new Date(date.getTime() + 24 * 60 * 60 * 1000);
+	//var today = new Date(date.getTime() + 24 * 60 * 60 * 3000); //two days later
+	//var tomorrow = new Date(date.getTime() + 24 * 60 * 60 * 4000); //three days later
 		today.setHours(0);
 		today.setMinutes(0);
 		today.setSeconds(0);

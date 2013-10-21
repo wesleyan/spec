@@ -77,6 +77,10 @@
       $('body').html(htmlspecialchars_decode($('body').html()));
       $('body').html(htmlspecialchars_decode($('body').html())); 
       //this is important because some HTML characters consist of other HTML characters, so double decoding is needed
+
+      $('#printButton').click(function(e) {
+        window.print();
+      });
     })
    </script>
   <link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css" rel="stylesheet" media="screen,print">
@@ -133,6 +137,14 @@
         margin: 20px 0;
       }
 
+      @media print
+      {    
+          .no-print, .no-print *
+          {
+              display: none !important;
+          }
+      }
+
     </style>
 
   </head>
@@ -142,9 +154,9 @@
 
     <!-- Part 1: Wrap all page content here -->
     <div id="wrap">
-
       <!-- Begin page content -->
       <div class="container">
+        <button class="btn btn-large btn-primary pull-right no-print" type="button" id="printButton">Print this page</button>
         <p class="lead">Events of {{= (new Date()).toDateString() }}:</p>
 
         {{ events.forEach(function(event) { }}

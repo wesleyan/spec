@@ -211,3 +211,8 @@ textarea{
   position: relative;
   top: -5px;
 }
+
+.event-bg-section {
+	opacity: 0.3;
+	background-color: black;
+}
