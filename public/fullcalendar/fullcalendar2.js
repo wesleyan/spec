@@ -3958,9 +3958,6 @@ function AgendaEventRenderer() {
 		var eventEnd = Date.parse(event.eventEnd);
 		var topPercentage = ((start - eventStart) / (start - end)) * 100;
 		var bottomPercentage = ((eventEnd - end) / (start - end)) * 100;
-		//var mod = percentage;
-		//var mod = "background: linear-gradient(0deg, red, green 20%, red 70%, black);";
-		var mod = '';
 		//modification end
 
 		var html = "<";
@@ -4003,8 +4000,9 @@ function AgendaEventRenderer() {
 			htmlEscape(event.title || '') +
 			"</div>" +
 			"</div>" +
-			"<div class='fc-event-bg' style='" + mod + "'>"+
-			"<div class='event-bg-section' style='height:" + topPercentage + "%'></div><div style='height:" + (100-topPercentage-bottomPercentage) + "%'></div>" +
+			"<div class='fc-event-bg'>"+
+			"<div class='event-bg-section' style='height:" + topPercentage + "%'></div>" +
+			"<div style='height:" + (100-topPercentage-bottomPercentage) + "%'></div>" +
 			"<div class='event-bg-section' style='height:" + bottomPercentage + "%'></div></div>";
 		if (seg.isEnd && isEventResizable(event)) {
 			html +=
