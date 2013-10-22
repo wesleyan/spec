@@ -709,38 +709,18 @@ app.get('/', function (req, res) {
 	if(!inSession(req)) {res.end();	return false;} //must be logged in
 	  res.render('index',
 		{
-			//user: req.session.cas_user,
 			username: getUser(req),
 			permission: permission(req),
 		});
 	});
 
-app.get('/m', function (req, res) {
+app.get('/m/', function (req, res) {
 	if(!inSession(req)) {res.end();	return false;} //must be logged in
-		var today = new Date();
-		today.setHours(0);
-		today.setMinutes(0);
-		today.setSeconds(0);
-		today.setMilliseconds(0);
-		var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
-		db.events.find({'start': {$gte: today, $lt: tomorrow}}, function(err, events) {
-			if (err || !events) {
-				console.log("No events found");
-			} else {
-				events = addBackgroundColor(events);
-					  res.render('mobile',
-						{
-							//user: req.session.cas_user,
-							username: getUser(req),
-							permission: permission(req),
-							'events': events,
-						});
-			}
-		});
-
+	res.render('mobi', {
+		username: getUser(req),
+		permission: permission(req),
 	});
-
-
+});
 
 app.get('/fileUpload', function(req, res) {
 	if(permission(req) != 10) {

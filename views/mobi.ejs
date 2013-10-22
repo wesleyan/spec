@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html class="ui-mobile-rendering">
+<head>
+    <title>Spec Mobile</title> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/jquery.mobile-1.0.1.min.css"/>
+    <style type="text/css">
+        .staffed {
+            border-left:        5px solid #0f0;
+        }
+        .notStaffed {
+            border-left:        5px solid #f00;
+        }
+        .semiStaffed {
+            border-left:        5px solid #faa;
+        }
+        .cancelled {
+            border-left:        5px solid #666;
+        }
+
+        .ui-bar-w {
+            background-color:   #990000; /* this is the color currently in use on cascade web pages */      /* #930c08; */
+            color:          #fff;
+            text-shadow:        0 1px 0 #000;
+        }
+        .ui-btn-text {
+            color:          #fff;
+        }
+        .ui-btn {
+            text-decoration:    none;
+        }
+
+        #slider_container .ui-slider-switch {
+            width:          9em;
+        }
+
+        #slider_container {
+            padding-top:        15px;
+        }
+
+        .filler {
+            white-space:        nowrap;
+        }
+
+        .ui-icon {
+            margin-top:     6px;
+        }
+
+    </style>
+    <!-- The Templates -->
+    <script type="text/template" id="home">
+
+        <div data-role="header" data-theme="w">
+            <h1>Spec Mobile</h1>
+        </div>
+
+        <div data-role="content">
+        <ul data-role="listview" id="eventList">
+
+
+        </ul>
+        </div>
+        <div data-role="footer" data-position="fixed">
+            <div data-role="navbar">
+                <ul>
+                    <li id="left"><a data-icon="arrow-l"> <span class="filler"/>  </a></li>
+                    <li id="today"><a data-icon="home"> <span class="filler"/> </a></li>
+                    <li id="right"><a data-icon="arrow-r"> <span class="filler"/> </a></li>
+                </ul>
+            </div>
+        </div>
+
+    </script>
+
+    <script type="text/template" id="event">
+
+        <div data-role="header">
+            <a href="#" data-icon="back" class="back ui-btn-left">Back</a>
+            <h1><%=SpecM.theEvent.title %></h1>
+        </div>
+
+        <div data-role="content">
+            <p>This is Page 1. It was created dynamically using an underscore.js template.</p>
+            <p>Navigate to:</p>
+            <ul data-role="listview" data-inset="true">
+                <li><a href="#">Home</a></li>
+                <li><a href="#page2">Page 2</a></li>
+            </ul>
+        </div>
+
+    </script>
+
+    <script type="text/template" id="options">
+
+        <div data-role="header">
+            <a href="#" data-icon="back" class="back ui-btn-left">Back</a>
+            <h1>Page 2</h1>
+        </div>
+
+        <div data-role="content">
+            <p>This is Page 2. It was created dynamically using an underscore.js template.</p>
+            <p>Navigate to:</p>
+            <ul data-role="listview" data-inset="true">
+                <li><a href="#">Home</a></li>
+                <li><a href="#page1">Page 1</a></li>
+            </ul>
+        </div>
+
+    </script>
+
+    <!-- The Scripts -->
+    <script src="lib/jquery-1.7.1.min.js"></script>
+    <script src="lib/jqm-config.js"></script>
+    <script src="lib/jquery.mobile-1.0.1.min.js"></script>
+    <script type="text/javascript" src="http://underscorejs.org/underscore-min.js"></script>
+    <script type="text/javascript" src="http://backbonejs.org/backbone-min.js"></script>
+    <script src="lib/specmobile.js"></script>
+    <script type="text/template" id="event_list_template">
+        <% rc.events.forEach(function(event) { %>
+        <%
+            if(event.valid == false) {
+                event.class = 'cancelled';
+            } else if(event.shifts.length < event.staffNeeded) {
+                event.class = 'notStaffed';
+            } else {
+                event.class = 'staffed';
+            }
+        %>
+
+            <li class='<%=event.class%>' href=""><a href="#event/<%=event['_id']%>"><%=event.title%></a></li>
+
+        <% }) %>
+</script>
+</head>
+
+<body></body>
+
+</html>
