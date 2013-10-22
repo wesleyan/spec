@@ -318,17 +318,11 @@ app.get('/printtoday', function(req, res) {
 	if(!inSession(req)) {res.end();	return false;} //must be logged in
 	console.log('Req for seeing today\'s events list');
 	var today = new Date();
-	var tomorrow = new Date(date.getTime() + 24 * 60 * 60 * 1000);
-	//var today = new Date(date.getTime() + 24 * 60 * 60 * 3000); //two days later
-	//var tomorrow = new Date(date.getTime() + 24 * 60 * 60 * 4000); //three days later
 		today.setHours(0);
 		today.setMinutes(0);
 		today.setSeconds(0);
 		today.setMilliseconds(0);
-		tomorrow.setHours(0);
-		tomorrow.setMinutes(0);
-		tomorrow.setSeconds(0);
-		tomorrow.setMilliseconds(0);
+		var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
 		db.events.find({start: {$gte: today, $lt: tomorrow}, valid:true}).sort({start: 1},
 			function(err, data) {
 					res.render('printtoday', {
@@ -719,6 +713,31 @@ app.get('/', function (req, res) {
 			username: getUser(req),
 			permission: permission(req),
 		});
+	});
+
+app.get('/m', function (req, res) {
+	if(!inSession(req)) {res.end();	return false;} //must be logged in
+		var today = new Date();
+		today.setHours(0);
+		today.setMinutes(0);
+		today.setSeconds(0);
+		today.setMilliseconds(0);
+		var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+		db.events.find({'start': {$gte: today, $lt: tomorrow}}, function(err, events) {
+			if (err || !events) {
+				console.log("No events found");
+			} else {
+				events = addBackgroundColor(events);
+					  res.render('mobile',
+						{
+							//user: req.session.cas_user,
+							username: getUser(req),
+							permission: permission(req),
+							'events': events,
+						});
+			}
+		});
+
 	});
 
 

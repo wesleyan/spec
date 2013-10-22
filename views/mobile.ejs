@@ -1,0 +1,147 @@
+<!doctype html>
+<html>
+<head>
+	<title>Spec Mobile</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
+	<script src="../lib/jquery.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
+	<script>
+		/* The settings under the "Options" section will be saved to cookies so it will persist for later */
+		/* Cookies will expire after 4 months...	*/
+		function saveOptions() {	// Gets called on the Options page when you hit the Back button
+			var xld = $('#xld').val();
+			var time = $('#time').val();
+
+			cookieMonster("xld",xld);
+			cookieMonster("time",time);
+		}
+		function cookieMonster(name,val) {
+			var exdate = new Date();
+			exdate.setDate(exdate.getDate()+120);	// 120 days to expire
+			document.cookie = name + '=' + val + '; expires=' + exdate.toUTCString();
+		}
+	</script>
+	<style type="text/css">
+		.staffed {
+			border-left:		5px solid #0f0;
+		}
+		.notStaffed {
+			border-left: 		5px solid #f00;
+		}
+		.semiStaffed {
+			border-left: 		5px solid #faa;
+		}
+		.cancelled {
+			border-left:		5px solid #666;
+		}
+
+		.ui-bar-w {
+			background-color: 	#990000; /* this is the color currently in use on cascade web pages */		/* #930c08; */
+			color: 			#fff;
+			text-shadow:		0 1px 0 #000;
+		}
+		.ui-btn-text {
+			color:			#fff;
+		}
+		.ui-btn {
+			text-decoration:	none;
+		}
+
+		#slider_container .ui-slider-switch {
+			width:			9em;
+		}
+
+		#slider_container {
+			padding-top:		15px;
+		}
+
+		.filler {
+			white-space:		nowrap;
+		}
+
+		.ui-icon {
+			margin-top:		6px;
+		}
+
+	</style>
+</head>
+
+<body>
+
+<div data-role="page" id="day">
+
+	<div data-role="header" data-position="fixed" data-theme="w">
+		<a href="?tt=1&who=me" class="ui-btn-left">All Events</a>
+		<h1>Today</h1>
+		<a href="#options" data-icon="gear" class="ui-btn-right">Options </a>
+	</div>
+
+	<div data-role="content">		
+	<!-- ************************ Main content goes here -->
+		<ul data-role="listview">
+
+		<!--<li class='staffed'><a href='event_detail.php?id=3701'>7:50 AM Conference: Adoptions from the Heart</a></li><li class='notStaffed'><a href='event_detail.php?id=3711'>1:00 PM Workshop: Graduate Career Symposium: Presentation/Workshop: Everything Interview</a></li>-->
+		{{ events.forEach(function(event) { }}
+		{{
+			if(event.valid == false) {
+				event.class = 'cancelled';
+			} else if(event.shifts.length < event.staffNeeded) {
+				event.class = 'notStaffed';
+			} else {
+				event.class = 'staffed';
+			}
+		}}
+
+			<li class='{{=event.class}}'>{{=event.title}}</li>
+
+		{{ }) }}
+		</ul>
+	</div>					
+	<!-- ************************ End of main content -->
+
+	<div data-role="footer" data-position="fixed">
+		<div data-role="navbar">
+			<ul>
+				<li><a href="?tt=0&who=all" data-icon="arrow-l"> <span class="filler"/>  </a></li>
+				<li><a href="?tt=0&who=all" data-icon="home"> <span class="filler"/> </a></li>
+				<li><a href="?tt=2&who=all" data-icon="arrow-r"> <span class="filler"/> </a></li>
+			</ul>
+		</div>
+	</div>
+
+</div>
+
+<div data-role="page" id="options">		
+<!-- ************************ Options page -->
+
+	<div data-role="header" data-position="fixed" data-theme="w">
+		<a href="index.php" data-direction="reverse" onClick="saveOptions()" data-icon="check">Save</a>
+		<h1>Options</h1>
+	</div>
+
+	<div data-role="content">
+
+		<div>
+			<label for="xld">Show Cancelled Events:</label>
+			<select name="xld" id="xld" data-role="slider">
+				<option value="off" selected>Off</option>
+				<option value="on" >On</option>
+			</select>
+		</div>
+
+		<div id="slider_container">
+			<label for="time">Display Times As:</label>
+			<select name="time" id="time" data-role="slider">
+				<option value="start" >Start Time</option>
+				<option value="setup" selected>Setup Time</option>
+			</select>
+		</div>
+
+	</div>
+
+</div>
+
+</body>
+
+</html>
