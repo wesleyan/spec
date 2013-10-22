@@ -686,6 +686,7 @@ var allInventory = [
 			}
 			var start = new Date(Date.parse(req.query.start));
 			var end = new Date(Date.parse(req.query.end));
+			end = new Date(end.getTime() + 24 * 60 * 60 * 1000);
 			console.log(start);
 			console.log("Req for staff check for " + req.query.user);
 			db.events.find({'start': {$gte: start, $lt: end}, 'shifts':{$elemMatch: {'staff': req.query.user}},}, function(err, events) {
