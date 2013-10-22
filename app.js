@@ -24,31 +24,31 @@ db.staff.find({}, function(err, data) {
 
 //CAS Session Management will come here.
 
-function getUser(req) {
-	return 'ckorkut'; //let's assume that the session variable is this for now
-	return req.session.cas_user;
-}
-
-function inSession(req) { //boolean returning function to detect if logged in or user in staff list
-	return true;
-	//this is the actual code for the future:
-	/*var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == getUser(req); });
-	if(userObj.length < 1) {
-		return false;
-	} else {
-		return true;
-	}*/
-}
-
-function permission(req) { //returns the permission level of the user in session
-	var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == getUser(req); });
-	if(userObj.length < 1) {
-		return false;
-	} else {
-		return userObj[0].level;
+	function getUser(req) {
+		return 'ckorkut'; //let's assume that the session variable is this for now
+		return req.session.cas_user;
 	}
-}
-//CAS Session Management ends here.
+
+	function inSession(req) { //boolean returning function to detect if logged in or user in staff list
+		return true;
+		//this is the actual code for the future:
+		/*var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == getUser(req); });
+		if(userObj.length < 1) {
+			return false;
+		} else {
+			return true;
+		}*/
+	}
+
+	function permission(req) { //returns the permission level of the user in session
+		var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == getUser(req); });
+		if(userObj.length < 1) {
+			return false;
+		} else {
+			return userObj[0].level;
+		}
+	}
+	//CAS Session Management ends here.
 
 var date = new Date();
 //var diff = date.getTimezoneOffset()/60;
@@ -726,6 +726,9 @@ app.get('/', function (req, res) {
 app.get('/m/', function (req, res) {
 	res.redirect('/m/0/');
 });
+app.locals.fixParantheses = function(s) {
+	return s.replace("&#35;","#").replace("&#41;",")").replace("&amp;#40;","(");
+}
 app.get('/m/:counter/', function (req, res) {
 	if(!inSession(req)) {res.end();	return false;} //must be logged in
 
@@ -783,99 +786,100 @@ app.get('/m/event/:id', function (req, res) {
 });
 
 
-app.get('/fileUpload', function(req, res) {
-	if(permission(req) != 10) {
-		res.write(JSON.stringify(false).toString("utf-8"));
-		res.end();
-		return false;
-	}
-  res.render('upload');
-});
+//File Upload
+	app.get('/fileUpload', function(req, res) {
+		if(permission(req) != 10) {
+			res.write(JSON.stringify(false).toString("utf-8"));
+			res.end();
+			return false;
+		}
+	  res.render('upload');
+	});
 
-var fs = require('fs');
-var parser = require('xml2json');
+	var fs = require('fs');
+	var parser = require('xml2json');
 
-app.post('/fileUpload', function(req, res) {
-	if(permission(req) != 10) {
-		res.write(JSON.stringify(false).toString("utf-8"));
-		res.end();
-		return false;
-	}
-	console.log('Upload and saving progress started');
-	//you should check if it's an xml file
-	try {
-		var xml = fs.readFileSync(req.files.myFile.path);
-		var parsed = parser.toJson(xml,{
-			object: true,
-			trim: true,
-			arrayNotation: true
-		});
-		parsed = parsed['CopyofIMSforExport']['Data'];
+	app.post('/fileUpload', function(req, res) {
+		if(permission(req) != 10) {
+			res.write(JSON.stringify(false).toString("utf-8"));
+			res.end();
+			return false;
+		}
+		console.log('Upload and saving progress started');
+		//you should check if it's an xml file
+		try {
+			var xml = fs.readFileSync(req.files.myFile.path);
+			var parsed = parser.toJson(xml,{
+				object: true,
+				trim: true,
+				arrayNotation: true
+			});
+			parsed = parsed['CopyofIMSforExport']['Data'];
 
-		var processed = [];
+			var processed = [];
 
-		parsed.forEach(function(data) {
-			var bookingDate = data['Booking_x0020_Date'].split(" ")[0]
-			var reservedStart = new Date(Date.parse(bookingDate + ' ' + data['Reserved_x0020_Start']));
-			var reservedEnd = new Date(Date.parse(bookingDate + ' ' + data['Reserved_x0020_End']));
-			var eventStart = new Date(Date.parse(bookingDate + ' ' + data['Event_x0020_Start']));
-			var eventEnd = new Date(Date.parse(bookingDate + ' ' + data['Event_x0020_End']));
-			if (data['Booking_x0020_Status'] == 'Cancelled') {
-				var valid = false;
-			} else {
-				var valid = true;
-			}
-			var video = false;
-			['video','recording'].forEach(function(word) {
-				if(String(data['Notes']).indexOf(word) != -1) {
-					video = true;
+			parsed.forEach(function(data) {
+				var bookingDate = data['Booking_x0020_Date'].split(" ")[0]
+				var reservedStart = new Date(Date.parse(bookingDate + ' ' + data['Reserved_x0020_Start']));
+				var reservedEnd = new Date(Date.parse(bookingDate + ' ' + data['Reserved_x0020_End']));
+				var eventStart = new Date(Date.parse(bookingDate + ' ' + data['Event_x0020_Start']));
+				var eventEnd = new Date(Date.parse(bookingDate + ' ' + data['Event_x0020_End']));
+				if (data['Booking_x0020_Status'] == 'Cancelled') {
+					var valid = false;
+				} else {
+					var valid = true;
 				}
+				var video = false;
+				['video','recording'].forEach(function(word) {
+					if(String(data['Notes']).indexOf(word) != -1) {
+						video = true;
+					}
+				});
+				processed.push({
+					title: data['Event_x0020_Name'],
+					desc: data['Notes'],
+					loc: data['Room_x0020_Description'],
+					staffNeeded: 1,
+					start: reservedStart,
+					end: reservedEnd,
+					'eventStart': eventStart,
+					'eventEnd': eventEnd,
+					'valid': valid,
+					duration: true,
+					'video': video,
+					inventory: [],
+					notes: [],
+					shifts:[]
+				});
 			});
-			processed.push({
-				title: data['Event_x0020_Name'],
-				desc: data['Notes'],
-				loc: data['Room_x0020_Description'],
-				staffNeeded: 1,
-				start: reservedStart,
-				end: reservedEnd,
-				'eventStart': eventStart,
-				'eventEnd': eventEnd,
-				'valid': valid,
-				duration: true,
-				'video': video,
-				inventory: [],
-				notes: [],
-				shifts:[]
+
+			processed.forEach(function(event) {
+				db.events.save(event, function(err, saved) {
+					if (err || !saved) console.log("Event not saved");
+					else console.log("Event saved");
+				});
 			});
-		});
 
-		processed.forEach(function(event) {
-			db.events.save(event, function(err, saved) {
-				if (err || !saved) console.log("Event not saved");
-				else console.log("Event saved");
-			});
-		});
+			console.log("Upload and saving progress ended successfully");
+			res.writeHead(200);
+		} catch(err) {
+			res.writeHead(400);
+			console.log(err);
+		}
+	  	deleteAfterUpload(req.files.myFile.path);
+	  	res.end();
+	});
 
-		console.log("Upload and saving progress ended successfully");
-		res.writeHead(200);
-	} catch(err) {
-		res.writeHead(400);
-		console.log(err);
-	}
-  	deleteAfterUpload(req.files.myFile.path);
-  	res.end();
-});
+	// Private functions
 
-// Private functions
-
-var deleteAfterUpload = function(path) {
-  setTimeout( function(){
-    fs.unlink(path, function(err) {
-      if (err) console.log(err);
-      console.log('file successfully deleted');
-    });
-  }, 60 * 1000 * 4); //stays there for 4 minutes
-};
+	var deleteAfterUpload = function(path) {
+	  setTimeout( function(){
+	    fs.unlink(path, function(err) {
+	      if (err) console.log(err);
+	      console.log('file successfully deleted');
+	    });
+	  }, 60 * 1000 * 4); //stays there for 4 minutes
+	};
 
 app.listen(8080);
 console.log('Listening on port 8080');

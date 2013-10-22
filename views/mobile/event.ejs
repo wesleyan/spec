@@ -48,15 +48,11 @@
             margin-top:     6px;
         }
     </style>
-    <script type="text/javascript">
-    $.mobile.defaultPageTransition = 'none';
-    $.mobile.defaultDialogTransition = 'none';
-    $.mobile.useFastClick = true;
-    </script>
+    
 </head> 
 <body> 
 
-<div data-role="page">
+<div data-role="page" id='event'>
 
 	<div data-role="header" data-theme="w">
         <a data-rel="back" data-icon="back" class="back ui-btn-left">Back</a>
@@ -76,10 +72,17 @@
                 <td><b>To</b></td><td><b>{{=formatAMPM(new Date(Date.parse(event.eventEnd))) }}</b></td><td>({{=formatAMPM(new Date(Date.parse(event.eventEnd))) }})</td>
             </tr>
         </table>
-        <p><i>{{=event.loc }}</i></p>
-        <p>{{=event.desc }}</p>
+        {{ if(event.duration == false) { }}
+            Setup and Breakdown
+        {{ } else { }}
+            Duration of Event
+        {{ } }}
+        <span id="charControl">
+            <p><i>{{=fixParantheses(event.loc) }}</i></p>
+            <p>{{=fixParantheses(event.desc) }}</p>
+        </span>
         <div class="ui-bar ui-bar-a">
-            <h3>Staff List</h3>
+            <h3>Staff List ({{=event.shifts.length }}/{{=event.staffNeeded}})</h3>
         </div>
         <ul data-role="listview" data-inset="true">
             {{ event.shifts.forEach(function(shift) { }}
@@ -93,11 +96,20 @@
 	<div data-role="footer" data-position="fixed">
         <div data-role="navbar">
             <ul>
-                
+                <li><a href= "tel:0000000000"  data-icon=search>Call Tech<span class="filler"/> </a></li>
+                <li><a href= "tel:3106132482"  data-icon=alert>Call Manager<span class="filler"/> </a></li>
             </ul>
         </div>
     </div>
-
+<script type="text/javascript">
+    $.mobile.defaultPageTransition = 'none';
+    $.mobile.defaultDialogTransition = 'none';
+    $.mobile.useFastClick = true;
+    var fixParantheses = function(s) {
+        return s.replace("&#35;","#").replace("&#40;","(").replace("&#41;",")");
+    }
+    $('#charControl').html(fixParantheses($('#charControl').html()));
+    </script>
 </div><!-- /page -->
 
 </body>
