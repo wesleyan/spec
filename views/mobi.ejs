@@ -55,9 +55,8 @@
         </div>
 
         <div data-role="content">
+        <a href="http://129.133.127.46:8080/m/#event/5265c57ad011c2ca20000052">asd</a>
         <ul data-role="listview" id="eventList">
-
-
         </ul>
         </div>
         <div data-role="footer" data-position="fixed">
@@ -74,18 +73,28 @@
 
     <script type="text/template" id="event">
 
-        <div data-role="header">
+        <div data-role="header" data-theme="w">
             <a href="#" data-icon="back" class="back ui-btn-left">Back</a>
             <h1><%=SpecM.theEvent.title %></h1>
         </div>
 
         <div data-role="content">
-            <p>This is Page 1. It was created dynamically using an underscore.js template.</p>
-            <p>Navigate to:</p>
-            <ul data-role="listview" data-inset="true">
-                <li><a href="#">Home</a></li>
-                <li><a href="#page2">Page 2</a></li>
-            </ul>
+             <div class="ui-bar ui-bar-a">
+                <h3><%=SpecM.theEvent.title %></h3>
+            </div>
+            <p><%=SpecM.theEvent.desc %></p>
+            <div class="ui-bar ui-bar-a">
+                <h3>Staff List</h3>
+            </div>
+                    <ul data-role="listview" data-inset="true">
+                        <% SpecM.theEvent.shifts.forEach(function(shift) { %>
+                        <li><a><%=shift.staff %> 
+                            <span class="ui-li-count">
+                                <%=SpecM.formatAMPM(new Date(Date.parse(shift.start))) %> - <%=SpecM.formatAMPM(new Date(Date.parse(shift.end))) %>
+                            </span></a></li>
+                        <% }) %>
+                    </ul>
+
         </div>
 
     </script>

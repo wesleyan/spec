@@ -47,8 +47,12 @@ var AppRouter = Backbone.Router.extend({
 
     home:function () {
         console.log('#home');
-        this.changePage(new HomeView());     
-
+        this.changePage(new HomeView());  
+        var template = _.template($("#event_list_template").html(), {
+            'events': SpecM.events
+        });
+        $('#eventList').html(template);
+        $('#eventList').listview('refresh');   
     },
 
     event:function (id) {
@@ -79,14 +83,26 @@ var AppRouter = Backbone.Router.extend({
 });
 
 
-var SpecM = {};
+var SpecM = {
+    formatAMPM: function(date) {
+      var hours = date.getHours();
+      var minutes = date.getMinutes();
+      var ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12; // the hour '0' should be '12'
+      minutes = minutes < 10 ? '0'+minutes : minutes;
+      var strTime = hours + ':' + minutes + ' ' + ampm;
+      return strTime;
+    }, //end formatAMPM
+};
 var today = new Date();
 today.setHours(0);
 today.setMinutes(0);
 today.setSeconds(0);
 today.setMilliseconds(0);
 var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
-SpecM.get = function(start, end) {
+
+SpecM.get = function(start, end, onLoad) {
     $.ajax({
         type: "GET",
         url: "../events/" ,
@@ -96,23 +112,21 @@ SpecM.get = function(start, end) {
             'end': end.getTime()/1000
         }
     }).done(function(msg) {
-        var template = _.template($("#event_list_template").html(), {
-            'events': msg
-        });
-        $('#eventList').html(template);
-        $('#eventList').listview('refresh');
+       
         SpecM.events = msg;
+        if(onLoad == true) {
+            app = new AppRouter();
+            Backbone.history.start();
+        }
     });
 }
 
 $(document).ready(function () {
     console.log('document ready');
-    app = new AppRouter();
-    Backbone.history.start();
     $.mobile.activeBtnClass = '';
     _.templateSettings.variable = "rc";
 
-    SpecM.get(today, tomorrow);
+    SpecM.get(today, tomorrow, true);
 
     $('body').on('click','#eventList li',function(e) {
         //Do something before going to the event page
