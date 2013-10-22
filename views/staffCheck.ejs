@@ -381,7 +381,9 @@
 
   </body>
     <script type="text/template" class="template">
-     <% rc.events.forEach(function(event) {  %>
+     <% 
+     var totalNumberOfMinutes = 0;
+     rc.events.forEach(function(event) {  %>
         <div class="media">
             <div class="media-body">
             <span class="media-heading pull-right" style="font-size:18px">
@@ -397,18 +399,25 @@
               <h5>Event itself starts at <%= formatAMPM(new Date(Date.parse(event.eventStart))) %> - <%= formatAMPM(new Date(Date.parse(event.eventEnd))) %></h5>
            <table class="table table-striped table-bordered">
                 <tbody>
-                <% var hirShift = $.grep(event.shifts, function(e){ return e.staff == user }); %>
+                <% var hirShift = $.grep(event.shifts, function(e){ return e.staff == user }); 
+                %>
                  <% hirShift.forEach(function(shift) { %>
                   <tr>
                     <td>(<%= shift.staff %>)</td>
                     <td><%= formatAMPM(new Date(Date.parse(shift.start))) %></td>
                     <td><%= formatAMPM(new Date(Date.parse(shift.end))) %></td>
                   </tr>
+                  <%
+                  totalNumberOfMinutes += (-Date.parse(shift.start)+Date.parse(shift.end))/60;
+                  %>
                   <% }) %>
                 </tbody>
               </table>
             </div>
           </div>
       <% }); %>
+      <div class="alert">
+        <b><%= totalNumberOfMinutes/60000 %> hours</b> in total in the given period
+      </div>
     </script>
 </html>
