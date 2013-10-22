@@ -765,6 +765,12 @@ app.post('/fileUpload', function(req, res) {
 			} else {
 				var valid = true;
 			}
+			var video = false;
+			['video','recording'].forEach(function(word) {
+				if(String(data['Notes']).indexOf(word) != -1) {
+					video = true;
+				}
+			});
 			processed.push({
 				title: data['Event_x0020_Name'],
 				desc: data['Notes'],
@@ -776,6 +782,7 @@ app.post('/fileUpload', function(req, res) {
 				'eventEnd': eventEnd,
 				'valid': valid,
 				duration: true,
+				'video': video,
 				inventory: [],
 				notes: [],
 				shifts:[]
