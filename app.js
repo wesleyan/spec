@@ -111,41 +111,41 @@ app.get("/user", function(req, res) {
 });
 
 //EVENTS
-//Event fetching should be filtered according to the time variables, still not done after MongoDB
-app.get("/events", function(req, res) {
-	if(!inSession(req)) {res.end();	return false;} //must be logged in
+	//Event fetching should be filtered according to the time variables, still not done after MongoDB
+	app.get("/events", function(req, res) {
+		if(!inSession(req)) {res.end();	return false;} //must be logged in
 
-	//86400s = 1d
-	var start = new Date(req.query.start * 1000);
-	var end = new Date(req.query.end * 1000);
-	var query = {};
-	if(req.query.filter == 'hideCancelled') {
-		query = {valid: true};
-	} else if(req.query.filter == 'unstaffed') {
-		query = { $where: "this.shifts.length < this.staffNeeded", valid: true };
-	} else if(req.query.filter == 'onlyMine') {
-		query = {shifts: { $elemMatch: { staff: getUser(req) } }};
-	} else if(req.query.filter == 'recentVideo') {
-		query = {video: true};
-	}
-	$.extend(query, {'start': {$gte: start, $lt: end}});
-	db.events.find(query, function(err, events) {
-		if (err || !events) {
-			console.log("No events found");
-		} else {
-			events = addBackgroundColor(events);
-			res.write(JSON.stringify(events).toString("utf-8"));
-			res.end();
+		//86400s = 1d
+		var start = new Date(req.query.start * 1000);
+		var end = new Date(req.query.end * 1000);
+		var query = {};
+		if(req.query.filter == 'hideCancelled') {
+			query = {valid: true};
+		} else if(req.query.filter == 'unstaffed') {
+			query = { $where: "this.shifts.length < this.staffNeeded", valid: true };
+		} else if(req.query.filter == 'onlyMine') {
+			query = {shifts: { $elemMatch: { staff: getUser(req) } }};
+		} else if(req.query.filter == 'recentVideo') {
+			query = {video: true};
 		}
-	});
+		$.extend(query, {'start': {$gte: start, $lt: end}});
+		db.events.find(query, function(err, events) {
+			if (err || !events) {
+				console.log("No events found");
+			} else {
+				events = addBackgroundColor(events);
+				res.write(JSON.stringify(events).toString("utf-8"));
+				res.end();
+			}
+		});
 
-	//req.url
-	console.log("Req for events starting at " + start.toDateString() + " and ending before " + end.toDateString());
-	res.writeHead(200, {
-		'Content-Type': 'application/json'
+		//req.url
+		console.log("Req for events starting at " + start.toDateString() + " and ending before " + end.toDateString());
+		res.writeHead(200, {
+			'Content-Type': 'application/json'
+		});
+		
 	});
-	
-});
 
 		app.post("/event/duration", function(req, res) {
 			res.writeHead(200, {
@@ -313,6 +313,14 @@ app.get("/events", function(req, res) {
 	  var strTime = hours + ':' + minutes + ' ' + ampm;
 	  return strTime;
 	} //end formatAMPM
+	app.locals.getFormattedDate = function(date) {
+	  var year = date.getFullYear();
+	  var month = (1 + date.getMonth()).toString();
+	  month = month.length > 1 ? month : '0' + month;
+	  var day = date.getDate().toString();
+	  day = day.length > 1 ? day : '0' + day;
+	  return month + '/' + day + '/' + year;
+	};
 
 app.get('/printtoday', function(req, res) {
 	if(!inSession(req)) {res.end();	return false;} //must be logged in
@@ -331,7 +339,8 @@ app.get('/printtoday', function(req, res) {
 			});
 	});
 
-var allInventory = [{
+var allInventory = [
+	{
 		"id": 4,
 		"text": "Video Camera",
 		"title": "This item needs to be recorded."
@@ -718,6 +727,8 @@ app.get('/m/', function (req, res) {
 	res.redirect('/m/0/');
 });
 app.get('/m/:counter/', function (req, res) {
+	if(!inSession(req)) {res.end();	return false;} //must be logged in
+
 	var today = new Date();
 	today.setHours(0);
 	today.setMinutes(0);
@@ -725,7 +736,17 @@ app.get('/m/:counter/', function (req, res) {
 	today.setMilliseconds(0);
 	var start = new Date(today.getTime() + 24 * 60 * 60 * 1000 * req.params.counter);
 	var end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
-	if(!inSession(req)) {res.end();	return false;} //must be logged in
+	
+	var title = '';
+	if (req.params.counter == 0) {
+		title = 'Today';
+	} else if (req.params.counter == -1) {
+		title = 'Yesterday';
+	} else if(req.params.counter == 1) {
+		title = 'Tomorrow';
+	} else {
+		title = app.locals.getFormattedDate(start);
+	}
 	query = {};
 	$.extend(query, {'start': {$gte: start, $lt: end}});
 	db.events.find(query, function(err, events) {
@@ -737,7 +758,8 @@ app.get('/m/:counter/', function (req, res) {
 				username: getUser(req),
 				permission: permission(req),
 				events: events,
-				counter: req.params.counter
+				counter: req.params.counter,
+				title:title,
 			});
 		}
 	});	

@@ -60,13 +60,23 @@
 
 	<div data-role="header" data-theme="w">
         <a data-rel="back" data-icon="back" class="back ui-btn-left">Back</a>
-		<h1>Spec M - Event</h1>
+		<h1>Event - Spec M</h1>
 	</div><!-- /header -->
 
 	<div data-role="content">	
         <div class="ui-bar ui-bar-a">
             <h3>{{=event.title }}</h3>
         </div>
+        <p>
+        <table>
+            <tr>
+                <td><b>From</b></td><td><b>{{=formatAMPM(new Date(Date.parse(event.start))) }}</b></td><td>({{=formatAMPM(new Date(Date.parse(event.eventStart))) }})</td>
+            </tr>
+            <tr>
+                <td><b>To</b></td><td><b>{{=formatAMPM(new Date(Date.parse(event.eventEnd))) }}</b></td><td>({{=formatAMPM(new Date(Date.parse(event.eventEnd))) }})</td>
+            </tr>
+        </table>
+        <p><i>{{=event.loc }}</i></p>
         <p>{{=event.desc }}</p>
         <div class="ui-bar ui-bar-a">
             <h3>Staff List</h3>
