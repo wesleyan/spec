@@ -715,12 +715,51 @@ app.get('/', function (req, res) {
 	});
 
 app.get('/m/', function (req, res) {
-	if(!inSession(req)) {res.end();	return false;} //must be logged in
-	res.render('mobi', {
-		username: getUser(req),
-		permission: permission(req),
-	});
+	res.redirect('/m/0/');
 });
+app.get('/m/:counter/', function (req, res) {
+	var today = new Date();
+	today.setHours(0);
+	today.setMinutes(0);
+	today.setSeconds(0);
+	today.setMilliseconds(0);
+	var start = new Date(today.getTime() + 24 * 60 * 60 * 1000 * req.params.counter);
+	var end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+	if(!inSession(req)) {res.end();	return false;} //must be logged in
+	query = {};
+	$.extend(query, {'start': {$gte: start, $lt: end}});
+	db.events.find(query, function(err, events) {
+		if (err || !events) {
+			console.log("No events found");
+		} else {
+			
+			res.render('mobile/index', {
+				username: getUser(req),
+				permission: permission(req),
+				events: events,
+				counter: req.params.counter
+			});
+		}
+	});	
+});
+app.get('/m/event/:id', function (req, res) {
+	if(!inSession(req)) {res.end();	return false;} //must be logged in
+	query = {};
+	$.extend(query, {'_id': new mongo.ObjectID(req.params.id)});
+	db.events.find(query, function(err, events) {
+		if (err || !events) {
+			console.log("No events found");
+		} else {
+			
+			res.render('mobile/event', {
+				username: getUser(req),
+				permission: permission(req),
+				event: events[0],
+			});
+		}
+	});	
+});
+
 
 app.get('/fileUpload', function(req, res) {
 	if(permission(req) != 10) {

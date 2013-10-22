@@ -1,0 +1,94 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+	<title>Spec Mobile</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.css" />
+	<script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
+	<style type="text/css">
+        .staffed {
+            border-left:        5px solid #0f0;
+        }
+        .notStaffed {
+            border-left:        5px solid #f00;
+        }
+        .semiStaffed {
+            border-left:        5px solid #faa;
+        }
+        .cancelled {
+            border-left:        5px solid #666;
+        }
+
+        .ui-bar-w {
+            background-color:   #990000; /* this is the color currently in use on cascade web pages */      /* #930c08; */
+            color:          #fff;
+            text-shadow:        0 1px 0 #000;
+        }
+        .ui-btn-text {
+            color:          #fff;
+        }
+        .ui-btn {
+            text-decoration:    none;
+        }
+
+        #slider_container .ui-slider-switch {
+            width:          9em;
+        }
+
+        #slider_container {
+            padding-top:        15px;
+        }
+
+        .filler {
+            white-space:        nowrap;
+        }
+
+        .ui-icon {
+            margin-top:     6px;
+        }
+    </style>
+    <script type="text/javascript">
+    $.mobile.defaultPageTransition = 'none';
+    $.mobile.defaultDialogTransition = 'none';
+    $.mobile.useFastClick = true;
+    </script>
+</head> 
+<body> 
+
+<div data-role="page">
+
+	<div data-role="header" data-theme="w">
+		<h1>Spec M</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">	
+		<ul data-role="listview" id="eventList">
+		{{ events.forEach(function(event) { }}
+        {{
+            if(event.valid == false) {
+                event.class = 'cancelled';
+            } else if(event.shifts.length < event.staffNeeded) {
+                event.class = 'notStaffed';
+            } else {
+                event.class = 'staffed';
+            }
+        }}
+            <li class='{{=event.class}}' href=""><a href="/m/event/{{=event['_id']}}">{{=event.title}}</a></li>
+        {{ }) }}
+        </ul>
+	</div><!-- /content -->
+	<div data-role="footer" data-position="fixed">
+        <div data-role="navbar">
+            <ul>
+                <li><a href='/m/{{=parseInt(counter)-1}}/' data-icon="arrow-l"> <span class="filler"/>  </a></li>
+                <li><a href='/m/' data-icon="home"> <span class="filler"/> </a></li>
+                <li><a href='/m/{{=parseInt(counter)+1}}/' data-icon="arrow-r"> <span class="filler"/> </a></li>
+            </ul>
+        </div>
+    </div>
+
+</div><!-- /page -->
+
+</body>
+</html>
