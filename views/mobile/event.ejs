@@ -47,6 +47,10 @@
         .ui-icon {
             margin-top:     6px;
         }
+        .ui-li-desc,h3 {
+                overflow: visible !important;        
+                white-space: normal !important;        
+          } 
     </style>
     
 </head> 
@@ -86,16 +90,36 @@
         <div class="ui-bar ui-bar-a">
             <h3>Staff List ({{=event.shifts.length }}/{{=event.staffNeeded}})</h3>
         </div>
-        <ul data-role="listview" data-inset="true" data-split-icon="delete">
+        <ul data-role="listview" data-inset="true" {{ if(permission == 10) { }}data-split-icon="delete"{{ } }}>
             {{ event.shifts.forEach(function(shift) { }}
-            <li><a>{{=shift.staff }}
+            <li> <a>{{=shift.staff }}
                 <span class="ui-li-count">
-                    {{=formatAMPM(new Date(Date.parse(shift.start))) }} - {{=formatAMPM(new Date(Date.parse(shift.end))) }}
+                    {{=formatAMPM(new Date(Date.parse(shift.start))) }}-{{=formatAMPM(new Date(Date.parse(shift.end))) }}
                 </span></a>
-                 <a href="/m/delete/{{=event['_id'] }}/{{=shift.staff }}" data-rel="popup" data-position-to="window" data-transition="pop">Delete</a>
+                {{ if(permission == 10) { }}
+                 <a class="deleteShift" data-shift="{{=shift['id'] }}">Delete</a>
+                {{ } }}
                 </li>
             {{ }); }}
         </ul>
+
+
+        <div class="ui-bar ui-bar-a">
+            <h3>Notes ({{=event.notes.length}})</h3>
+        </div>
+        <ul data-role="listview" data-inset="true">
+            {{ event.notes.forEach(function(note) { }}
+            <li>
+                <p><strong>{{=note.user}}</strong></p>
+                <p>{{=note.text}}</p>
+            </li>
+            {{ }); }}
+        </ul>
+        <div class="ui-bar ui-bar-a">
+            <h3>Inventory ({{=event.inventory.length}})</h3>
+        </div>
+        
+
 	</div><!-- /content -->
 	<div data-role="footer" data-position="fixed">
         <div data-role="navbar">
@@ -106,9 +130,35 @@
         </div>
     </div>
 <script type="text/javascript">
+    
     $.mobile.defaultPageTransition = 'none';
     $.mobile.defaultDialogTransition = 'none';
     $.mobile.useFastClick = true;
+
+    {{ if(permission == 10) { }}
+    function refreshPage() {
+        jQuery.mobile.changePage(window.location.href, {
+            allowSamePageTransition: true,
+            transition: 'none',
+            reloadPage: true
+        });
+    }
+    var shiftId = "{{=event['_id'] }}";
+    $('.deleteShift').click(function(e) {
+        //console.log(this);
+        $.ajax({
+            type: "POST",
+            url: "/staff/remove",
+            data: {
+                'id': $(this).attr('data-shift'),
+                'eventid': shiftId
+            }
+        }).done(function(msg) {
+            console.log('shift deleted');
+            refreshPage();
+        });
+    });
+    {{ } }}
     </script>
 </div><!-- /page -->
 
