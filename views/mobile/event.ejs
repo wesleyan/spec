@@ -107,7 +107,7 @@
                     <input type="text" name="text-basic" id="text-basic" value="">
                     <fieldset data-role="controlgroup" data-type="horizontal">
                         <legend>Start:</legend>
-                        <select name="select-native-11" id="select-native-11">
+                        <select name="start1" id="start1">
                             <option>1</option>
                             <option>2</option>
                             <option>3</option>
@@ -121,7 +121,7 @@
                             <option>11</option>
                             <option>12</option>
                         </select>
-                        <select name="select-native-12" id="select-native-12">
+                        <select name="start2" id="start2">
                             <option>00</option>
                             <option>05</option>
                             <option>10</option>
@@ -135,14 +135,14 @@
                             <option>50</option>
                             <option>55</option>
                         </select>
-                        <select name="select-native-13" id="select-native-13">
+                        <select name="start3" id="start3">
                             <option>AM</option>
                             <option>PM</option>
                         </select>
                     </fieldset>
                     <fieldset data-role="controlgroup" data-type="horizontal">
                         <legend>End:</legend>
-                        <select name="select-native-11" id="select-native-11">
+                        <select name="end1" id="end1">
                             <option>1</option>
                             <option>2</option>
                             <option>3</option>
@@ -156,7 +156,7 @@
                             <option>11</option>
                             <option>12</option>
                         </select>
-                        <select name="select-native-12" id="select-native-12">
+                        <select name="end2" id="end2">
                             <option>00</option>
                             <option>05</option>
                             <option>10</option>
@@ -170,7 +170,7 @@
                             <option>50</option>
                             <option>55</option>
                         </select>
-                        <select name="select-native-13" id="select-native-13">
+                        <select name="end3" id="end3">
                             <option>AM</option>
                             <option>PM</option>
                         </select>
@@ -227,6 +227,14 @@
                 $('#inventoryList').append('<li>' + tool.text + '</li>');
             });
             $('#inventoryList').listview('refresh');
+
+                    {{ if(permission == 10) { }}
+                        // do this for every select input
+                        $('#start1 option').filter(function() { 
+                            return ($(this).text() == '3'); //To select Blue
+                        }).attr('selected', true);
+                        $( "#start1" ).selectmenu( "refresh" );
+                    {{ } }}
         }); 
 
 
@@ -252,6 +260,9 @@
             refreshPage();
         });
     });
+
+
+
     {{ } }}
     </script>
 </div><!-- /page -->
