@@ -118,7 +118,8 @@
         <div class="ui-bar ui-bar-a">
             <h3>Inventory ({{=event.inventory.length}})</h3>
         </div>
-        
+        <ul data-role="listview" id="inventoryList" data-inset="true">
+        </ul>
 
 	</div><!-- /content -->
 	<div data-role="footer" data-position="fixed">
@@ -135,6 +136,21 @@
     $.mobile.defaultDialogTransition = 'none';
     $.mobile.useFastClick = true;
 
+        var eventId = "{{=event['_id'] }}";
+    $(document).ready(function(e) {
+        $.ajax({
+            type: "GET",
+            url: "/inventory/existing/" + eventId,
+        }).done(function(msg) {
+            msg.forEach(function(tool) {
+                $('#inventoryList').append('<li>' + tool.text + '</li>');
+            });
+            $('#inventoryList').listview('refresh');
+        });   
+    })
+
+
+
     {{ if(permission == 10) { }}
     function refreshPage() {
         jQuery.mobile.changePage(window.location.href, {
@@ -143,7 +159,6 @@
             reloadPage: true
         });
     }
-    var shiftId = "{{=event['_id'] }}";
     $('.deleteShift').click(function(e) {
         //console.log(this);
         $.ajax({
@@ -151,7 +166,7 @@
             url: "/staff/remove",
             data: {
                 'id': $(this).attr('data-shift'),
-                'eventid': shiftId
+                'eventid': eventId
             }
         }).done(function(msg) {
             console.log('shift deleted');
