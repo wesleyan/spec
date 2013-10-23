@@ -22,34 +22,6 @@ db.staff.find({}, function(err, data) {
 		}
 	});
 
-//CAS Session Management will come here.
-
-	function getUser(req) {
-		return 'ckorkut'; //let's assume that the session variable is this for now
-		return req.session.cas_user;
-	}
-
-	function inSession(req) { //boolean returning function to detect if logged in or user in staff list
-		return true;
-		//this is the actual code for the future:
-		/*var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == getUser(req); });
-		if(userObj.length < 1) {
-			return false;
-		} else {
-			return true;
-		}*/
-	}
-
-	function permission(req) { //returns the permission level of the user in session
-		var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == getUser(req); });
-		if(userObj.length < 1) {
-			return false;
-		} else {
-			return userObj[0].level;
-		}
-	}
-	//CAS Session Management ends here.
-
 var date = new Date();
 //var diff = date.getTimezoneOffset()/60;
 var diff = 0;
@@ -96,6 +68,46 @@ var ejs = require('ejs');
 ejs.open = '{{';
 ejs.close = '}}';
 //We can store all staff in memory, since it is not a big array and it will be used VERY frequently, will save time.
+
+//CAS Session Management will come here.
+	var cas = require('grand_master_cas');
+	cas.configure({
+	  casHost: 'sso.wesleyan.edu',
+	  ssl: true,
+	  service: 'http://ims-dev.wesleyan.edu:8080',
+	  redirectUrl: '/login'
+	});
+app.get('/logout', cas.logout);
+
+app.get('/login', cas.bouncer, function(req, res) {
+  res.redirect('/');
+});
+
+	function getUser(req) {
+		//return 'ckorkut'; //let's assume that the session variable is this for now
+		return req.session.cas_user;
+	}
+
+	function inSession(req) { //boolean returning function to detect if logged in or user in staff list
+		return true;
+		//this is the actual code for the future:
+		/*var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == getUser(req); });
+		if(userObj.length < 1) {
+			return false;
+		} else {
+			return true;
+		}*/
+	}
+
+	function permission(req) { //returns the permission level of the user in session
+		var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == getUser(req); });
+		if(userObj.length < 1) {
+			return false;
+		} else {
+			return userObj[0].level;
+		}
+	}
+	//CAS Session Management ends here.
 
 
 app.get("/user", function(req, res) {
@@ -715,7 +727,7 @@ var allInventory = [
 
 //Main Page Rendering
 
-app.get('/', function (req, res) {
+app.get('/', cas.blocker, function (req, res) {
 	if(!inSession(req)) {res.end();	return false;} //must be logged in
 	  res.render('index',
 		{
