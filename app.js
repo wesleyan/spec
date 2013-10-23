@@ -15,7 +15,6 @@
 	var db = require("mongojs").connect(databaseUrl, collections);
 	var mongo = require('mongodb-wrapper');
 	var fs = require('fs');
-	var forceSSL = require('express-force-ssl');
 
 	app.configure(function() {
 		app.set('views', __dirname + '/views');
@@ -25,8 +24,6 @@
 		app.use(express.cookieParser('secret'));
 		app.use(express.session());
 		app.use(app.router);
-		app.use('httpsPort', 8443);
-		app.use(forceSSL);
 		app.use(express.static(__dirname + '/public'));
 	});
 	var ejs = require('ejs');
@@ -892,15 +889,12 @@ app.get('/', function (req, res) {
 
 // STARTING THE SERVER
 	var https = require('https');
-	
+	var port = 8080;
 	var options = {
 	        key: fs.readFileSync('../ssl-key.pem'),
 	        cert: fs.readFileSync('/etc/pki/tls/certs/ca-bundle.crt'),
 	        };
 	var http = require('http');
-	var secureServer = https.createServer(options, app)
-	var server = http.createServer(app)
-	secureServer.listen(443);
-	server.listen(80);
-
-	console.log('Listening on port 8080');
+	var server = https.createServer(options, app).listen(port, function(){
+	  console.log("Express server listening on port " + port);
+	});
