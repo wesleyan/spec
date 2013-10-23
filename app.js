@@ -4,7 +4,7 @@ var express = require('express');
 var app = express();
 var $ = require('jquery');
 
-var databaseUrl = "spec"; // "username:password@example.com/mydb"
+var databaseUrl = "127.0.0.1:27017/spec"; // "username:password@example.com/mydb"
 var collections = ['events','staff']
 var db = require("mongojs").connect(databaseUrl, collections);
 var mongo = require('mongodb-wrapper');

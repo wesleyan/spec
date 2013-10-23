@@ -1,4 +1,4 @@
-var databaseUrl = "spec"; // "username:password@example.com/mydb"
+var databaseUrl = "127.0.0.1:27017/spec"; // "username:password@example.com/mydb"
 var collections = ["staff"]
 var db = require("mongojs").connect(databaseUrl, collections);
 var mongo = require('mongodb-wrapper');
