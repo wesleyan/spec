@@ -25,12 +25,6 @@
             color:          #fff;
             text-shadow:        0 1px 0 #000;
         }
-        .ui-btn-text {
-            color:          #fff;
-        }
-        .ui-btn {
-            text-decoration:    none;
-        }
 
         #slider_container .ui-slider-switch {
             width:          9em;
@@ -51,6 +45,9 @@
                 overflow: visible !important;        
                 white-space: normal !important;        
           } 
+          .ui-collapsible-heading {
+            font-size: 13px;
+            }
     </style>
     
 </head> 
@@ -102,8 +99,17 @@
                 </li>
             {{ }); }}
         </ul>
+        <div data-role="collapsible-set" data-theme="c" data-content-theme="d" data-mini="true">
+            <div data-role="collapsible">
+                <h3>Add new staff</h3>
 
+                    <label for="text-basic">Staff username:</label>
+                    <input type="text" name="text-basic" id="text-basic" value="">
+                    <input id="settime" type="time" step="5" />
+                    <a href="#" data-role="button" data-inline="true" data-theme="a" data-mini="true">Add this staff</a>
 
+            </div>
+        </div>
         <div class="ui-bar ui-bar-a">
             <h3>Notes ({{=event.notes.length}})</h3>
         </div>
@@ -115,6 +121,13 @@
             </li>
             {{ }); }}
         </ul>
+        <div data-role="collapsible-set" data-theme="c" data-content-theme="d" data-mini="true">
+            <div data-role="collapsible">
+                <h3>Add new note</h3>
+                    <textarea cols="40" rows="8" name="textarea" id="textarea"></textarea>
+                    <a href="#" data-role="button" data-inline="true" data-theme="a" data-mini="true">Send the note</a>
+            </div>
+        </div>
         <div class="ui-bar ui-bar-a">
             <h3>Inventory ({{=event.inventory.length}})</h3>
         </div>
@@ -137,7 +150,6 @@
     $.mobile.useFastClick = true;
 
         var eventId = "{{=event['_id'] }}";
-    $(document).ready(function(e) {
         $.ajax({
             type: "GET",
             url: "/inventory/existing/" + eventId,
@@ -146,8 +158,7 @@
                 $('#inventoryList').append('<li>' + tool.text + '</li>');
             });
             $('#inventoryList').listview('refresh');
-        });   
-    })
+        }); 
 
 
 
