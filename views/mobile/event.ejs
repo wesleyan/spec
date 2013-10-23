@@ -105,7 +105,76 @@
 
                     <label for="text-basic">Staff username:</label>
                     <input type="text" name="text-basic" id="text-basic" value="">
-                    <input id="settime" type="time" step="5" />
+                    <fieldset data-role="controlgroup" data-type="horizontal">
+                        <legend>Start:</legend>
+                        <select name="select-native-11" id="select-native-11">
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                            <option>6</option>
+                            <option>7</option>
+                            <option>8</option>
+                            <option>9</option>
+                            <option>10</option>
+                            <option>11</option>
+                            <option>12</option>
+                        </select>
+                        <select name="select-native-12" id="select-native-12">
+                            <option>00</option>
+                            <option>05</option>
+                            <option>10</option>
+                            <option>15</option>
+                            <option>20</option>
+                            <option>25</option>
+                            <option>30</option>
+                            <option>35</option>
+                            <option>40</option>
+                            <option>45</option>
+                            <option>50</option>
+                            <option>55</option>
+                        </select>
+                        <select name="select-native-13" id="select-native-13">
+                            <option>AM</option>
+                            <option>PM</option>
+                        </select>
+                    </fieldset>
+                    <fieldset data-role="controlgroup" data-type="horizontal">
+                        <legend>End:</legend>
+                        <select name="select-native-11" id="select-native-11">
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                            <option>6</option>
+                            <option>7</option>
+                            <option>8</option>
+                            <option>9</option>
+                            <option>10</option>
+                            <option>11</option>
+                            <option>12</option>
+                        </select>
+                        <select name="select-native-12" id="select-native-12">
+                            <option>00</option>
+                            <option>05</option>
+                            <option>10</option>
+                            <option>15</option>
+                            <option>20</option>
+                            <option>25</option>
+                            <option>30</option>
+                            <option>35</option>
+                            <option>40</option>
+                            <option>45</option>
+                            <option>50</option>
+                            <option>55</option>
+                        </select>
+                        <select name="select-native-13" id="select-native-13">
+                            <option>AM</option>
+                            <option>PM</option>
+                        </select>
+                    </fieldset>
                     <a href="#" data-role="button" data-inline="true" data-theme="a" data-mini="true">Add this staff</a>
 
             </div>
@@ -159,7 +228,6 @@
             });
             $('#inventoryList').listview('refresh');
         }); 
-
 
 
     {{ if(permission == 10) { }}
