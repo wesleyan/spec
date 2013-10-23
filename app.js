@@ -25,7 +25,7 @@ db.staff.find({}, function(err, data) {
 //CAS Session Management will come here.
 
 	function getUser(req) {
-		return 'kakoi'; //let's assume that the session variable is this for now
+		return 'ckorkut'; //let's assume that the session variable is this for now
 		return req.session.cas_user;
 	}
 
