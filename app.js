@@ -25,7 +25,7 @@ db.staff.find({}, function(err, data) {
 //CAS Session Management will come here.
 
 	function getUser(req) {
-		return 'ckorkut'; //let's assume that the session variable is this for now
+		return 'kakoi'; //let's assume that the session variable is this for now
 		return req.session.cas_user;
 	}
 
@@ -531,7 +531,7 @@ var allInventory = [
 			var deleteNote = function() {
 				db.events.update(
 					{_id: new mongo.ObjectID(req.body.eventid)},
-					{ $pull: {'notes': {'id': new mongo.ObjectID(req.body.id), 'user':getUser(req)} } }, 
+					{ $pull: {'notes': {'id': new mongo.ObjectID(req.body.id)/*, 'user':getUser(req)*/} } }, 
 					function(err, updated) {
 						if (err || !updated) {
 							console.log("Note not removed:" + err);

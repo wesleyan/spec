@@ -48,6 +48,9 @@
           .ui-collapsible-heading {
             font-size: 13px;
             }
+            .ui-btn-text {
+            
+            }
     </style>
     
 </head> 
@@ -70,7 +73,7 @@
                 <td><b>From</b></td><td><b>{{=formatAMPM(new Date(Date.parse(event.start))) }}</b></td><td>({{=formatAMPM(new Date(Date.parse(event.eventStart))) }})</td>
             </tr>
             <tr>
-                <td><b>To</b></td><td><b>{{=formatAMPM(new Date(Date.parse(event.eventEnd))) }}</b></td><td>({{=formatAMPM(new Date(Date.parse(event.eventEnd))) }})</td>
+                <td><b>To</b></td><td><b>{{=formatAMPM(new Date(Date.parse(event.end))) }}</b></td><td>({{=formatAMPM(new Date(Date.parse(event.eventEnd))) }})</td>
             </tr>
         </table>
         <b>
@@ -99,86 +102,88 @@
                 </li>
             {{ }); }}
         </ul>
-        <div data-role="collapsible-set" data-theme="c" data-content-theme="d" data-mini="true">
-            <div data-role="collapsible">
-                <h3>Add new staff</h3>
+        {{ if(permission == 10) { }}
+            <div data-role="collapsible-set" data-theme="c" data-content-theme="d" data-mini="true">
+                <div data-role="collapsible">
+                    <h3>Add new staff</h3>
 
-                    <label for="text-basic">Staff username:</label>
-                    <input type="text" name="text-basic" id="text-basic" value="">
-                    <fieldset data-role="controlgroup" data-type="horizontal">
-                        <legend>Start:</legend>
-                        <select name="start1" id="start1">
-                            <option>1</option>
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
-                            <option>5</option>
-                            <option>6</option>
-                            <option>7</option>
-                            <option>8</option>
-                            <option>9</option>
-                            <option>10</option>
-                            <option>11</option>
-                            <option>12</option>
-                        </select>
-                        <select name="start2" id="start2">
-                            <option>00</option>
-                            <option>05</option>
-                            <option>10</option>
-                            <option>15</option>
-                            <option>20</option>
-                            <option>25</option>
-                            <option>30</option>
-                            <option>35</option>
-                            <option>40</option>
-                            <option>45</option>
-                            <option>50</option>
-                            <option>55</option>
-                        </select>
-                        <select name="start3" id="start3">
-                            <option>AM</option>
-                            <option>PM</option>
-                        </select>
-                    </fieldset>
-                    <fieldset data-role="controlgroup" data-type="horizontal">
-                        <legend>End:</legend>
-                        <select name="end1" id="end1">
-                            <option>1</option>
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
-                            <option>5</option>
-                            <option>6</option>
-                            <option>7</option>
-                            <option>8</option>
-                            <option>9</option>
-                            <option>10</option>
-                            <option>11</option>
-                            <option>12</option>
-                        </select>
-                        <select name="end2" id="end2">
-                            <option>00</option>
-                            <option>05</option>
-                            <option>10</option>
-                            <option>15</option>
-                            <option>20</option>
-                            <option>25</option>
-                            <option>30</option>
-                            <option>35</option>
-                            <option>40</option>
-                            <option>45</option>
-                            <option>50</option>
-                            <option>55</option>
-                        </select>
-                        <select name="end3" id="end3">
-                            <option>AM</option>
-                            <option>PM</option>
-                        </select>
-                    </fieldset>
-                    <a href="#" data-role="button" data-inline="true" data-theme="a" data-mini="true">Add this staff</a>
+                        <label for="staff-username">Staff username:</label>
+                        <input type="text" name="staff-username" id="staff-username" value="">
+                        <fieldset data-role="controlgroup" data-type="horizontal">
+                            <legend>Start:</legend>
+                            <select name="start1" id="start1">
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                                <option>6</option>
+                                <option>7</option>
+                                <option>8</option>
+                                <option>9</option>
+                                <option>10</option>
+                                <option>11</option>
+                                <option>12</option>
+                            </select>
+                            <select name="start2" id="start2">
+                                <option>00</option>
+                                <option>05</option>
+                                <option>10</option>
+                                <option>15</option>
+                                <option>20</option>
+                                <option>25</option>
+                                <option>30</option>
+                                <option>35</option>
+                                <option>40</option>
+                                <option>45</option>
+                                <option>50</option>
+                                <option>55</option>
+                            </select>
+                            <select name="start3" id="start3">
+                                <option>AM</option>
+                                <option>PM</option>
+                            </select>
+                        </fieldset>
+                        <fieldset data-role="controlgroup" data-type="horizontal">
+                            <legend>End:</legend>
+                            <select name="end1" id="end1">
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                                <option>5</option>
+                                <option>6</option>
+                                <option>7</option>
+                                <option>8</option>
+                                <option>9</option>
+                                <option>10</option>
+                                <option>11</option>
+                                <option>12</option>
+                            </select>
+                            <select name="end2" id="end2">
+                                <option>00</option>
+                                <option>05</option>
+                                <option>10</option>
+                                <option>15</option>
+                                <option>20</option>
+                                <option>25</option>
+                                <option>30</option>
+                                <option>35</option>
+                                <option>40</option>
+                                <option>45</option>
+                                <option>50</option>
+                                <option>55</option>
+                            </select>
+                            <select name="end3" id="end3">
+                                <option>AM</option>
+                                <option>PM</option>
+                            </select>
+                        </fieldset>
+                        <a class="addShift" data-role="button" data-inline="true" data-theme="a" data-mini="true">Add this staff</a>
 
+                </div>
             </div>
-        </div>
+        {{ } }}    
         <div class="ui-bar ui-bar-a">
             <h3>Notes ({{=event.notes.length}})</h3>
         </div>
@@ -219,6 +224,8 @@
     $.mobile.useFastClick = true;
 
         var eventId = "{{=event['_id'] }}";
+        var start = '{{=formatAMPM(new Date(Date.parse(event.start))) }}';
+        var end = '{{=formatAMPM(new Date(Date.parse(event.end))) }}';
         $.ajax({
             type: "GET",
             url: "/inventory/existing/" + eventId,
@@ -229,37 +236,74 @@
             $('#inventoryList').listview('refresh');
 
                     {{ if(permission == 10) { }}
-                        // do this for every select input
                         $('#start1 option').filter(function() { 
-                            return ($(this).text() == '3'); //To select Blue
+                            return ($(this).text() == start.split(":")[0]);
                         }).attr('selected', true);
                         $( "#start1" ).selectmenu( "refresh" );
+                        $('#start2 option').filter(function() { 
+                            return ($(this).text() == start.split(":")[1].split(" ")[0]);
+                        }).attr('selected', true);
+                        $( "#start2" ).selectmenu( "refresh" );
+                        $('#start3 option').filter(function() { 
+                            return ($(this).text() == start.split(" ")[1]);
+                        }).attr('selected', true);
+                        $( "#start3" ).selectmenu( "refresh" );
+                        $('#end1 option').filter(function() { 
+                            return ($(this).text() == end.split(":")[0]);
+                        }).attr('selected', true);
+                        $( "#end1" ).selectmenu( "refresh" );
+                        $('#end2 option').filter(function() { 
+                            return ($(this).text() == end.split(":")[1].split(" ")[0]);
+                        }).attr('selected', true);
+                        $( "#end2" ).selectmenu( "refresh" );
+                        $('#end3 option').filter(function() { 
+                            return ($(this).text() == end.split(" ")[1]);
+                        }).attr('selected', true);
+                        $( "#end3" ).selectmenu( "refresh" );
                     {{ } }}
         }); 
 
 
     {{ if(permission == 10) { }}
-    function refreshPage() {
-        jQuery.mobile.changePage(window.location.href, {
-            allowSamePageTransition: true,
-            transition: 'none',
-            reloadPage: true
+        function refreshPage() {
+            jQuery.mobile.changePage(window.location.href, {
+                allowSamePageTransition: true,
+                transition: 'none',
+                reloadPage: true
+            });
+        }
+        $('.addShift').click(function(e) {
+            //console.log(this);
+            $.ajax({
+                type: "POST",
+                url: "/staff/add",
+                data: {
+                    'staff': $('#staff-username').val(),
+                    'start': $('#start1').val() + ':' + $('#start2').val() + ' ' + $('#start3').val(),
+                    'end': $('#end1').val() + ':' + $('#end2').val() + ' ' + $('#end3').val(),
+                    'eventid': "{{=event['_id'] }}",
+                    'eventStart': "{{=event['start'] }}",
+                    'eventEnd': "{{=event['end'] }}"
+                }
+            }).done(function(msg) {
+                console.log('shift added');
+                refreshPage();
+            });
         });
-    }
-    $('.deleteShift').click(function(e) {
-        //console.log(this);
-        $.ajax({
-            type: "POST",
-            url: "/staff/remove",
-            data: {
-                'id': $(this).attr('data-shift'),
-                'eventid': eventId
-            }
-        }).done(function(msg) {
-            console.log('shift deleted');
-            refreshPage();
+        $('.deleteShift').click(function(e) {
+            //console.log(this);
+            $.ajax({
+                type: "POST",
+                url: "/staff/remove",
+                data: {
+                    'id': $(this).attr('data-shift'),
+                    'eventid': eventId
+                }
+            }).done(function(msg) {
+                console.log('shift deleted');
+                refreshPage();
+            });
         });
-    });
 
 
 
