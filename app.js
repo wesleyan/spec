@@ -15,7 +15,7 @@
 	var db = require("mongojs").connect(databaseUrl, collections);
 	var mongo = require('mongodb-wrapper');
 	var fs = require('fs');
-	var cas = require('grand_master_cas');
+	var cas = require('./modules/grand_master_cas.js');
 
 	app.configure(function() {
 		app.set('views', __dirname + '/views');
@@ -78,22 +78,8 @@
 	];
 
 // CAS SESSION MANAGEMENT
-	
-
 	function getUser(req) {
-		return 'ckorkut'; //let's assume that the session variable is this for now
-		//return req.session.cas_user;
-	}
-
-	function inSession(req) { //boolean returning function to detect if logged in or user in staff list
-		return true;
-		//this is the actual code for the future:
-		/*var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == getUser(req); });
-		if(userObj.length < 1) {
-			return false;
-		} else {
-			return true;
-		}*/
+		return req.session.cas_user;
 	}
 
 	function permission(req) { //returns the permission level of the user in session
@@ -104,8 +90,8 @@
 			return userObj[0].level;
 		}
 	}
-	app.get("/user", function(req, res) {
-		if(!inSession(req)) {res.end();	return false;} //must be logged in
+	app.get("/user", cas.blocker, function(req, res) {
+		
 		//req.url
 		console.log("Req for session user");
 		res.writeHead(200, {
@@ -150,9 +136,7 @@
 	}
 
 	//Event fetching should be filtered according to the time variables, still not done after MongoDB
-	app.get("/events", function(req, res) {
-		if(!inSession(req)) {res.end();	return false;} //must be logged in
-
+	app.get("/events", cas.blocker, function(req, res) {
 		//86400s = 1d
 		var start = new Date(req.query.start * 1000);
 		var end = new Date(req.query.end * 1000);
@@ -185,7 +169,7 @@
 		
 	});
 
-		app.post("/event/duration", function(req, res) {
+		app.post("/event/duration", cas.blocker, function(req, res) {
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
@@ -209,7 +193,7 @@
 					}
 				});
 		});
-		app.post("/event/video", function(req, res) {
+		app.post("/event/video", cas.blocker, function(req, res) {
 			//req.url
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
@@ -233,7 +217,7 @@
 					}
 				});
 		});
-		app.post("/event/edit", function(req, res) {
+		app.post("/event/edit", cas.blocker, function(req, res) {
 			//req.url
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
@@ -270,7 +254,7 @@
 					}
 				});
 		});
-		app.post("/event/spinner", function(req, res) {
+		app.post("/event/spinner", cas.blocker, function(req, res) {
 			//req.url
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
@@ -294,7 +278,7 @@
 					}
 				});
 		});
-		app.post("/event/cancel", function(req, res) {
+		app.post("/event/cancel", cas.blocker, function(req, res) {
 			//req.url
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
@@ -318,7 +302,7 @@
 					}
 				});
 		});
-		app.post("/event/remove", function(req, res) {
+		app.post("/event/remove", cas.blocker, function(req, res) {
 			//req.url
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
@@ -360,30 +344,27 @@
 	  return month + '/' + day + '/' + year;
 	};
 
-	app.get('/printtoday', function(req, res) {
-	if(!inSession(req)) {res.end();	return false;} //must be logged in
-	console.log('Req for seeing today\'s events list');
-	var today = new Date();
-		today.setHours(0);
-		today.setMinutes(0);
-		today.setSeconds(0);
-		today.setMilliseconds(0);
-		var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
-		db.events.find({start: {$gte: today, $lt: tomorrow}, valid:true}).sort({start: 1},
-			function(err, data) {
-					res.render('printtoday', {
-						events: data
-					});
-			});
+	app.get('/printtoday', cas.blocker, function(req, res) {
+		console.log('Req for seeing today\'s events list');
+		var today = new Date();
+			today.setHours(0);
+			today.setMinutes(0);
+			today.setSeconds(0);
+			today.setMilliseconds(0);
+			var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+			db.events.find({start: {$gte: today, $lt: tomorrow}, valid:true}).sort({start: 1},
+				function(err, data) {
+						res.render('printtoday', {
+							events: data
+						});
+				});
 	});
 
 // TRIVIAL STUFF
 
 	// INVENTORY
 		// All inventory
-		app.get("/inventory/all", function(req, res) {
-
-			if(!inSession(req)) {res.end();	return false;} //must be logged in
+		app.get("/inventory/all", cas.blocker, function(req, res) {
 			//req.url
 			console.log("Req for all inventory");
 			res.writeHead(200, {
@@ -394,8 +375,7 @@
 		});
 
 		//Existing inventory for each event
-		app.get("/inventory/existing/:id", function(req, res) {
-			if(!inSession(req)) {res.end();	return false;} //must be logged in
+		app.get("/inventory/existing/:id", cas.blocker, function(req, res) {
 			//req.url
 			console.log("Req for inventory of Event ID " + req.params.id);
 			res.writeHead(200, {
@@ -423,8 +403,7 @@
 
 		//Inventory Update
 			//Add inventory to an event (POST)
-			app.post("/inventory/add", function(req, res) {
-				//req.url
+			app.post("/inventory/add", cas.blocker, function(req, res) {
 				res.writeHead(200, {
 					'Content-Type': 'application/json'
 				});
@@ -455,8 +434,7 @@
 			});
 
 			//Remove inventory from an event (POST)
-			app.post("/inventory/remove", function(req, res) {
-				//req.url
+			app.post("/inventory/remove", cas.blocker, function(req, res) {
 				res.writeHead(200, {
 					'Content-Type': 'application/json'
 				});
@@ -482,8 +460,7 @@
 
 	// NOTES
 		//Existing notes for each event
-		app.get("/notes/existing/:id", function(req, res) {
-			if(!inSession(req)) {res.end();	return false;} //must be logged in
+		app.get("/notes/existing/:id", cas.blocker, function(req, res) {
 			//req.url
 			console.log("Req for fetching notes of Event ID " + req.params.id);
 			//Event filtering and inventory
@@ -502,16 +479,11 @@
 
 		//Notes Update
 			//Add inventory to an event (POST) - not tested // username is required
-			app.post("/notes/add", function(req, res) {
+			app.post("/notes/add", cas.blocker, function(req, res) {
 				//req.url
 				res.writeHead(200, {
 					'Content-Type': 'application/json'
 				});
-				if(!inSession(req)) {
-					res.write(JSON.stringify(false).toString("utf-8"));
-					res.end();
-					return false;
-				}
 				console.log("Req for adding note \"" + req.body.note + "\" to Event ID " + req.body.eventid);
 				var generatedID = new mongo.ObjectID();
 				db.events.update(
@@ -530,7 +502,7 @@
 
 			//Remove inventory from an event (POST) - username is required for verification
 				//managers should be able to delete any comment, others should only be able to delete their own
-			app.post("/notes/remove", function(req, res) {
+			app.post("/notes/remove", cas.blocker, function(req, res) {
 				//req.url
 				res.writeHead(200, {
 					'Content-Type': 'application/json'
@@ -572,8 +544,8 @@
 
 	// STAFF
 		//All event staff in IMS
-		app.get("/staff/all", function(req, res) {
-			if(!inSession(req)) {res.end();	return false;} //must be logged in
+		app.get("/staff/all", cas.blocker, function(req, res) {
+			
 			//req.url
 			console.log("Req for all staff info");
 			// Filter the events/database and return the staff and shifts info (requires to decide on db structure)
@@ -584,8 +556,8 @@
 			res.end();
 		});
 		//Get the existing staff of an event
-		app.get("/staff/get/:id", function(req, res) {
-			if(!inSession(req)) {res.end();	return false;} //must be logged in
+		app.get("/staff/get/:id", cas.blocker, function(req, res) {
+			
 			//req.url
 			console.log("Req for staff info of Event ID " + req.params.id);
 			// Filter the events/database and return the staff and shifts info (requires to decide on db structure)
@@ -602,7 +574,7 @@
 			});
 		});
 		//Add staff/shift to an event (POST)
-			app.post("/staff/add", function(req, res) {
+			app.post("/staff/add", cas.blocker, function(req, res) {
 				//req.url
 				res.writeHead(200, {
 					'Content-Type': 'application/json'
@@ -632,8 +604,7 @@
 					});
 			});
 		//Remove staff/shift from an event (POST)
-			app.post("/staff/remove", function(req, res) {
-				//req.url
+			app.post("/staff/remove", cas.blocker, function(req, res) {
 				res.writeHead(200, {
 					'Content-Type': 'application/json'
 				});
@@ -658,8 +629,7 @@
 			});
 
 			//this is determined by staff time checking, not shift time checking, therefore if 
-			app.get("/staff/available/today", function(req, res) {
-				if(!inSession(req)) {res.end();	return false;} //must be logged in
+			app.get("/staff/available/today", cas.blocker, function(req, res) {
 				var busyStaff = [];
 				//86400s = 1d
 				var start = new Date(req.query.start * 1000);
@@ -686,7 +656,7 @@
 				});
 			});
 
-			app.get("/staff/check", function(req, res) {
+			app.get("/staff/check", cas.blocker, function(req, res) {
 				if(permission(req) != 10) {
 					res.write(JSON.stringify(false).toString("utf-8"));
 					res.end();
@@ -708,7 +678,7 @@
 				}
 		});
 			});
-		app.get('/staffCheck', function (req, res) {
+		app.get('/staffCheck', cas.blocker, function (req, res) {
 			if(permission(req) != 10) {
 				res.write(JSON.stringify(false).toString("utf-8"));
 				res.end();
@@ -722,7 +692,7 @@
 			});
 
 	// FILE UPLOAD
-		app.get('/fileUpload', function(req, res) {
+		app.get('/fileUpload', cas.blocker, function(req, res) {
 			if(permission(req) != 10) {
 				res.write(JSON.stringify(false).toString("utf-8"));
 				res.end();
@@ -732,7 +702,7 @@
 		});
 		var parser = require('xml2json');
 
-		app.post('/fileUpload', function(req, res) {
+		app.post('/fileUpload', cas.blocker, function(req, res) {
 			if(permission(req) != 10) {
 				res.write(JSON.stringify(false).toString("utf-8"));
 				res.end();
@@ -817,7 +787,6 @@
 //Main Page Rendering
 
 app.get('/', cas.blocker, function (req, res) {
-	if(!inSession(req)) {res.end();	return false;} //must be logged in
 	  res.render('index',
 		{
 			username: getUser(req),
@@ -826,15 +795,13 @@ app.get('/', cas.blocker, function (req, res) {
 	});
 
 // MOBILE
-	app.get('/m/', function (req, res) {
+	app.get('/m/', cas.blocker, function (req, res) {
 		res.redirect('/m/0/');
 	});
 	app.locals.fixParantheses = function(s) {
 		return s.replace("&#35;","#").replace("&#41;",")").replace("&amp;#40;","(");
 	}
-	app.get('/m/:counter/', function (req, res) {
-		if(!inSession(req)) {res.end();	return false;} //must be logged in
-
+	app.get('/m/:counter/', cas.blocker, function (req, res) {
 		var today = new Date();
 		today.setHours(0);
 		today.setMinutes(0);
@@ -870,8 +837,8 @@ app.get('/', cas.blocker, function (req, res) {
 			}
 		});	
 	});
-	app.get('/m/event/:id', function (req, res) {
-		if(!inSession(req)) {res.end();	return false;} //must be logged in
+	app.get('/m/event/:id', cas.blocker, function (req, res) {
+		
 		query = {};
 		$.extend(query, {'_id': new mongo.ObjectID(req.params.id)});
 		db.events.find(query, function(err, events) {
