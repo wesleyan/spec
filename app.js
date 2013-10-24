@@ -787,6 +787,7 @@
 //Main Page Rendering
 
 app.get('/', cas.blocker, function (req, res) {
+	if(req.params.ticket) {res.redirect('/');} //redirect to the base if there is a ticket in the URL
 	  res.render('index',
 		{
 			username: getUser(req),
@@ -796,6 +797,7 @@ app.get('/', cas.blocker, function (req, res) {
 
 // MOBILE
 	app.get('/m/', cas.blocker, function (req, res) {
+		if(req.params.ticket) {res.redirect('/');} //redirect to the base if there is a ticket in the URL
 		res.redirect('/m/0/');
 	});
 	app.locals.fixParantheses = function(s) {
