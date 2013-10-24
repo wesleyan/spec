@@ -815,14 +815,14 @@
 
 //Main Page Rendering
 
-app.get('/', function (req, res) {
+/*app.get('/', function (req, res) {
 	if(!inSession(req)) {res.end();	return false;} //must be logged in
 	  res.render('index',
 		{
 			username: getUser(req),
 			permission: permission(req),
 		});
-	});
+	});*/
 
 // MOBILE
 	app.get('/m/', function (req, res) {
@@ -888,13 +888,36 @@ app.get('/', function (req, res) {
 	});
 
 // STARTING THE SERVER
-	var https = require('https');
-	var port = 8080;
+	/*
 	var options = {
 	        key: fs.readFileSync('../ssl-key.pem'),
 	        cert: fs.readFileSync('/etc/pki/tls/certs/ca-bundle.crt'),
 	        };
-	var http = require('http');
-	var server = https.createServer(options, app).listen(port, function(){
+	*/
+	app.get('/', function(req, res) {
+		var ticket = req.param('ticket');
+		if (ticket) {
+			cas.validate(ticket, function(err, status, username) {
+				if (err) {
+					// Handle the error
+					res.send({
+						error: err
+					});
+				} else {
+					// Log the user in
+					res.send({
+						status: status,
+						username: username
+					});
+				}
+			});
+		} else {
+			res.redirect('/');
+		}
+	});
+	var CAS = require('cas');
+	var cas = new CAS({base_url: 'https://sso.wesleyan.edu/login', service: 'http://ims-dev.wesleyan.edu:8080/'});
+	var port = 8080;
+	app.listen(port, function() {
 	  console.log("Express server listening on port " + port);
 	});
