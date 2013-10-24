@@ -15,6 +15,7 @@
 	var db = require("mongojs").connect(databaseUrl, collections);
 	var mongo = require('mongodb-wrapper');
 	var fs = require('fs');
+	var cas = require('grand_master_cas');
 
 	app.configure(function() {
 		app.set('views', __dirname + '/views');
@@ -815,14 +816,14 @@
 
 //Main Page Rendering
 
-/*app.get('/', function (req, res) {
+app.get('/', cas.blocker, function (req, res) {
 	if(!inSession(req)) {res.end();	return false;} //must be logged in
 	  res.render('index',
 		{
 			username: getUser(req),
 			permission: permission(req),
 		});
-	});*/
+	});
 
 // MOBILE
 	app.get('/m/', function (req, res) {
@@ -886,7 +887,12 @@
 			}
 		});	
 	});
+	
+	app.get('/login', cas.bouncer, function(req, res) {
+		res.redirect('/');
+	});
 
+	app.get('/logout', cas.logout);
 // STARTING THE SERVER
 	/*
 	var options = {
@@ -894,30 +900,13 @@
 	        cert: fs.readFileSync('/etc/pki/tls/certs/ca-bundle.crt'),
 	        };
 	*/
-	app.get('/', function(req, res) {
-		var ticket = req.param('ticket');
-		if (ticket) {
-			cas.validate(ticket, function(err, status, username) {
-				if (err) {
-					// Handle the error
-					res.send({
-						error: err
-					});
-				} else {
-					// Log the user in
-					res.send({
-						status: status,
-						username: username
-					});
-				}
-			});
-		} else {
-			res.redirect('/');
-		}
+	cas.configure({
+		casHost: 'sso.wesleyan.edu',
+		ssl: true,
+		service: 'http://ims-dev.wesleyan.edu:8080/',
+		redirectUrl: '/login'
 	});
-	var CAS = require('cas');
-	var cas = new CAS({base_url: 'https://sso.wesleyan.edu/login', service: 'http://ims-dev.wesleyan.edu:8080/'});
 	var port = 8080;
 	app.listen(port, function() {
-	  console.log("Express server listening on port " + port);
+		console.log("Express server listening on port " + port);
 	});
