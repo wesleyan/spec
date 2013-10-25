@@ -797,7 +797,7 @@ app.get('/', cas.blocker, function (req, res) {
 	});
 
 // MOBILE
-	app.get('/m/', cas.blocker, function (req, res) {
+	app.get('/m', cas.blocker, function (req, res) {
 		if(req.query.ticket) {res.redirect('/m/');} //redirect to the base if there is a ticket in the URL
 		res.redirect('/m/0/');
 	});
