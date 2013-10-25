@@ -521,15 +521,15 @@
 								res.end();
 							}
 						});
-				}
+				};
 				if(permission(req) == 10) { //remove the note if it's a manager
 					deleteNote();
 				} else {
-					db.events.find({_id: new mongo.ObjectID(req.params.eventid)}, function(err, events) {
-						if (err || !events) {
+					db.events.find({_id: new mongo.ObjectID(req.body.eventid)}, function(err, events) {
+						if (err || !events || events.length < 1 ) {
 							console.log("No such note/event found");
 						} else {
-							var theNote = $.grep(events[0].notes, function(e){ return e['_id'] == req.params.id; });
+							var theNote = $.grep(events[0].notes, function(e){ return e['_id'] == req.body.id; });
 							if(theNote.user == getUser(req)) {
 								deleteNote();
 							} else {

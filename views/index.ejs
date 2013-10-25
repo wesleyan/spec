@@ -298,9 +298,13 @@
 	     			<%= op.note.text %>
 	     			<br>
 	     			<span class="label"><%= op.note.user %> | <%= defaults.monthNamesShort[op.note.date.getMonth()] %> <%= op.note.date.getDate() %></span>
-					<% if(op.note.user == Spec.username) { %>
-	     				<span class="pull-right btn btn-mini btn-danger removeNote" href="<%= op.note.id %>"><i class="icon-remove icon-white"></i></span>
-	     			<% } %>
+	     			{{ if(permission != 10) { }}
+						<% if(op.note.user == Spec.username) { %>
+					{{ } }}
+	     					<span class="pull-right btn btn-mini btn-danger removeNote" href="<%= op.note.id %>"><i class="icon-remove icon-white"></i></span>
+	     			{{ if(permission != 10) { }}
+	     				<% } %>
+	     			{{ } }}
 	     		</td>
 		   	</tr>
 	</script>
