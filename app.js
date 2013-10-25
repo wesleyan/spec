@@ -7,6 +7,8 @@
         |_|                
 */
 // CONFIGURATION AND MODULES
+
+	var debug = true; //making it false will overwrite console.log
 	require('ofe').call();
 	var express = require('express');
 	var app = express();
@@ -31,6 +33,7 @@
 	var ejs = require('ejs');
 	ejs.open = '{{';
 	ejs.close = '}}';
+
 
 // STUFF TO LOAD AT INITIATION
 	//We can store all staff in memory, since it is not a big array and it will be used VERY frequently, will save time.
@@ -748,6 +751,7 @@
 						}
 					});
 					processed.push({
+						XMLid: data['Service_x0020_Order_x0020_Detail_x0020_ID'],
 						title: data['Event_x0020_Name'],
 						desc: data['Notes'],
 						loc: data['Room_x0020_Description'],
@@ -761,7 +765,11 @@
 						'video': video,
 						inventory: [],
 						notes: [],
-						shifts:[]
+						shifts:[],
+						customer: {
+							'name':data['Customer'],
+							'phone':data['Customer_x0020_Phone_x0020_1'],
+						}
 					});
 				});
 
@@ -896,4 +904,6 @@ app.get('/', cas.blocker, function (req, res) {
 	var port = 8080;
 	app.listen(port, function() {
 		console.log("Express server listening on port " + port);
+
+		if(debug == false) {console.log = function(){};} //cancel console logs if debug
 	});
