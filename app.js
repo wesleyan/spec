@@ -7,6 +7,7 @@
         |_|                
 */
 // CONFIGURATION AND MODULES
+	require('ofe').call();
 	var express = require('express');
 	var app = express();
 	var $ = require('jquery');
