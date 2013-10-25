@@ -511,7 +511,7 @@
 				var deleteNote = function() {
 					db.events.update(
 						{_id: new mongo.ObjectID(req.body.eventid)},
-						{ $pull: {'notes': {'id': new mongo.ObjectID(req.body.id)/*, 'user':getUser(req)*/} } }, 
+						{ $pull: {'notes': {'id': new mongo.ObjectID(req.body.id)} } }, 
 						function(err, updated) {
 							if (err || !updated) {
 								console.log("Note not removed:" + err);
@@ -525,12 +525,12 @@
 				if(permission(req) == 10) { //remove the note if it's a manager
 					deleteNote();
 				} else {
-					db.events.find({_id: new mongo.ObjectID(req.params.eventid)}, function(err, note) {
-						if (err || !note) {
-							console.log("No such note found");
+					db.events.find({_id: new mongo.ObjectID(req.params.eventid)}, function(err, events) {
+						if (err || !events) {
+							console.log("No such note/event found");
 						} else {
 							var theNote = $.grep(events[0].notes, function(e){ return e['_id'] == req.params.id; });
-							if(theNote.user == getUser(req)) { //req.session.cas_user
+							if(theNote.user == getUser(req)) {
 								deleteNote();
 							} else {
 								res.write(JSON.stringify(false).toString("utf-8"));
@@ -797,7 +797,7 @@ app.get('/', cas.blocker, function (req, res) {
 
 // MOBILE
 	app.get('/m/', cas.blocker, function (req, res) {
-		if(req.query.ticket) {res.redirect('/');} //redirect to the base if there is a ticket in the URL
+		if(req.query.ticket) {res.redirect('/m/');} //redirect to the base if there is a ticket in the URL
 		res.redirect('/m/0/');
 	});
 	app.locals.fixParantheses = function(s) {
