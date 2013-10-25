@@ -79,6 +79,7 @@
 	];
 
 // CAS SESSION MANAGEMENT
+
 	function getUser(req) {
 		return req.session.cas_user;
 	}
@@ -91,6 +92,13 @@
 			return userObj[0].level;
 		}
 	}
+
+	app.get('/login', cas.bouncer, function(req, res) {
+		res.redirect('/');
+	});
+
+	app.get('/logout', cas.logout);
+
 	app.get("/user", cas.blocker, function(req, res) {
 		
 		//req.url
@@ -857,12 +865,21 @@ app.get('/', cas.blocker, function (req, res) {
 			}
 		});	
 	});
-	
-	app.get('/login', cas.bouncer, function(req, res) {
-		res.redirect('/');
-	});
 
-	app.get('/logout', cas.logout);
+	app.get('/m/staff/:username', cas.blocker, function (req, res) {
+		var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == req.params.username; });
+		if(userObj.length != 1) {
+			res.end();
+			return false;
+		}
+		res.render('mobile/staff', {
+			username: getUser(req),
+			permission: permission(req),
+			staff: userObj[0],
+		});
+	});
+	
+
 // STARTING THE SERVER
 	/*
 	var options = {
