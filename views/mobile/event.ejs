@@ -92,7 +92,7 @@
         </div>
         <ul data-role="listview" data-inset="true" {{ if(permission == 10) { }}data-split-icon="delete"{{ } }}>
             {{ event.shifts.forEach(function(shift) { }}
-            <li> <a href="staff/{{=shift.staff }}">{{=shift.staff }}
+            <li> <a href="../staff/{{=shift.staff }}">{{=shift.staff }}
                 <span class="ui-li-count">
                     {{=formatAMPM(new Date(Date.parse(shift.start))) }}-{{=formatAMPM(new Date(Date.parse(shift.end))) }}
                 </span></a>
