@@ -680,28 +680,73 @@
 				console.log(start);
 				console.log("Req for staff check for " + req.query.user);
 				db.events.find({'start': {$gte: start, $lt: end}, 'shifts':{$elemMatch: {'staff': req.query.user}},}, function(err, events) {
-				if (err || !events) {
-					console.log("No events found");
-					res.write(JSON.stringify(false).toString("utf-8"));
-					res.end();
-				} else {
-					res.write(JSON.stringify(events).toString("utf-8"));
-					res.end();
-				}
-		});
-			});
-		app.get('/staffCheck', cas.blocker, function (req, res) {
-			if(permission(req) != 10) {
-				res.write(JSON.stringify(false).toString("utf-8"));
-				res.end();
-				return false;
-			}
-			console.log("Req for staff check");
-			  res.render('staffCheck',
-				{
-					//users: app.locals.,
+					if (err || !events) {
+						console.log("No events found");
+						res.write(JSON.stringify(false).toString("utf-8"));
+						res.end();
+					} else {
+						res.write(JSON.stringify(events).toString("utf-8"));
+						res.end();
+					}
 				});
 			});
+			app.get("/staff/table", cas.blocker, function(req, res) {
+				if(permission(req) != 10) {
+					res.write(JSON.stringify(false).toString("utf-8"));
+					res.end();
+					return false;
+				}
+				var start = new Date(Date.parse(req.query.start));
+				var end = new Date(Date.parse(req.query.end));
+				end = new Date(end.getTime() + 24 * 60 * 60 * 1000);
+				console.log(start);
+				console.log("Req for staff table for " + req.query.user);
+				db.events.find({'start': {$gte: start, $lt: end},}, function(err, events) {
+					if (err || !events) {
+						console.log("No events found");
+						res.write(JSON.stringify(false).toString("utf-8"));
+						res.end();
+					} else {
+						var result = {};
+						events.forEach(function(event) {
+							event.shifts.forEach(function(shift) {
+								result[shift.staff] = (typeof result[shift.staff] === 'undefined') ? {} : result[shift.staff];
+								result[shift.staff].hour = (typeof result[shift.staff].hour === 'undefined') ? 0 : result[shift.staff].hour;
+								result[shift.staff].event = (typeof result[shift.staff].event === 'undefined') ? 0 : result[shift.staff].event;
+								result[shift.staff].event += 1;
+								result[shift.staff].hour += ((Date.parse(shift.end) - Date.parse(shift.start)) / 3600000);
+							})
+						});
+						res.write(JSON.stringify(result).toString("utf-8"));
+						res.end();
+					}
+				});
+			});
+			app.get('/staffCheck', cas.blocker, function (req, res) {
+				if(permission(req) != 10) {
+					res.write(JSON.stringify(false).toString("utf-8"));
+					res.end();
+					return false;
+				}
+				console.log("Req for staff check");
+				  res.render('staffCheck',
+					{
+						//users: app.locals.,
+					});
+				});
+
+			app.get('/staffTable', cas.blocker, function (req, res) {
+				if(permission(req) != 10) {
+					res.write(JSON.stringify(false).toString("utf-8"));
+					res.end();
+					return false;
+				}
+				console.log("Req for staff check");
+				  res.render('staffTable',
+					{
+						//users: app.locals.,
+					});
+				});
 
 	// FILE UPLOAD
 		app.get('/fileUpload', cas.blocker, function(req, res) {
@@ -904,6 +949,5 @@ app.get('/', cas.blocker, function (req, res) {
 	var port = 8080;
 	app.listen(port, function() {
 		console.log("Express server listening on port " + port);
-
 		if(debug == false) {console.log = function(){};} //cancel console logs if debug
 	});

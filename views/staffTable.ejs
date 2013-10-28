@@ -12,57 +12,56 @@
     <script src="../lib/jquery.min.js"></script>
     <script type="text/javascript" src="http://underscorejs.org/underscore-min.js"></script>
     <script src="../lib/bootstrap-datepicker.js"></script>
-     <script>
-    var fixParantheses = function(s) {
-      return s.replace("&#35;","#").replace("&#41;",")").replace("&amp;#40;","(");
-    }
-    var user = '';
-    $(document).ready(function() {
-       _.templateSettings.variable = "rc";
-      $('body').html(fixParantheses($('body').html()));
-      $('body').html(fixParantheses($('body').html())); 
-      //this is important because some HTML characters consist of other HTML characters, so double decoding is needed
-      var today = new Date();
-      today.setHours(0);
-      today.setMinutes(0);
-      today.setSeconds(0);
-      today.setMilliseconds(0);
-      var lastWeek = new Date(today.getTime() - 24 * 60 * 60 * 1000 * 7);
-      $('.combobox').combobox();
-      $('.date').datepicker();
-      $('#d1').datepicker('setValue', lastWeek);
-      $('#d2').datepicker('setValue', today);
-      $('#send').click(function(e) {
-        try {
-         user = $('.combobox').val().match(/\(([^)]+)\)/)[1];
-        } catch(err) {return false;}
-        $.ajax({
-          type: "GET",
-          url: "../staff/check",
-          data: {
-            'start': $('#d1').data('datepicker').date,
-            'end': $('#d2').data('datepicker').date,
-          }
-        }).done(function(msg) {
-          if(msg == 'false') {
-            return false;
-          }
-          var template = _.template( $(".template").html(), {'events': JSON.parse(msg)});
-          //console.log(template);
-          $('#content').html(template);
+    <script>
+      var fixParantheses = function(s) {
+        return s.replace("&#35;","#").replace("&#41;",")").replace("&amp;#40;","(");
+      }
+      var user = '';
+      $(document).ready(function() {
+         _.templateSettings.variable = "rc";
+        $('body').html(fixParantheses($('body').html()));
+        $('body').html(fixParantheses($('body').html())); 
+        //this is important because some HTML characters consist of other HTML characters, so double decoding is needed
+        var today = new Date();
+        today.setHours(0);
+        today.setMinutes(0);
+        today.setSeconds(0);
+        today.setMilliseconds(0);
+        var lastWeek = new Date(today.getTime() - 24 * 60 * 60 * 1000 * 7);
+        $('.date').datepicker();
+        $('#d1').datepicker('setValue', lastWeek);
+        $('#d2').datepicker('setValue', today);
+        $('#send').click(function(e) {
+          try {
+           user = $('.combobox').val().match(/\(([^)]+)\)/)[1];
+          } catch(err) {return false;}
+          $.ajax({
+            type: "GET",
+            url: "../staff/table",
+            data: {
+              'start': $('#d1').data('datepicker').date,
+              'end': $('#d2').data('datepicker').date,
+            }
+          }).done(function(msg) {
+            if(msg == 'false') {
+              return false;
+            }
+            var template = _.template( $(".template").html(), {'staff': JSON.parse(msg)});
+            //console.log(template);
+            $('#content').html(template);
+          });
         });
       });
-    });
-    var formatAMPM = function(date) {
-        var hours = date.getHours();
-        var minutes = date.getMinutes();
-        var ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12;
-        hours = hours ? hours : 12; // the hour '0' should be '12'
-        minutes = minutes < 10 ? '0'+minutes : minutes;
-        var strTime = hours + ':' + minutes + ' ' + ampm;
-        return strTime;
-      }; //end formatAMPM
+      var formatAMPM = function(date) {
+          var hours = date.getHours();
+          var minutes = date.getMinutes();
+          var ampm = hours >= 12 ? 'PM' : 'AM';
+          hours = hours % 12;
+          hours = hours ? hours : 12; // the hour '0' should be '12'
+          minutes = minutes < 10 ? '0'+minutes : minutes;
+          var strTime = hours + ':' + minutes + ' ' + ampm;
+          return strTime;
+        }; //end formatAMPM
    </script>
     <link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css" rel="stylesheet" media="screen,print">
     <link href="../lib/bootstrap-datepicker.css" rel="stylesheet">
@@ -322,11 +321,11 @@
           </tr>
         </thead>
         <tbody>
-         <% rc.staffList.forEach(function(staff) { %>
+         <% _.each(function(value, key) { %>
           <tr>
-            <td><%= staff.name %> (<%= staff.staff %>)</td>
-            <td><%= staff.events %></td>
-            <td><%= staff.hours %></td>
+            <td>(<%= key %>)</td>
+            <td><%= value.event %></td>
+            <td><%= value.hour %></td>
           </tr>
           <% }) %>
         </tbody>
