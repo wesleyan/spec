@@ -32,9 +32,6 @@
         $('#d1').datepicker('setValue', lastWeek);
         $('#d2').datepicker('setValue', today);
         $('#send').click(function(e) {
-          try {
-           user = $('.combobox').val().match(/\(([^)]+)\)/)[1];
-          } catch(err) {return false;}
           $.ajax({
             type: "GET",
             url: "../staff/table",
@@ -321,7 +318,7 @@
           </tr>
         </thead>
         <tbody>
-         <% _.each(function(value, key) { %>
+         <% _.each(rc.staff, function(value, key) { %>
           <tr>
             <td>(<%= key %>)</td>
             <td><%= value.event %></td>
