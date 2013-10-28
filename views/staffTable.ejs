@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Spec: Staff Check</title>
+    <title>Spec: Staff Table</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -322,7 +321,7 @@
           <tr>
             <td>(<%= key %>)</td>
             <td><%= value.event %></td>
-            <td><%= value.hour %></td>
+            <td><%= value.hour.toFixed(2) %></td>
           </tr>
           <% }) %>
         </tbody>

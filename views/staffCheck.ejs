@@ -358,7 +358,7 @@
           </div>
       <% }); %>
       <div class="alert">
-        <b><%= totalNumberOfMinutes/60000 %> hours</b> in total in the given period
+        <b><%= (totalNumberOfMinutes/60000).toFixed(2) %> hours</b> in total in the given period
       </div>
     </script>
 </html>
