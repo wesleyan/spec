@@ -13,6 +13,7 @@
 	var express = require('express');
 	var app = express();
 	var $ = require('jquery');
+	var _ = require('underscore');
 	var databaseUrl = "127.0.0.1:27017/spec"; // "username:password@example.com/mydb"
 	var collections = ['events','staff']
 	var db = require("mongojs").connect(databaseUrl, collections);
@@ -768,17 +769,36 @@
 			console.log('Upload and saving progress started');
 			//you should check if it's an xml file
 			try {
-				var xml = fs.readFileSync(req.files.myFile.path);
-				var parsed = parser.toJson(xml,{
-					object: true,
-					trim: true,
-					arrayNotation: true
+				// Freshly uploaded XML and last.xml are read
+					var xml = fs.readFileSync(req.files.myFile.path);
+					var last = fs.readFileSync('./uploads/last.xml');
+				// Both XML files are parsed
+					xml = parser.toJson(xml,{
+						object: true,
+						trim: true,
+						arrayNotation: true
+					})['CopyofIMSforExport']['Data'];
+					last = parser.toJson(xml,{
+						object: true,
+						trim: true,
+						arrayNotation: true
+					})['CopyofIMSforExport']['Data'];
+
+				var whatToChange = { update: [], add: [] };
+				// Parsed XML files are compared according to their unique ID's, event by event
+				xml.forEach(function(xmlEntry) {
+					//try to find an object with the same unique ID
+					var entryInLast = _.findWhere(last, {'Service_x0020_Order_x0020_Detail_x0020_ID': xmlEntry['Service_x0020_Order_x0020_Detail_x0020_ID']});
+					if(typeof entryInLast != 'undefined') { //if exists, then compare if they are the same
+						if(!_isEqual(xmlEntry, entryInLast)) {
+							whatToChange.update.push(xmlEntry); //if they are the same, store to update later
+						}
+					} else { //if it doesn't exist in the last.xml, then store it to add later.
+						whatToChange.add.push(xmlEntry);
+					}
 				});
-				parsed = parsed['CopyofIMSforExport']['Data'];
 
-				var processed = [];
-
-				parsed.forEach(function(data) {
+				var process = function(data) {
 					var bookingDate = data['Booking_x0020_Date'].split(" ")[0]
 					var reservedStart = new Date(Date.parse(bookingDate + ' ' + data['Reserved_x0020_Start']));
 					var reservedEnd = new Date(Date.parse(bookingDate + ' ' + data['Reserved_x0020_End']));
@@ -795,67 +815,100 @@
 							video = true;
 						}
 					});
-					processed.push({
+					return {
 						XMLid: data['Service_x0020_Order_x0020_Detail_x0020_ID'],
 						title: data['Event_x0020_Name'],
-						desc: data['Notes'],
-						loc: data['Room_x0020_Description'],
+						desc:  data['Notes'],
+						loc:   data['Room_x0020_Description'],
 						staffNeeded: 1,
 						start: reservedStart,
-						end: reservedEnd,
+						end:   reservedEnd,
 						'eventStart': eventStart,
-						'eventEnd': eventEnd,
-						'valid': valid,
+						'eventEnd':   eventEnd,
+						'valid':  valid,
 						duration: true,
-						'video': video,
+						'video':  video,
 						inventory: [],
-						notes: [],
-						shifts:[],
+						notes:     [],
+						shifts:    [],
 						customer: {
-							'name':data['Customer'],
-							'phone':data['Customer_x0020_Phone_x0020_1'],
+							'name':  data['Customer'],
+							'phone': data['Customer_x0020_Phone_x0020_1'],
 						}
+					};
+				};
+
+				whatToChange.update = whatToChange.update.map(process);
+				whatToChange.add = whatToChange.add.map(process);
+
+				whatToChange.add.forEach(function(event) {
+					db.events.save(event, function(err, saved) {
+						if (err || !saved) console.log("New event is not saved");
+						else console.log("New event saved");
 					});
 				});
-
-				processed.forEach(function(event) {
-					db.events.save(event, function(err, saved) {
-						if (err || !saved) console.log("Event not saved");
-						else console.log("Event saved");
-					});
+				whatToChange.update.forEach(function(event) {
+					db.events.update(
+						{_id: new mongo.ObjectID(req.body.eventid)}, 
+						{$set: event }, //this version updates everything!!!, beware!
+						function(err, updated) {
+							if (err || !updated) {
+								console.log("Event could not be updated:" + err);
+							} else {
+								console.log("Event updated");
+								res.write(JSON.stringify(true).toString("utf-8"));
+								res.end();
+							}
+						});
 				});
 
 				console.log("Upload and saving progress ended successfully");
 				res.writeHead(200);
 			} catch(err) {
+				deleteAfterError(req.files.myFile.path);
 				res.writeHead(400);
 				console.log(err);
+				return false;
 			}
-		  	deleteAfterUpload(req.files.myFile.path);
+		  	renameAfterUpload(req.files.myFile.path);
 		  	res.end();
 		});
 
 		// Private functions
-
-		var deleteAfterUpload = function(path) {
+		var deleteAfterError = function(path) {
+			setTimeout(function() {
+				fs.unlink(path, function(err) {
+					if (err) console.log(err);
+					console.log('File with error successfully deleted');
+				});
+			}, 60 * 1000 * 1); //stays there for a minute
+		};
+		var renameAfterUpload = function(path) {
 		  setTimeout( function(){
 		    fs.unlink(path, function(err) {
-		      if (err) console.log(err);
-		      console.log('file successfully deleted');
-		    });
-		  }, 60 * 1000 * 4); //stays there for 4 minutes
+		      if (err) {
+		      	console.log(err);
+		      	return false;
+		      }
+		      console.log('Old last.xml file successfully deleted');
+				fs.rename(path, './uploads/last.xml', function(err) {
+					if (err) throw err;
+					console.log('Uploaded file renamed to last.xml');
+				});
+			});
+		  }, 60 * 1000 * 1); //stays there for 1 minute
 		};
 
 //Main Page Rendering
 
-app.get('/', cas.blocker, function (req, res) {
-	if(req.query.ticket) {res.redirect('/');} //redirect to the base if there is a ticket in the URL
-	  res.render('index',
-		{
-			username: getUser(req),
-			permission: permission(req),
+	app.get('/', cas.blocker, function (req, res) {
+		if(req.query.ticket) {res.redirect('/');} //redirect to the base if there is a ticket in the URL
+		  res.render('index',
+			{
+				username: getUser(req),
+				permission: permission(req),
+			});
 		});
-	});
 
 // MOBILE
 	app.get('/m', cas.blocker, function (req, res) {
