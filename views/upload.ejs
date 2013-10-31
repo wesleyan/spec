@@ -74,7 +74,11 @@
         };
         
         xhr.onload = function() {
-          showInfo(this.statusText);
+          if (this.status == 200) {
+            showInfo(this.responseText);
+          } else {
+            showInfo(this.statusText);
+          }
         };
         
         xhr.send(formData);

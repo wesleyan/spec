@@ -773,16 +773,18 @@
 					var xml = fs.readFileSync(req.files.myFile.path);
 					var last = fs.readFileSync('./uploads/last.xml');
 				// Both XML files are parsed
-					xml = parser.toJson(xml,{
+					xml = parser.toJson(xml, {
 						object: true,
 						trim: true,
 						arrayNotation: true
 					})['CopyofIMSforExport']['Data'];
-					last = parser.toJson(xml,{
+					last = parser.toJson(last, {
 						object: true,
 						trim: true,
 						arrayNotation: true
 					})['CopyofIMSforExport']['Data'];
+
+					if(last == 0) {last = [];} //this is only for the first setup of spec on any machine
 
 				var whatToChange = { update: [], add: [] };
 				// Parsed XML files are compared according to their unique ID's, event by event
@@ -790,7 +792,7 @@
 					//try to find an object with the same unique ID
 					var entryInLast = _.findWhere(last, {'Service_x0020_Order_x0020_Detail_x0020_ID': xmlEntry['Service_x0020_Order_x0020_Detail_x0020_ID']});
 					if(typeof entryInLast != 'undefined') { //if exists, then compare if they are the same
-						if(!_isEqual(xmlEntry, entryInLast)) {
+						if(!_.isEqual(xmlEntry, entryInLast)) {
 							whatToChange.update.push(xmlEntry); //if they are the same, store to update later
 						}
 					} else { //if it doesn't exist in the last.xml, then store it to add later.
@@ -841,29 +843,36 @@
 				whatToChange.update = whatToChange.update.map(process);
 				whatToChange.add = whatToChange.add.map(process);
 
+				var changeNumbers = {add:0, update 0};
+
 				whatToChange.add.forEach(function(event) {
 					db.events.save(event, function(err, saved) {
-						if (err || !saved) console.log("New event is not saved");
-						else console.log("New event saved");
+						if (err || !saved) {
+							console.log("New event is not saved");
+						} else {
+							changeNumbers.add++;
+						}
 					});
 				});
+
 				whatToChange.update.forEach(function(event) {
 					db.events.update(
-						{_id: new mongo.ObjectID(req.body.eventid)}, 
+						{XMLid: event.XMLid}, 
 						{$set: event }, //this version updates everything!!!, beware!
 						function(err, updated) {
 							if (err || !updated) {
-								console.log("Event could not be updated:" + err);
+								console.log("Event could not be updated: " + err);
+								console.log(event.title);
 							} else {
-								console.log("Event updated");
+								changeNumbers.update++;
 								res.write(JSON.stringify(true).toString("utf-8"));
 								res.end();
 							}
 						});
 				});
-
 				console.log("Upload and saving progress ended successfully");
-				res.writeHead(200);
+				res.writeHead(200, {'Content-Type': 'text/html'});
+				res.send(changeNumbers.add + ' events added and ' + changeNumbers.update + ' events updated, upload and saving progress ended successfully.');
 			} catch(err) {
 				deleteAfterError(req.files.myFile.path);
 				res.writeHead(400);
@@ -885,7 +894,7 @@
 		};
 		var renameAfterUpload = function(path) {
 		  setTimeout( function(){
-		    fs.unlink(path, function(err) {
+		    fs.unlink('./uploads/last.xml', function(err) {
 		      if (err) {
 		      	console.log(err);
 		      	return false;
