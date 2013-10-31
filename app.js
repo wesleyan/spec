@@ -799,7 +799,7 @@
 						whatToChange.add.push(xmlEntry);
 					}
 				});
-
+				//should write a part that distinguishes new events and updated events.
 				var process = function(data) {
 					var bookingDate = data['Booking_x0020_Date'].split(" ")[0]
 					var reservedStart = new Date(Date.parse(bookingDate + ' ' + data['Reserved_x0020_Start']));
@@ -843,7 +843,7 @@
 				whatToChange.update = whatToChange.update.map(process);
 				whatToChange.add = whatToChange.add.map(process);
 
-				var changeNumbers = {add:0, update 0};
+				var changeNumbers = {add:0, update:0};
 
 				whatToChange.add.forEach(function(event) {
 					db.events.save(event, function(err, saved) {
@@ -865,13 +865,12 @@
 								console.log(event.title);
 							} else {
 								changeNumbers.update++;
-								res.write(JSON.stringify(true).toString("utf-8"));
-								res.end();
 							}
 						});
 				});
 				console.log("Upload and saving progress ended successfully");
-				res.writeHead(200, {'Content-Type': 'text/html'});
+				//should implement async parallel functions for this waiting for db functions
+				res.writeHead(200);
 				res.send(changeNumbers.add + ' events added and ' + changeNumbers.update + ' events updated, upload and saving progress ended successfully.');
 			} catch(err) {
 				deleteAfterError(req.files.myFile.path);
@@ -890,7 +889,7 @@
 					if (err) console.log(err);
 					console.log('File with error successfully deleted');
 				});
-			}, 60 * 1000 * 1); //stays there for a minute
+			}, 60 * 1000 * 0.2); //stays there for 20 sec
 		};
 		var renameAfterUpload = function(path) {
 		  setTimeout( function(){
@@ -905,7 +904,7 @@
 					console.log('Uploaded file renamed to last.xml');
 				});
 			});
-		  }, 60 * 1000 * 1); //stays there for 1 minute
+		  }, 60 * 1000 * 0.2); //stays there for 20 sec
 		};
 
 //Main Page Rendering
