@@ -768,7 +768,7 @@
 			}
 			console.log('Upload and saving progress started');
 			//you should check if it's an xml file
-			//try {
+			try {
 				// Freshly uploaded XML and last.xml are read
 					var xml = fs.readFileSync(req.files.myFile.path);
 					var last = fs.readFileSync('./uploads/last.xml');
@@ -822,7 +822,7 @@
 						title: data['Event_x0020_Name'],
 						desc:  data['Notes'],
 						loc:   data['Room_x0020_Description'],
-						staffNeeded: 1,
+						//staffNeeded: 1,
 						start: reservedStart,
 						end:   reservedEnd,
 						'eventStart': eventStart,
@@ -830,9 +830,9 @@
 						'valid':  valid,
 						duration: true,
 						'video':  video,
-						inventory: [],
-						notes:     [],
-						shifts:    [],
+						//inventory: [], //we don't want to reset these for the events that are only updated
+						//notes:     [],
+						//shifts:    [],
 						customer: {
 							'name':  data['Customer'],
 							'phone': data['Customer_x0020_Phone_x0020_1'],
@@ -840,8 +840,16 @@
 					};
 				};
 
+				var cleanSheet = function(data) { //these are for the new events to be added.
+					data.inventory = [];
+					data.notes = [];
+					data.shifts = [];
+					data.staffNeeded = 1;
+					return data;
+				}
+
 				whatToChange.update = whatToChange.update.map(process);
-				whatToChange.add = whatToChange.add.map(process);
+				whatToChange.add = whatToChange.add.map(process).map(cleanSheet);
 
 				var changeNumbers = {add:0, update:0};
 
@@ -870,16 +878,20 @@
 				});
 				console.log("Upload and saving progress ended successfully");
 				//should implement async parallel functions for this waiting for db functions
-				res.writeHead(200);
-				res.send(changeNumbers.add + ' events added and ' + changeNumbers.update + ' events updated, upload and saving progress ended successfully.');
-			/*} catch(err) {
+				setTimeout(function() {
+					res.writeHead(200);
+					res.write(changeNumbers.add + ' events added and ' + changeNumbers.update + ' events updated, upload and saving progress ended successfully.');
+					res.end();
+				}, 2 * 1000);
+			} catch(err) {
 				deleteAfterError(req.files.myFile.path);
 				res.writeHead(400);
+				res.end();
 				console.log(err);
 				return false;
-			}*/
-		  	//renameAfterUpload(req.files.myFile.path);
-		  	res.end();
+			}
+		  	renameAfterUpload(req.files.myFile.path);
+		  	
 		});
 
 		// Private functions
@@ -889,7 +901,7 @@
 					if (err) console.log(err);
 					console.log('File with error successfully deleted');
 				});
-			}, 60 * 1000 * 0.2); //stays there for 20 sec
+			}, 60 * 1000 * 0.1); //stays there for 10 sec
 		};
 		var renameAfterUpload = function(path) {
 		  setTimeout( function(){
@@ -904,7 +916,7 @@
 					console.log('Uploaded file renamed to last.xml');
 				});
 			});
-		  }, 60 * 1000 * 0.2); //stays there for 20 sec
+		  }, 60 * 1000 * 0.1); //stays there for 10 sec
 		};
 
 //Main Page Rendering
