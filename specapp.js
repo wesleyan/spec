@@ -768,7 +768,7 @@
 			}
 			console.log('Upload and saving progress started');
 			//you should check if it's an xml file
-			try {
+			//try {
 				// Freshly uploaded XML and last.xml are read
 					var xml = fs.readFileSync(req.files.myFile.path);
 					var last = fs.readFileSync('./uploads/last.xml');
@@ -872,13 +872,13 @@
 				//should implement async parallel functions for this waiting for db functions
 				res.writeHead(200);
 				res.send(changeNumbers.add + ' events added and ' + changeNumbers.update + ' events updated, upload and saving progress ended successfully.');
-			} catch(err) {
+			/*} catch(err) {
 				deleteAfterError(req.files.myFile.path);
 				res.writeHead(400);
 				console.log(err);
 				return false;
-			}
-		  	renameAfterUpload(req.files.myFile.path);
+			}*/
+		  	//renameAfterUpload(req.files.myFile.path);
 		  	res.end();
 		});
 
