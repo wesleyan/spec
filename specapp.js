@@ -21,6 +21,8 @@
 	var fs = require('fs');
 	var cas = require('./modules/grand_master_cas.js');
 
+	var async = require('async');
+
 	app.configure(function() {
 		app.set('views', __dirname + '/views');
 		app.set('view engine', 'ejs');
@@ -852,37 +854,44 @@
 				whatToChange.add = whatToChange.add.map(process).map(cleanSheet);
 
 				var changeNumbers = {add:0, update:0};
+				var parallel = [];
 
 				whatToChange.add.forEach(function(event) {
-					db.events.save(event, function(err, saved) {
-						if (err || !saved) {
-							console.log("New event is not saved");
-						} else {
-							changeNumbers.add++;
-						}
-					});
+					parallel.push(function(callback) {
+											db.events.save(event, function(err, saved) {
+												if (err || !saved) {
+													console.log("New event is not saved");
+												} else {
+													changeNumbers.add++;
+													callback();
+												}
+											});
+										});
 				});
 
 				whatToChange.update.forEach(function(event) {
-					db.events.update(
-						{XMLid: event.XMLid}, 
-						{$set: event }, //this version updates everything!!!, beware!
-						function(err, updated) {
-							if (err || !updated) {
-								console.log("Event could not be updated: " + err);
-								console.log(event.title);
-							} else {
-								changeNumbers.update++;
-							}
-						});
+					parallel.push(function(callback) {
+											db.events.update(
+												{XMLid: event.XMLid}, 
+												{$set: event },
+												function(err, updated) {
+													if (err || !updated) {
+														console.log("Event could not be updated: " + err);
+														console.log(event.title);
+													} else {
+														changeNumbers.update++;
+														callback();
+													}
+												});
+										});
 				});
-				console.log("Upload and saving progress ended successfully");
-				//should implement async parallel functions for this waiting for db functions
-				setTimeout(function() {
+
+				async.parallel(parallel, function() {
+					console.log("Upload and saving progress ended successfully");
 					res.writeHead(200);
 					res.write(changeNumbers.add + ' events added and ' + changeNumbers.update + ' events updated, upload and saving progress ended successfully.');
 					res.end();
-				}, 2 * 1000);
+				});
 			} catch(err) {
 				deleteAfterError(req.files.myFile.path);
 				res.writeHead(400);
