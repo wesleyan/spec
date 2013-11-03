@@ -7,20 +7,34 @@
         |_|                
 */
 // CONFIGURATION AND MODULES
+	var Preferences = {
+		//general preferences
+		debug: true, //making it false will overwrite console.log
+		path_last_xml: './uploads/last.xml',
+		port: 8080,
 
-	var debug = true; //making it false will overwrite console.log
+		//MongoDB preferences
+		databaseUrl: "127.0.0.1:27017/spec",
+		collections: ['events','staff']
+	}
+
 	require('ofe').call();
 	var express = require('express');
 	var app = express();
 	var $ = require('jquery');
 	var _ = require('underscore');
-	var databaseUrl = "127.0.0.1:27017/spec"; // "username:password@example.com/mydb"
-	var collections = ['events','staff']
-	var db = require("mongojs").connect(databaseUrl, collections);
+	var db = require("mongojs").connect(Preferences.databaseUrl, Preferences.collections);
 	var mongo = require('mongodb-wrapper');
 	var fs = require('fs');
 	var cas = require('./modules/grand_master_cas.js');
 
+	//CAS Configurations
+	cas.configure({
+		casHost: 'sso.wesleyan.edu',
+		ssl: true,
+		service: 'http://ims-dev.wesleyan.edu:8080/',
+		redirectUrl: '/login'
+	});
 	var async = require('async');
 
 	app.configure(function() {
@@ -34,9 +48,9 @@
 		app.use(express.static(__dirname + '/public'));
 	});
 	var ejs = require('ejs');
+	// Template engine tags are changed to {{ }} because underscore uses <% %> as well in the front end
 	ejs.open = '{{';
 	ejs.close = '}}';
-
 
 // STUFF TO LOAD AT INITIATION
 	//We can store all staff in memory, since it is not a big array and it will be used VERY frequently, will save time.
@@ -85,7 +99,6 @@
 	];
 
 // CAS SESSION MANAGEMENT
-
 	function getUser(req) {
 		return req.session.cas_user;
 	}
@@ -760,9 +773,10 @@
 			}
 		  res.render('upload');
 		});
-		var parser = require('xml2json');
+
 
 		app.post('/fileUpload', cas.blocker, function(req, res) {
+			var parser = require('xml2json');
 			if(permission(req) != 10) {
 				res.write(JSON.stringify(false).toString("utf-8"));
 				res.end();
@@ -773,7 +787,7 @@
 			try {
 				// Freshly uploaded XML and last.xml are read
 					var xml = fs.readFileSync(req.files.myFile.path);
-					var last = fs.readFileSync('./uploads/last.xml');
+					var last = fs.readFileSync(Preferences.path_last_xml);
 				// Both XML files are parsed
 					xml = parser.toJson(xml, {
 						object: true,
@@ -855,8 +869,8 @@
 
 				var changeNumbers = {add:0, update:0};
 				var parallel = [];
-
-				whatToChange.add.forEach(function(event) {
+				//push update functions in an array, in order to have a final callback function to end response after the async.parallel process
+				whatToChange.add.forEach(function(event) { 
 					parallel.push(function(callback) {
 											db.events.save(event, function(err, saved) {
 												if (err || !saved) {
@@ -891,44 +905,41 @@
 					res.writeHead(200);
 					res.write(changeNumbers.add + ' events added and ' + changeNumbers.update + ' events updated, upload and saving progress ended successfully.');
 					res.end();
+
+					// delete the old last.xml file and rename the new uploaded file as last.xml
+					(function(path) {
+						fs.unlink(Preferences.path_last_xml, function(err) {
+							if (err) {
+								console.log(err);
+								return false;
+							}
+							console.log('Old last.xml file successfully deleted');
+							fs.rename(path, Preferences.path_last_xml, function(err) {
+								if (err) throw err;
+								console.log('Uploaded file renamed to last.xml');
+							});
+						});
+					})(req.files.myFile.path);
 				});
-			} catch(err) {
-				deleteAfterError(req.files.myFile.path);
+			} catch (err) {
+				// delete the newly uploaded file because there is no need to store it
+				(function(path) {
+					fs.unlink(path, function(err) {
+						if (err) {
+							console.log(err);
+							return false;
+						}
+						console.log('File with error successfully deleted');
+					});
+				})(req.files.myFile.path);
 				res.writeHead(400);
 				res.end();
 				console.log(err);
 				return false;
 			}
-		  	renameAfterUpload(req.files.myFile.path);
-		  	
 		});
 
-		// Private functions
-		var deleteAfterError = function(path) {
-			setTimeout(function() {
-				fs.unlink(path, function(err) {
-					if (err) console.log(err);
-					console.log('File with error successfully deleted');
-				});
-			}, 60 * 1000 * 0.1); //stays there for 10 sec
-		};
-		var renameAfterUpload = function(path) {
-		  setTimeout( function(){
-		    fs.unlink('./uploads/last.xml', function(err) {
-		      if (err) {
-		      	console.log(err);
-		      	return false;
-		      }
-		      console.log('Old last.xml file successfully deleted');
-				fs.rename(path, './uploads/last.xml', function(err) {
-					if (err) throw err;
-					console.log('Uploaded file renamed to last.xml');
-				});
-			});
-		  }, 60 * 1000 * 0.1); //stays there for 10 sec
-		};
-
-//Main Page Rendering
+// MAIN PAGE RENDERING
 
 	app.get('/', cas.blocker, function (req, res) {
 		if(req.query.ticket) {res.redirect('/');} //redirect to the base if there is a ticket in the URL
@@ -984,7 +995,6 @@
 		});	
 	});
 	app.get('/m/event/:id', cas.blocker, function (req, res) {
-		
 		query = {};
 		$.extend(query, {'_id': new mongo.ObjectID(req.params.id)});
 		db.events.find(query, function(err, events) {
@@ -1013,23 +1023,15 @@
 			staff: userObj[0],
 		});
 	});
-	
 
 // STARTING THE SERVER
-	/*
+	/* //options for using SSL, not used right now
 	var options = {
 	        key: fs.readFileSync('../ssl-key.pem'),
 	        cert: fs.readFileSync('/etc/pki/tls/certs/ca-bundle.crt'),
 	        };
 	*/
-	cas.configure({
-		casHost: 'sso.wesleyan.edu',
-		ssl: true,
-		service: 'http://ims-dev.wesleyan.edu:8080/',
-		redirectUrl: '/login'
-	});
-	var port = 8080;
-	app.listen(port, function() {
-		console.log("Express server listening on port " + port);
-		if(debug == false) {console.log = function(){};} //cancel console logs if debug
+	app.listen(Preferences.port, function() {
+		console.log("Express server listening on port " + Preferences.port);
+		if(Preferences.debug == false) {console.log = function(){};} //cancel console logs if debug
 	});
