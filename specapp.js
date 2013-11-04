@@ -297,6 +297,17 @@
 			});
 	}
 
+	function gCalToFullCalendar(events) {
+		return _.map(events, function(event) {
+			return {
+				title: event.summary,
+				start: event.start.dateTime, //FullCalendar can parse ISO8601 date strings
+				end: event.end.dateTime,
+				backgroundColor: '#7F5417'
+			};
+		})
+	}
+
 	function overallGoogleCheck(req, callback) {
 		if (_.isUndefined(req.session.refresh_token)) {
 			//check the database for refresh token
@@ -305,7 +316,6 @@
 					console.log('There is an error when fetching refresh token for the user');
 					return false;
 				} else {
-					console.log(data);
 					if (_.isUndefined(data[0].refresh_token)) { //if there is no refresh token,
 						return false;
 					} else { //if there is one for the user
@@ -319,15 +329,20 @@
 		}
 	}
 	app.get('/gCalEvents', cas.blocker, function(req, res) {
+		var start = new Date(req.query.start * 1000);
+		var end = new Date(req.query.end * 1000);
+
 		var all = function() {
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
 			read_models(req, {
-				timeMin: (new Date).toISOString(),
-				timeMax: new Date((new Date).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+				timeMin: start.toISOString,
+				timeMax: end.toISOString,
+				//timeMin: (new Date).toISOString(), //today
+				//timeMax: new Date((new Date).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString(), //next week
 				success: function(items) {
-					res.write(JSON.stringify(items));
+					res.write(JSON.stringify(gCalToFullCalendar(items)));
 					res.end();
 				}
 			});

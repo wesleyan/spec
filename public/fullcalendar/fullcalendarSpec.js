@@ -3951,13 +3951,19 @@ function AgendaEventRenderer() {
 	
 	
 	function slotSegHtml(event, seg) {
-		//NED Event start and end times modification -> big edit
+		//Spec Event start and end times modification -> big edit
 		var start = Date.parse(event.start);
 		var end = Date.parse(event.end);
-		var eventStart = Date.parse(event.eventStart);
-		var eventEnd = Date.parse(event.eventEnd);
-		var topPercentage = ((start - eventStart) / (start - end)) * 100;
-		var bottomPercentage = ((eventEnd - end) / (start - end)) * 100;
+		var topPercentage, bottomPercentage
+		if(typeof event.eventStart !== 'undefined' && typeof event.eventEnd !== 'undefined') {
+			var eventStart = Date.parse(event.eventStart);
+			var eventEnd = Date.parse(event.eventEnd);
+			topPercentage = ((start - eventStart) / (start - end)) * 100;
+			bottomPercentage = ((eventEnd - end) / (start - end)) * 100;
+		} else {
+			topPercentage = 0;
+			bottomPercentage = 0;
+		}
 		//modification end
 
 		var html = "<";
