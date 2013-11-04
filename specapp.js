@@ -189,12 +189,7 @@
 						options.success(calendar.items);
 				});
 		}
-		if (req.session.refresh_token) {
-			all();
-		} else {
-			//fetch the refresh token from the db for that given user, all() after getting token
-			//if there is no refresh token for that user, redirect to /authorize
-		}
+		overallGoogleCheck(req, function() {all();});
 	}
 
 	// Fetch access & refresh token
@@ -240,18 +235,30 @@
 								} else { //Now we have the calendar owner and readers, let's check it
 									//find owner, delete 'user:' from id, split to check the user name and domain
 									var user = (_.findWhere(names.items, {'role':'owner'}))['id'].substr(5).split('@'); 
-									if(user[1] === 'wesleyan.edu' && staffUsernameArray.indexOf(user[0]) !== -1) {
-										console.log(user[0] + ' is in Wesleyan domain and in our staff list');
+									if(user[1] === 'wesleyan.edu' && staffUsernameArray.indexOf(user[0]) !== -1 && getUser(req) === user[0]) {
+										console.log(user[0] + ' is in Wesleyan domain and in our staff list, and the logged in user');
 										req.session.credentials = tokens;
-										// If refresh token does not exist, update
-										if (_.isUndefined(req.session.refresh_token)) {
-											req.session.refresh_token = tokens.refresh_token;
-										}
+										req.session.refresh_token = tokens.refresh_token;
+
 										//register the refresh token to the database, for that user
+										db.staff.update( 
+											{username: getUser(req)},
+											{ $set: {'refresh_token': tokens.refresh_token } }, 
+											function(err, updated) {
+												if (err || !updated) {
+													console.log("Refresh token not updated:" + err);
+												} else {
+													console.log("Refresh token updated for " + getUser(req));
+													res.write(JSON.stringify(true).toString("utf-8"));
+													res.end();
+												}
+											});
+										
 										res.redirect('/gCalEvents');
 									} else {
 										// should explain the user that they have to use their valid wesleyan.edu accounts
 										// 		or they are not registered in the Spec system.
+										console.log('Something is wrong with this user ' + getUser(req));
 										res.redirect('/authorize');
 									}
 								}
@@ -263,7 +270,7 @@
 
 	// Refreshes access_token
 
-	function refreshAccessToken(options, req) {
+	function refreshAccessToken(options, req, callback) {
 		console.log("Refreshing OAuth access token.");
 		// check if there is credentials registered in session - (access token expired in usage time)
 		// if not(access token expired already) db query to fetch the refresh token for that user
@@ -288,20 +295,27 @@
 					options.error(true);
 				} else if (body.access_token) {
 					req.session.credentials = body;
+					if(_.isFunction(callback)){ callback(); }
 				}
 			});
 	}
 
-	function overallGoogleCheck() {
+	function overallGoogleCheck(req, callback) {
 		if (_.isUndefined(req.session.refresh_token)) {
 			//check the database for refresh token
+			db.staff.find({username:getUser(req)}, function(err, data) {
 				if(err || !data) {
-					//if there is no refresh token,
-					res.redirect('/authorize');
+					console.log('There is an error when fetching refresh token for the user');
+					res.redirect('/');
 				} else {
-					//if there is one for the user
-					refreshAccessToken();
+					if (_.isUndefined(data[0].refresh_token)) { //if there is no refresh token,
+						res.redirect('/authorize');
+					} else { //if there is one for the user
+						req.session.refresh_token = data[0].refresh_token;
+						refreshAccessToken({}, req, callback);
+					}
 				}
+			});
 		} else if(_.isUndefined(req.session.credentials)) {
 			refreshAccessToken();
 		} else {
