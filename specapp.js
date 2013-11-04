@@ -146,7 +146,7 @@
 	}
 
 	// TODO: Replace with or add a button on frontend
-	app.get('/authorize', function(req, res) {
+	app.get('/authorize', cas.blocker, function(req, res) {
 		//if we have the refresh token for the user, then we just need to refreshAccessToken, otherwise take permission
 		var oauth2Client = new OAuth2Client(oauth_cache.web.client_id, oauth_cache.web.client_secret, REDIRECT_URL);
 		getFirstToken(oauth2Client, app, req, res);
@@ -206,7 +206,7 @@
 
 		// After user authentication
 		// Google responds with an access "code"
-		app.get('/oauth2callback', function(req, res) {
+		app.get('/oauth2callback', cas.blocker, function(req, res) {
 			oauth2Client.getToken(req.query.code, function(err, tokens) {
 				//We should check if the user is in wesleyan.edu domain and if ze is registered in our system
 				googleapis.discover('calendar', 'v3').withOpts({cache: {path: './config'}})
@@ -301,15 +301,15 @@
 		if (_.isUndefined(req.session.refresh_token)) {
 			//check the database for refresh token
 			db.staff.find({username:getUser(req)}, function(err, data) {
-				if(err || !data) {
+				if(err || !data || data.length < 1) {
 					console.log('There is an error when fetching refresh token for the user');
 					return false;
 				} else {
 					console.log(data);
-					if (_.isUndefined(data.refresh_token)) { //if there is no refresh token,
+					if (_.isUndefined(data[0].refresh_token)) { //if there is no refresh token,
 						return false;
 					} else { //if there is one for the user
-						req.session.refresh_token = data.refresh_token;
+						req.session.refresh_token = data[0].refresh_token;
 						refreshAccessToken({}, req, callback);
 					}
 				}
@@ -318,7 +318,7 @@
 			if(_.isFunction(callback)){ callback(); }
 		}
 	}
-	app.get('/gCalEvents', function(req, res) {
+	app.get('/gCalEvents', cas.blocker, function(req, res) {
 		var all = function() {
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
