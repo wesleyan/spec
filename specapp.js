@@ -189,7 +189,7 @@
 						options.success(calendar.items);
 				});
 		}
-		overallGoogleCheck(req, function() {all();});
+		overallGoogleCheck(req, res, function() {all();});
 	}
 
 	// Fetch access & refresh token
@@ -300,7 +300,7 @@
 			});
 	}
 
-	function overallGoogleCheck(req, callback) {
+	function overallGoogleCheck(req, res, callback) {
 		if (_.isUndefined(req.session.refresh_token)) {
 			//check the database for refresh token
 			db.staff.find({username:getUser(req)}, function(err, data) {
