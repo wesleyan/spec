@@ -164,32 +164,29 @@
 	}
 	// Fetches calendar objects from Google calendar
 	function getCalendar(client, authClient, userId, options, req) {
-		var all = function() {
-			client.calendar.events.list({
-					calendarId: 'primary',
-					//maxResults: 5,
-					orderBy: "startTime",
-					singleEvents: true,
-					timeMin: options.timeMin,
-					timeMax: options.timeMax,
-					fields: "items(end,start,summary,description),summary"
-				})
-				.withAuthClient(authClient)
-				.execute(function(err, calendar) {
-					if (err) {
-						// TODO: After the access_token is refreshed, there should be a new attempt to getCalendar
-						if (err.message == "Invalid Credentials") {
-							console.log("Invalid OAuth credentials");
-							refreshAccessToken(options, req);
-						} else {
-							console.log("An error occurred!\n", err);
-							options.error(true);
-						}
-					} else
-						options.success(calendar.items);
-				});
-		}
-		overallGoogleCheck(req, res, function() {all();});
+		client.calendar.events.list({
+				calendarId: 'primary',
+				//maxResults: 5,
+				orderBy: "startTime",
+				singleEvents: true,
+				timeMin: options.timeMin,
+				timeMax: options.timeMax,
+				fields: "items(end,start,summary,description),summary"
+			})
+			.withAuthClient(authClient)
+			.execute(function(err, calendar) {
+				if (err) {
+					// TODO: After the access_token is refreshed, there should be a new attempt to getCalendar
+					if (err.message == "Invalid Credentials") {
+						console.log("Invalid OAuth credentials");
+						refreshAccessToken(options, req);
+					} else {
+						console.log("An error occurred!\n", err);
+						options.error(true);
+					}
+				} else
+					options.success(calendar.items);
+			});
 	}
 
 	// Fetch access & refresh token
@@ -300,45 +297,46 @@
 			});
 	}
 
-	function overallGoogleCheck(req, res, callback) {
+	function overallGoogleCheck(req, callback) {
 		if (_.isUndefined(req.session.refresh_token)) {
 			//check the database for refresh token
 			db.staff.find({username:getUser(req)}, function(err, data) {
 				if(err || !data) {
 					console.log('There is an error when fetching refresh token for the user');
-					res.redirect('/');
+					return false;
 				} else {
 					if (_.isUndefined(data[0].refresh_token)) { //if there is no refresh token,
-						res.redirect('/authorize');
+						return false;
 					} else { //if there is one for the user
 						req.session.refresh_token = data[0].refresh_token;
 						refreshAccessToken({}, req, callback);
 					}
 				}
 			});
-		} else if(_.isUndefined(req.session.credentials)) {
-			refreshAccessToken();
 		} else {
-			res.redirect('/gCalEvents');
+			if(_.isFunction(callback)){ callback(); }
 		}
 	}
 	app.get('/gCalEvents', function(req, res) {
-		if (_.isUndefined(req.session.refresh_token)) {
-			res.write(JSON.stringify(false));
+		var all = function() {
+			res.writeHead(200, {
+				'Content-Type': 'application/json'
+			});
+			read_models(req, {
+				timeMin: (new Date).toISOString(),
+				timeMax: new Date((new Date).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+				success: function(items) {
+					res.write(JSON.stringify(items));
+					res.end();
+				}
+			});
+		}
+		if(overallGoogleCheck(req, all) === false) {
+			res.write(JSON.stringify(false).toString("utf-8"));
 			res.end();
 			return false;
 		}
-		res.writeHead(200, {
-			'Content-Type': 'application/json'
-		});
-		read_models(req, {
-			timeMin: (new Date).toISOString(),
-			timeMax: new Date((new Date).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-			success: function(items) {
-				res.write(JSON.stringify(items));
-				res.end();
-			}
-		});
+
 	});
 
 // EVENTS
