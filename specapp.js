@@ -205,7 +205,7 @@
 		var oauthOptions = {access_type: 'offline', scope: 'https://www.googleapis.com/auth/calendar'};
 
 		// Prompt for consent page if no valid refresh token
-		if (_.isUndefined(req.session.refresh_token)) {
+		if (typeof req.session.refresh_token === 'undefined') {
 			oauthOptions.prompt = 'consent';
 		}
 
@@ -244,7 +244,7 @@
 										console.log(user[0] + ' is in Wesleyan domain');
 										req.session.credentials = tokens;
 										// If refresh token does not exist, update
-										if (_.isUndefined(req.session.refresh_token)) {
+										if (typeof req.session.refresh_token === 'undefined') {
 											req.session.refresh_token = tokens.refresh_token;
 										}
 										//register the refresh token to the database, for that user
@@ -293,7 +293,7 @@
 	}
 
 	function overallGoogleCheck() {
-		if (_.isUndefined(req.session.refresh_token)) {
+		if (typeof req.session.refresh_token === 'undefined') {
 			//check the database for refresh token
 				if(err || !data) {
 					//if there is no refresh token,
@@ -302,14 +302,16 @@
 					//if there is one for the user
 					refreshAccessToken();
 				}
-		} else if(_.isUndefined(req.session.credentials)) {
+		} else if(typeof req.session.credentials === 'undefined') {
 			refreshAccessToken();
 		} else {
 			res.redirect('/gCalEvents');
 		}
 	}
 	app.get('/gCalEvents', function(req, res) {
-		if (_.isUndefined(req.session.refresh_token)) {
+		if (typeof req.session.refresh_token === 'undefined') {
+			res.write(JSON.stringify(false));
+			res.end();
 			return false;
 		}
 		res.writeHead(200, {
