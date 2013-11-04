@@ -205,7 +205,7 @@
 		var oauthOptions = {access_type: 'offline', scope: 'https://www.googleapis.com/auth/calendar'};
 
 		// Prompt for consent page if no valid refresh token
-		if (typeof req.session.refresh_token === 'undefined') {
+		if (_.isUndefined(req.session.refresh_token)) {
 			oauthOptions.prompt = 'consent';
 		}
 
@@ -240,11 +240,11 @@
 								} else { //Now we have the calendar owner and readers, let's check it
 									//find owner, delete 'user:' from id, split to check the user name and domain
 									var user = (_.findWhere(names.items, {'role':'owner'}))['id'].substr(5).split('@'); 
-									if(user[1] === 'wesleyan.edu' && staffUsernameArray.indexOf(user[0]) === -1) {
-										console.log(user[0] + ' is in Wesleyan domain');
+									if(user[1] === 'wesleyan.edu' && staffUsernameArray.indexOf(user[0]) !== -1) {
+										console.log(user[0] + ' is in Wesleyan domain and in our staff list');
 										req.session.credentials = tokens;
 										// If refresh token does not exist, update
-										if (typeof req.session.refresh_token === 'undefined') {
+										if (_.isUndefined(req.session.refresh_token)) {
 											req.session.refresh_token = tokens.refresh_token;
 										}
 										//register the refresh token to the database, for that user
@@ -293,7 +293,7 @@
 	}
 
 	function overallGoogleCheck() {
-		if (typeof req.session.refresh_token === 'undefined') {
+		if (_.isUndefined(req.session.refresh_token)) {
 			//check the database for refresh token
 				if(err || !data) {
 					//if there is no refresh token,
@@ -302,14 +302,14 @@
 					//if there is one for the user
 					refreshAccessToken();
 				}
-		} else if(typeof req.session.credentials === 'undefined') {
+		} else if(_.isUndefined(req.session.credentials)) {
 			refreshAccessToken();
 		} else {
 			res.redirect('/gCalEvents');
 		}
 	}
 	app.get('/gCalEvents', function(req, res) {
-		if (typeof req.session.refresh_token === 'undefined') {
+		if (_.isUndefined(req.session.refresh_token)) {
 			res.write(JSON.stringify(false));
 			res.end();
 			return false;
