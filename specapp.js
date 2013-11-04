@@ -251,7 +251,7 @@
 												}
 											});
 										
-										res.redirect('/gCalEvents');
+										res.redirect('/');
 									} else {
 										// should explain the user that they have to use their valid wesleyan.edu accounts
 										// 		or they are not registered in the Spec system.
@@ -328,7 +328,7 @@
 			if(_.isFunction(callback)){ callback(); }
 		}
 	}
-	app.get('/gCalEvents', cas.blocker, function(req, res) {
+	app.get('/gCalEvents/', cas.blocker, function(req, res) {
 		var start = new Date(req.query.start * 1000);
 		var end = new Date(req.query.end * 1000);
 
@@ -337,8 +337,8 @@
 				'Content-Type': 'application/json'
 			});
 			read_models(req, {
-				timeMin: start.toISOString,
-				timeMax: end.toISOString,
+				timeMin: start.toISOString(),
+				timeMax: end.toISOString(),
 				//timeMin: (new Date).toISOString(), //today
 				//timeMax: new Date((new Date).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString(), //next week
 				success: function(items) {
