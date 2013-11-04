@@ -144,6 +144,19 @@ Spec = {
 				ignoreTimezone: false
 			};
 	}, //end eventSource
+	gCalEventSource: {
+		url: 'gCalEvents/',
+		ignoreTimezone: false
+	}, //end gCalEventSource
+	boolGCal: false;
+	toggleGCalEvents: function() {
+		if(Spec.boolGCal === false) {
+			$('#calendar').fullCalendar('addEventSource', Spec.gCalEventSource);
+		} else {
+			$('#calendar').fullCalendar('removeEventSource', Spec.gCalEventSource);
+		}
+		Spec.boolGCal = !Spec.boolGCal;
+	}, //end toggleGCalEvents
 	refetchEvents: function() {
 		$('#calendar').fullCalendar('changeView', 'month');
 		$('#calendar').fullCalendar('removeEvents'); //for fetching the whole month events
