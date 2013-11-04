@@ -148,7 +148,7 @@ Spec = {
 		url: 'gCalEvents/',
 		ignoreTimezone: false
 	}, //end gCalEventSource
-	boolGCal: false;
+	boolGCal: false,
 	toggleGCalEvents: function() {
 		if(Spec.boolGCal === false) {
 			$('#calendar').fullCalendar('addEventSource', Spec.gCalEventSource);
