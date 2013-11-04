@@ -130,6 +130,201 @@
 		res.end();
 	});
 
+// GOOGLE CALENDAR INTEGRATION
+	var request = require('request');
+	var googleapis = require('googleapis');
+
+	var OAuth2Client = googleapis.OAuth2Client;
+	var oauth_cache = {};
+
+	//this one must match with the one you have saved in https://code.google.com/apis/console
+	var REDIRECT_URL = 'http://ims-dev.wesleyan.edu:8080/oauth2callback'; 
+	try {
+	oauth_cache = JSON.parse(fs.readFileSync('./config/client_secret.json', 'utf8'));
+	} catch (e) {
+		console.log("Could not read client_secrets.json from the config directory\nError: " + e);
+	}
+
+	// TODO: Replace with or add a button on frontend
+	app.get('/authorize', function(req, res) {
+		//if we have the refresh token for the user, then we just need to refreshAccessToken, otherwise take permission
+		var oauth2Client = new OAuth2Client(oauth_cache.web.client_id, oauth_cache.web.client_secret, REDIRECT_URL);
+		getFirstToken(oauth2Client, app, req, res);
+	});
+
+
+	// Requests list and sends response to collection
+	var read_models = function(req, options) {
+		googleapis.discover('calendar', 'v3').withOpts({cache: {path: './config'}})
+			.execute(function(err, client) {
+				var auth = new OAuth2Client();
+				auth.credentials = req.session.credentials;
+				getCalendar(client, auth, 'me', options, req);
+			});
+	}
+	// Fetches calendar objects from Google calendar
+	function getCalendar(client, authClient, userId, options, req) {
+		var all = function() {
+			client.calendar.events.list({
+					calendarId: 'primary',
+					//maxResults: 5,
+					orderBy: "startTime",
+					singleEvents: true,
+					timeMin: options.timeMin,
+					timeMax: options.timeMax(),
+					fields: "items(end,start,summary,description),summary"
+				})
+				.withAuthClient(authClient)
+				.execute(function(err, calendar) {
+					if (err) {
+						// TODO: After the access_token is refreshed, there should be a new attempt to getCalendar
+						if (err.message == "Invalid Credentials") {
+							console.log("Invalid OAuth credentials");
+							refreshAccessToken(options, req);
+						} else {
+							console.log("An error occurred!\n", err);
+							options.error(true);
+						}
+					} else
+						options.success(calendar.items);
+				});
+		}
+		if (req.session.refresh_token) {
+			all();
+		} else {
+			//fetch the refresh token from the db for that given user, all() after getting token
+			//if there is no refresh token for that user, redirect to /authorize
+		}
+	}
+
+	// Fetch access & refresh token
+		/* this function is only for the first time to fetch access & refresh tokens
+		if there is a refresh token registered for that user but no valid access token, you need to use refreshAccessToken function*/
+	function getFirstToken(oauth2Client, app, req, res) {
+		// OAuth options
+		var oauthOptions = {access_type: 'offline', scope: 'https://www.googleapis.com/auth/calendar'};
+
+		// Prompt for consent page if no valid refresh token
+		if (typeof req.session.refresh_token === 'undefined') {
+			oauthOptions.prompt = 'consent';
+		}
+
+		// Generate request URL and redirect user
+		res.redirect(oauth2Client.generateAuthUrl(oauthOptions));
+
+		// After user authentication
+		// Google responds with an access "code"
+		app.get('/oauth2callback', function(req, res) {
+			oauth2Client.getToken(req.query.code, function(err, tokens) {
+				//We should check if the user is in wesleyan.edu domain and if ze is registered in our system
+				googleapis.discover('calendar', 'v3').withOpts({cache: {path: './config'}})
+					.execute(function(err, client) {
+						var auth = new OAuth2Client();
+						auth.credentials = tokens;
+						client
+							.calendar.acl.list({
+								calendarId: 'primary',
+								fields: "items(id,role)"
+							})
+							.withAuthClient(auth)
+							.execute(function(err, names) {
+								if (err) {
+									// TODO: After the access_token is refreshed, there should be a new attempt to getCalendar
+									if (err.message == "Invalid Credentials") {
+										console.log("Invalid OAuth credentials");
+										refreshAccessToken(options, req);
+									} else {
+										console.log("An error occurred!\n", err);
+										options.error(true);
+									}
+								} else { //Now we have the calendar owner and readers, let's check it
+									//find owner, delete 'user:' from id, split to check the user name and domain
+									var user = (_.findWhere(names.items, {'role':'owner'}))['id'].substr(5).split('@'); 
+									if(user[1] === 'wesleyan.edu'/* && staffUsernameArray.indexOf(user[0]) === -1*/) {
+										console.log(user[0] + ' is in Wesleyan domain');
+										req.session.credentials = tokens;
+										// If refresh token does not exist, update
+										if (typeof req.session.refresh_token === 'undefined') {
+											req.session.refresh_token = tokens.refresh_token;
+										}
+										//register the refresh token to the database, for that user
+										res.redirect('/gCalEvents');
+									} else {
+										// should explain the user that they have to use their valid wesleyan.edu accounts
+										// 		or they are not registered in the Spec system.
+										res.redirect('/authorize');
+									}
+								}
+							});
+					});
+			});			
+		});
+	}
+
+	// Refreshes access_token
+
+	function refreshAccessToken(options, req) {
+		console.log("Refreshing OAuth access token.");
+		// check if there is credentials registered in session - (access token expired in usage time)
+		// if not(access token expired already) db query to fetch the refresh token for that user
+		request.post(
+			'https://accounts.google.com/o/oauth2/token', {
+				form: {
+					client_id: oauth_cache.web.client_id,
+					client_secret: oauth_cache.web.client_secret,
+					refresh_token: req.session.refresh_token,
+					grant_type: 'refresh_token'
+				}
+			},
+			function(error, response) {
+				if (error) {
+					console.log('Could not refresh OAuth tokens!\n', error);
+				}
+
+				// Parse body of http response
+				var body = JSON.parse(response.body);
+				if (body.error) {
+					console.log("Refreshing OAuth token failed!\n", body.error);
+					options.error(true);
+				} else if (body.access_token) {
+					req.session.credentials = body;
+				}
+			});
+	}
+
+	function overallGoogleCheck() {
+		if (typeof req.session.refresh_token === 'undefined') {
+			//check the database for refresh token
+				if(err || !data) {
+					//if there is no refresh token,
+					res.redirect('/authorize');
+				} else {
+					//if there is one for the user
+					refreshAccessToken();
+				}
+		} else if(typeof req.session.credentials === 'undefined') {
+			refreshAccessToken();
+		} else {
+			res.redirect('/gCalEvents');
+		}
+	}
+	app.get('/gCalEvents', function(req, res) {
+		if (typeof req.session.refresh_token === 'undefined') {
+			return false;
+		}
+		res.writeHead(200, {
+			'Content-Type': 'application/json'
+		});
+		read_models(req, {
+			timeMin: (new Date).toISOString(),
+			timeMax: new Date((new Date).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+			success: function(items) {
+				res.write(JSON.stringify(items));
+				res.end();
+			}
+		});
+	});
+
 // EVENTS
 	var date = new Date();
 	//var diff = date.getTimezoneOffset()/60;
