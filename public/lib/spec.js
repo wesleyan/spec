@@ -676,7 +676,7 @@ $(document).ready(function() {
 					'start': res.start,
 					'end': res.end,
 					'staff': chosenStaff,
-					'staffname': $('.combobox').val().substring(0, $('.combobox').val().indexOf('(')-1),
+					'staffname': $('#staffInput').val().substring(0, $('#staffInput').val().indexOf('(')-1),
 				};
 			var each_staff_view2 = new Spec.View.EachStaff({ //Backbone new note view used
 				'item': newShift

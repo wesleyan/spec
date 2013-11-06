@@ -1170,10 +1170,12 @@
 
 	app.get('/', cas.blocker, function (req, res) {
 		if(req.query.ticket) {res.redirect('/');} //redirect to the base if there is a ticket in the URL
+		  var currentUser = _.findWhere(app.locals.storeStaff, { 'username': getUser(req) };
 		  res.render('index',
 			{
-				username: getUser(req),
-				permission: permission(req),
+				username: currentUser.username,
+				permission: currentUser.level,
+				staffname: currentUser.name,
 			});
 		});
 
