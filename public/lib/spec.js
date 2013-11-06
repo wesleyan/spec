@@ -150,13 +150,12 @@ Spec = {
 	}, //end gCalEventSource
 	boolGCal: false,
 	toggleGCalEvents: function() {
-		Spec.boolGCal = !Spec.boolGCal;
 		if(Spec.boolGCal === false) {
 			$('#calendar').fullCalendar('addEventSource', Spec.gCalEventSource);
 		} else {
 			$('#calendar').fullCalendar('removeEventSource', Spec.gCalEventSource);
 		}
-		
+		Spec.boolGCal = !Spec.boolGCal;
 	}, //end toggleGCalEvents
 	refetchEvents: function() {
 		$('#calendar').fullCalendar('changeView', 'month');
@@ -472,6 +471,7 @@ $(document).ready(function() {
 
 	// JQUERY EVENTS
 	$('#gCalButton').click(function(e) {
+		$('#gCalButton').toggleClass('active');
 		Spec.toggleGCalEvents();
 	});
 	$('#eventButton').click(function(e) {
