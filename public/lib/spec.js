@@ -646,7 +646,7 @@ $(document).ready(function() {
 		return false;
 	});
 	$('body').on('click','#addNewStaff',function(e) {
-		if($('#staffInput').val() == '') {
+		if($('.combobox').val() == '') {
 			$.bootstrapGrowl("You must choose a staff to add a valid shift.", {
 			  type: 'error',
 			  align: 'center',
@@ -654,7 +654,12 @@ $(document).ready(function() {
 			});
 			return false;		
 		}
-			var chosenStaff = $('#staffInput').val().match(/\(([^)]+)\)/)[1];
+			var chosenStaff;
+			try {
+				$('#staffInput').val().match(/\(([^)]+)\)/)[1];
+			} catch(e) {
+				$('.combobox').val().match(/\(([^)]+)\)/)[1];
+			}
 		$.ajax({
 			type: "POST",
 			url: "staff/add",
