@@ -316,9 +316,11 @@
 							if(err || !data || data.length < 1) {
 								console.log('There is an error when fetching refresh token for the user');
 								everythingOK = false;
+								return;
 							} else {
 								if (_.isUndefined(data[0].refresh_token)) { //if there is no refresh token,
 									everythingOK = false;
+									return;
 								} else { //if there is one for the user
 									req.session.refresh_token = data[0].refresh_token;
 									refreshAccessToken({}, req, callback);
@@ -326,6 +328,7 @@
 								}
 							}
 						});
+			console.log(everythingOK);
 			return everythingOK;
 		} else {
 			if(_.isFunction(callback)){ callback(); }
