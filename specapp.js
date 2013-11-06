@@ -1137,7 +1137,7 @@
 																	console.log(event.title);
 																} else {
 																	changeNumbers.update++;
-																	whatToReport.remove.push(updated);
+																	whatToReport.update.push(event.XMLid);
 																	callback();
 																}
 															});
@@ -1154,7 +1154,7 @@
 																	console.log(event.title);
 																} else {
 																	changeNumbers.remove++;
-																	whatToReport.remove.push(removed);
+																	whatToReport.remove.push(event.XMLid);
 																	callback();
 																}
 															});
@@ -1186,15 +1186,17 @@
 							});
 						} catch (err) {
 							// delete the newly uploaded file because there is no need to store it
-							(function(path) {
-								fs.unlink(path, function(err) {
-									if (err) {
-										console.log(err);
-										return false;
-									}
-									console.log('File with error successfully deleted');
-								});
-							})(req.files.myFile.path);
+							if(!_.isUndefined(req.files.myFile)) { //if there is actually a file, then delete it
+								(function(path) {
+									fs.unlink(path, function(err) {
+										if (err) {
+											console.log(err);
+											return false;
+										}
+										console.log('File with error successfully deleted');
+									});3
+								})(req.files.myFile.path);
+							}
 							res.writeHead(400);
 							res.end();
 							console.log(err);
@@ -1208,9 +1210,15 @@
 
 		//this will send messages to the managers and the people who are registered in those events
 		function reportUpdate(whatToReport) {
-			console.log(whatToReport);
+			//we have an object {update:[], remove:[]}, and the arrays have the XMLid's of these events, we need to find the people involved
+			whatToReport.update.forEach(function(id) {
+				db.events.find({'XMLid':id}, function(err, event) {
+					console.log(event);
+				});
+			});
+
 		}
-		
+
 // MAIN PAGE RENDERING
 
 	app.get('/', cas.blocker, function (req, res) {

@@ -52,6 +52,7 @@
       };
       
       $('input[type="submit"]').on('click', function(evt) {
+        if(('#myFile').val() == '') {return false;} //don't allow ajax if there is no file
         evt.preventDefault();
         $('div.progress').show();
         var formData = new FormData();
