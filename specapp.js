@@ -869,7 +869,6 @@
 					query['shifts']['staff'] = getUser(req);
 				}
 				console.log("Req for removing shift ID " + req.body.id + " from Event ID " + req.body.eventid);
-				
 				db.events.update(
 					{_id: new mongo.ObjectID(req.body.eventid)},
 					{ $pull: query }, 
