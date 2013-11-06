@@ -314,11 +314,11 @@
 				db.staff.find({username:getUser(req)}, function(err, data) {
 							if(err || !data || data.length < 1) {
 								console.log('There is an error when fetching refresh token for the user');
-								res.redirect('/authorize');
+								res.status(404).send('Not found');
 								return;
 							} else {
 								if (_.isUndefined(data[0].refresh_token)) { //if there is no refresh token,
-									res.redirect('/authorize');
+									res.status(404).send('Not found');
 									return;
 								} else { //if there is one for the user
 									req.session.refresh_token = data[0].refresh_token;
