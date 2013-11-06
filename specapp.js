@@ -1186,7 +1186,7 @@
 							});
 						} catch (err) {
 							// delete the newly uploaded file because there is no need to store it
-							if(!_.isUndefined(req.files.myFile)) { //if there is actually a file, then delete it
+							if(!_.isUndefined(req.files)) { //if there is actually a file, then delete it
 								(function(path) {
 									fs.unlink(path, function(err) {
 										if (err) {
@@ -1194,7 +1194,7 @@
 											return false;
 										}
 										console.log('File with error successfully deleted');
-									});3
+									});
 								})(req.files.myFile.path);
 							}
 							res.writeHead(400);
