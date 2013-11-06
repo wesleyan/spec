@@ -347,10 +347,10 @@
 			<tr>
 				<td>
 					{{ if(permission == 10) { }}
-						<select class="combobox input-medium" name="normal">
+						<select class="combobox input-medium" name="normal" id="staffInput">
 						</select>
 					{{ } else { }}
-						<input class="input-medium" id="disabledInput" type="text" value="({{=username}})" disabled>
+						<input id="staffInput" class="input-medium" id="disabledInput" type="text" value="({{=username}})" disabled>
 					{{ } }}
 				</td>
 				<td>
