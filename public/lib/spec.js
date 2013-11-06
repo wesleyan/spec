@@ -138,11 +138,13 @@ Spec = {
 	    temp =null;
 	    return str;
 	}, //end decodeEntries
-	eventSource: function() { 
-		return {
+	generateEventSource: function() { 
+		var result = {
 				url: 'events/?filter=' + Spec.filter, // Shows all events BUT need it to show only events to certain location
 				ignoreTimezone: false
 			};
+		Spec.lastEventSource = result;
+		return result;
 	}, //end eventSource
 	gCalEventSource: {
 		url: 'gCalEvents/',
@@ -158,13 +160,13 @@ Spec = {
 		Spec.boolGCal = !Spec.boolGCal;
 	}, //end toggleGCalEvents
 	refetchEvents: function() {
-		$('#calendar').fullCalendar('changeView', 'month');
-		$('#calendar').fullCalendar('removeEvents'); //for fetching the whole month events
-		$('#calendar').fullCalendar('addEventSource', Spec.eventSource());
+		$('#calendar').fullCalendar('removeEventSource', Spec.lastEventSource); //for fetching the whole month events
+		$('#calendar').fullCalendar('changeView', 'month'); //this should be after removing to avoid unnecessary ajax requests
+		$('#calendar').fullCalendar('addEventSource', Spec.generateEventSource());
 		$('#calendar').fullCalendar('changeView', 'agendaWeek');
 	}, //end refetchEvents
 	techTemplateUpdate: function() {
-		if(Spec.lastClickedEvent.duration == false) {
+		if(Spec.lastClickedEvent.duration === false) {
 	    	$('#technician').html('<b>setup and breakdown</b> only.');
 	    } else {
 	    	$('#technician').html('<b>duration of event</b>.');
@@ -174,179 +176,179 @@ Spec = {
 //User info must be imported for this part
 
 // BACKBONE.JS ROUTER SECTION
-var AppRouter = Backbone.Router.extend({
-	routes: {
-		"printToday": "printToday",
-		"*filter": "all"
-	}
-});
+	var AppRouter = Backbone.Router.extend({
+		routes: {
+			"printToday": "printToday",
+			"*filter": "all"
+		}
+	});
 
-Spec.app = new AppRouter;
+	Spec.app = new AppRouter;
 
-Spec.app.on('route:printToday', function() {
-	console.log('printToday');
-});
+	Spec.app.on('route:printToday', function() {
+		console.log('printToday');
+	});
 
-Spec.app.on('route:all', function(filter) {
-	Spec.dropdownActiveFix();
-	Spec.filter = filter;
-	Spec.refetchEvents();
-	console.log(filter);
-});
+	Spec.app.on('route:all', function(filter) {
+		Spec.dropdownActiveFix();
+		Spec.filter = filter;
+		Spec.refetchEvents();
+		console.log(filter);
+	});
 
-Backbone.history.start();
+	Backbone.history.start();
 
 // BACKBONE.JS VIEWS Spec.View.*
-_.templateSettings.variable = "op";
-$.fn.editable.defaults.mode = 'inline';   //toggle `popup` / `inline` mode
-Spec.View.Edit = Backbone.View.extend({
-        initialize: function(){
-            this.render();
-            Spec.storeEdited = {};
-		    $('#title').editable();
-		    $('#desc').editable({
-		        title: 'Description',
-		        rows: 4
-		    });
-		    $('#loc').editable();
-		     $('#startDate').editable({
-		        format: 'yyyy-mm-dd',    
-		        viewformat: 'mm/dd/yyyy',    
-		        datepicker: {
-		                weekStart: 1
-		           }
-			});
-	     	$('.bootstrap-timepicker input').timepicker({
-			});
-			$('.bootstrap-timepicker input').on('show.timepicker', function(e) {
-				$(this).prev().toggle();
-			});
-			$('#editSpinner').spinner();
-
-
-			$('.x-edit-event').on('save', function(e, params) {
-				var result = {};
-				result[this.id] = params.newValue;
-			    $.extend(Spec.storeEdited, result)
-			});
-
-        },
-        render: function(){
-            var variables = { event: Spec.lastClickedEvent};
-            var template = _.template( $("#edit_template").html(), variables );
-            $("#editEvent .modal-body").html( template );
-        }
-    });
-
-Spec.View.Remove = Backbone.View.extend({
-        initialize: function(){
-            this.render();
-        },
-        render: function(){
-            var variables = { event: Spec.lastClickedEvent};
-            var template = _.template( $("#remove_template").html(), variables );
-            $("#removeEvent").html( template );
-        }
-    });
-
-Spec.View.Notes = Backbone.View.extend({
-        initialize: function(options){
-            this.render(options);
-            options.notes.forEach(function(note) {
-            	var each_note_view = new Spec.View.EachNote(note);
-            });
-        },
-        render: function(options){
-            var variables = { eventid: Spec.lastClickedEvent['_id'], notes: options.notes };
-            var template = _.template( $("#notes_template").html(), variables );
-            $("#notes").html( template );
-        }
-    });
-
-Spec.View.EachNote = Backbone.View.extend({
-        initialize: function(note){
-            this.render(note);
-            var removedItem;
-        },
-        render: function(note){
-            var variables = { eventid: Spec.lastClickedEvent['_id'], 'note': note };
-            var template = _.template( $("#each_note_template").html(), variables );
-            $("#notesBody").append( template );
-        }
-    });
-
-Spec.View.Staff = Backbone.View.extend({
-        initialize: function(options){
-            this.render(options);
-        },
-        render: function(options){
-            var variables = {'shifts': options.shifts };
-            var template = _.template( $("#staff_template").html(), variables );
-            $("#staffEvent .modal-body").html( template );
-            Spec.techTemplateUpdate();
-            options.shifts.forEach(function(shift) {
-            	var each_note_view = new Spec.View.EachStaff({ 'item': shift });
-            });
-            Spec.newRowInit(options.shifts.slice(-1)[0]);
-            $('.combobox').combobox({
-				placeholder: 'Choose a staff'
-			});
-			$('#staffSpinner').spinner();
-			$('#staffSpinner').on('changed', function(e, val) {
-				$.ajax({
-					type: "POST",
-					url: "event/spinner",
-					data: {
-						eventid: Spec.lastClickedEvent['_id'],
-						make: val
-					}
-				}).done(function(msg) {
-					Spec.refetchEvents();
-					Spec.lastClickedEvent.staffNeeded = parseInt(val);
-					Spec.changePopupColor(Spec.lastClickedEvent);
-					console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' staff number changed to ' + val);
+	_.templateSettings.variable = "op";
+	$.fn.editable.defaults.mode = 'inline';   //toggle `popup` / `inline` mode
+	Spec.View.Edit = Backbone.View.extend({
+	        initialize: function(){
+	            this.render();
+	            Spec.storeEdited = {};
+			    $('#title').editable();
+			    $('#desc').editable({
+			        title: 'Description',
+			        rows: 4
+			    });
+			    $('#loc').editable();
+			     $('#startDate').editable({
+			        format: 'yyyy-mm-dd',    
+			        viewformat: 'mm/dd/yyyy',    
+			        datepicker: {
+			                weekStart: 1
+			           }
 				});
-			}); //end of staffSpinner
-        }
-    });
-Spec.View.EachStaff = Backbone.View.extend({
-        initialize: function(options){
-            this.render(options);
-        },
-        render: function(options){
-            var variables = {'item': options.item };
-            var template = _.template( $("#each_staff_template").html(), variables );
-            $("#staffEvent .modal-body tbody").prepend( template );
-        }
-    });
+		     	$('.bootstrap-timepicker input').timepicker({
+				});
+				$('.bootstrap-timepicker input').on('show.timepicker', function(e) {
+					$(this).prev().toggle();
+				});
+				$('#editSpinner').spinner();
 
-Spec.newRowInit = function (lastShift) {
-	if(lastShift == undefined) {
-		var startTime = Spec.formatAMPM(Spec.lastClickedEvent.start);
-		var endTime = Spec.formatAMPM(Spec.lastClickedEvent.end);
-	} else {
-		var startTime = Spec.formatAMPM(new Date(Date.parse(lastShift.start)));
-		var endTime = Spec.formatAMPM(new Date(Date.parse(lastShift.end)));
+
+				$('.x-edit-event').on('save', function(e, params) {
+					var result = {};
+					result[this.id] = params.newValue;
+				    $.extend(Spec.storeEdited, result)
+				});
+
+	        },
+	        render: function(){
+	            var variables = { event: Spec.lastClickedEvent};
+	            var template = _.template( $("#edit_template").html(), variables );
+	            $("#editEvent .modal-body").html( template );
+	        }
+	    });
+
+	Spec.View.Remove = Backbone.View.extend({
+	        initialize: function(){
+	            this.render();
+	        },
+	        render: function(){
+	            var variables = { event: Spec.lastClickedEvent};
+	            var template = _.template( $("#remove_template").html(), variables );
+	            $("#removeEvent").html( template );
+	        }
+	    });
+
+	Spec.View.Notes = Backbone.View.extend({
+	        initialize: function(options){
+	            this.render(options);
+	            options.notes.forEach(function(note) {
+	            	var each_note_view = new Spec.View.EachNote(note);
+	            });
+	        },
+	        render: function(options){
+	            var variables = { eventid: Spec.lastClickedEvent['_id'], notes: options.notes };
+	            var template = _.template( $("#notes_template").html(), variables );
+	            $("#notes").html( template );
+	        }
+	    });
+
+	Spec.View.EachNote = Backbone.View.extend({
+	        initialize: function(note){
+	            this.render(note);
+	            var removedItem;
+	        },
+	        render: function(note){
+	            var variables = { eventid: Spec.lastClickedEvent['_id'], 'note': note };
+	            var template = _.template( $("#each_note_template").html(), variables );
+	            $("#notesBody").append( template );
+	        }
+	    });
+
+	Spec.View.Staff = Backbone.View.extend({
+	        initialize: function(options){
+	            this.render(options);
+	        },
+	        render: function(options){
+	            var variables = {'shifts': options.shifts };
+	            var template = _.template( $("#staff_template").html(), variables );
+	            $("#staffEvent .modal-body").html( template );
+	            Spec.techTemplateUpdate();
+	            options.shifts.forEach(function(shift) {
+	            	var each_note_view = new Spec.View.EachStaff({ 'item': shift });
+	            });
+	            Spec.newRowInit(options.shifts.slice(-1)[0]);
+	            $('.combobox').combobox({
+					placeholder: 'Choose a staff'
+				});
+				$('#staffSpinner').spinner();
+				$('#staffSpinner').on('changed', function(e, val) {
+					$.ajax({
+						type: "POST",
+						url: "event/spinner",
+						data: {
+							eventid: Spec.lastClickedEvent['_id'],
+							make: val
+						}
+					}).done(function(msg) {
+						Spec.refetchEvents();
+						Spec.lastClickedEvent.staffNeeded = parseInt(val);
+						Spec.changePopupColor(Spec.lastClickedEvent);
+						console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' staff number changed to ' + val);
+					});
+				}); //end of staffSpinner
+	        }
+	    });
+	Spec.View.EachStaff = Backbone.View.extend({
+	        initialize: function(options){
+	            this.render(options);
+	        },
+	        render: function(options){
+	            var variables = {'item': options.item };
+	            var template = _.template( $("#each_staff_template").html(), variables );
+	            $("#staffEvent .modal-body tbody").prepend( template );
+	        }
+	    });
+
+	Spec.newRowInit = function (lastShift) {
+		if(lastShift == undefined) {
+			var startTime = Spec.formatAMPM(Spec.lastClickedEvent.start);
+			var endTime = Spec.formatAMPM(Spec.lastClickedEvent.end);
+		} else {
+			var startTime = Spec.formatAMPM(new Date(Date.parse(lastShift.start)));
+			var endTime = Spec.formatAMPM(new Date(Date.parse(lastShift.end)));
+		}
+	 	$('#timepicker5').timepicker({
+			defaultTime: startTime
+		});
+		$('#timepicker6').timepicker({
+			defaultTime: endTime
+		});
+		$('.bootstrap-timepicker input').on('show.timepicker', function(e) {
+			$(this).prev().toggle();
+	  	});
+		$('.combobox').html('');
+		Spec.storeAllStaff.forEach(function(person) {
+			if(person.name == false) {return;}
+			$('.combobox')
+				.append($('<option>', {
+						'value': person.username
+					})
+					.text(person.name + ' (' + person.username + ')'));
+		});
 	}
- 	$('#timepicker5').timepicker({
-		defaultTime: startTime
-	});
-	$('#timepicker6').timepicker({
-		defaultTime: endTime
-	});
-	$('.bootstrap-timepicker input').on('show.timepicker', function(e) {
-		$(this).prev().toggle();
-  	});
-	$('.combobox').html('');
-	Spec.storeAllStaff.forEach(function(person) {
-		if(person.name == false) {return;}
-		$('.combobox')
-			.append($('<option>', {
-					'value': person.username
-				})
-				.text(person.name + ' (' + person.username + ')'));
-	});
-}
 
 $(document).ready(function() {
 	//Spec.updateUser();
@@ -376,6 +378,7 @@ $(document).ready(function() {
 			Spec.resizeMap();
 		},
 		eventClick: function(calEvent, jsEvent, view) {
+			if(calEvent.gCal === true) { return false;} //do none of the stuff below, just show them
 			Spec.lastClickedEvent = calEvent;
 			//This function should contain specific stuff like opening the event-based selection/description box etc
 			$('#popup').modalPopover('hide');
@@ -426,6 +429,7 @@ $(document).ready(function() {
 		},
 		eventRightClick: function(calEvent, jsEvent, view) {
 			jsEvent.preventDefault(); //Right click event only prevents default because context menu is binded in eventRender
+			if(calEvent.gCal === true) { return false;} //do none of the stuff below, just show them
 			if(calEvent.valid == true) {
 				$('a[href="#cancelEvent"] span').text("Cancel this event");
 			} else {
@@ -451,7 +455,7 @@ $(document).ready(function() {
 				Spec.setTimeline();
 			} catch (err) {}
 		},
-		eventSources: [Spec.eventSource()]
+		eventSources: [Spec.generateEventSource()]
 	});
 
 	//Important: especially not using defaultView option of FullCalendar, for efficient use of lazyFetching.

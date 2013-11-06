@@ -303,7 +303,8 @@
 				title: event.summary,
 				start: event.start.dateTime, //FullCalendar can parse ISO8601 date strings
 				end: event.end.dateTime,
-				backgroundColor: '#7F5417'
+				backgroundColor: '#7F5417',
+				gCal: true, //we could check the bg color in the front end but this way semantically makes more sense
 			};
 		})
 	}
