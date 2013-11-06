@@ -44,8 +44,10 @@ Spec = {
 		$('#popupStaffInfo').html(event.shifts.length + '/' + event.staffNeeded);
 	},
 	resizeMap: function() {
-		var column_height = $(window).height();
-		$('#calendar').fullCalendar('option', 'height', column_height - 40); //$("#calendar").css("height", + "px")
+		var height = $(window).height() - 40;
+		$('#calendar').fullCalendar('option', 'height', height);
+		//$(".fc-view-month").css("height", height-100 + "px");
+		$('modifyCSSRule').html('.fc-view-month { height:' + (height) + 'px !important; }');
 	}, //end resizeMap
 	setTimeline: function(view) { //this is borrowed from stackoverflow
 		var parentDiv = jQuery(".fc-agenda-slots:visible").parent();
@@ -438,6 +440,7 @@ $(document).ready(function() {
 			Spec.lastClickedEvent = calEvent;
 		},
 		eventRender: function(event, element) {
+			if(calEvent.gCal === true) { return false;} //do none of the stuff below, just show them
 			//Adding all events to an array for event filtering with Backbone.js router
 			symbol = '';
 			if (event.video == true) {

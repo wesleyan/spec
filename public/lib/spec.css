@@ -1,3 +1,6 @@
+html {
+  height: 100%;
+}
 body {
 	margin-top: 10px;
 	margin-bottom: 20px;
@@ -215,4 +218,11 @@ textarea{
 .event-bg-section {
 	opacity: 0.3;
 	background-color: black;
+}
+
+.fc-view-month {
+    width: 100%; 
+    max-height: 100%;
+    bottom:0;
+    overflow-y: scroll;
 }
