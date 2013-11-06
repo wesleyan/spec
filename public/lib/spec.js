@@ -47,7 +47,7 @@ Spec = {
 		var height = $(window).height() - 40;
 		$('#calendar').fullCalendar('option', 'height', height);
 		//$(".fc-view-month").css("height", height-100 + "px");
-		$('#modifyCSSRule').html('.fc-view-month { height:' + (height) + 'px !important; }');
+		$('#modifyCSSRule').html('.fc-view-month { height:' + (height - 70) + 'px !important; }');
 	}, //end resizeMap
 	setTimeline: function(view) { //this is borrowed from stackoverflow
 		var parentDiv = jQuery(".fc-agenda-slots:visible").parent();
@@ -440,17 +440,17 @@ $(document).ready(function() {
 			Spec.lastClickedEvent = calEvent;
 		},
 		eventRender: function(event, element) {
-			if(event.gCal === true) { return false;} //do none of the stuff below, just show them
-			//Adding all events to an array for event filtering with Backbone.js router
-			symbol = '';
-			if (event.video == true) {
-				symbol += '<i class="icon-facetime-video icon-white"></i> ';
+			if(event.gCal !== true) {
+				//Adding all events to an array for event filtering with Backbone.js router
+				symbol = '';
+				if (event.video == true) {
+					symbol += '<i class="icon-facetime-video icon-white"></i> ';
+				}
+				element.find('.fc-event-title').html(symbol + event.title);
+				element.contextmenu({
+					'target': '#context-menu'
+				});
 			}
-			element.find('.fc-event-title').html(symbol + event.title);
-			element.contextmenu({
-				'target': '#context-menu'
-			});
-
 		},
 		viewRender: function(view, element) {
 			//console.log(view.name);
