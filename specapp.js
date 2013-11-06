@@ -311,19 +311,23 @@
 	function overallGoogleCheck(req, callback) {
 		if (_.isUndefined(req.session.refresh_token)) {
 			//check the database for refresh token
-			db.staff.find({username:getUser(req)}, function(err, data) {
-				if(err || !data || data.length < 1) {
-					console.log('There is an error when fetching refresh token for the user');
-					return false;
-				} else {
-					if (_.isUndefined(data[0].refresh_token)) { //if there is no refresh token,
-						return false;
-					} else { //if there is one for the user
-						req.session.refresh_token = data[0].refresh_token;
-						refreshAccessToken({}, req, callback);
-					}
-				}
-			});
+			try {
+				db.staff.find({username:getUser(req)}, function(err, data) {
+							if(err || !data || data.length < 1) {
+								console.log('There is an error when fetching refresh token for the user');
+								throw 'return false';
+							} else {
+								if (_.isUndefined(data[0].refresh_token)) { //if there is no refresh token,
+									throw 'return false';
+								} else { //if there is one for the user
+									req.session.refresh_token = data[0].refresh_token;
+									refreshAccessToken({}, req, callback);
+								}
+							}
+						});
+			} catch(e) {
+				return false;
+			}
 		} else {
 			if(_.isFunction(callback)){ callback(); }
 		}

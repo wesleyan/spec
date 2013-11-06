@@ -470,6 +470,9 @@ $(document).ready(function() {
 	});
 
 	// JQUERY EVENTS
+	$('#gCalButton').click(function(e) {
+		Spec.toggleGCalEvents();
+	});
 	$('#eventButton').click(function(e) {
 		$('#eventButton').addClass('disabled');
 		$('#popup').modalPopover('hide');
