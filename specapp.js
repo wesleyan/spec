@@ -311,25 +311,25 @@
 	function overallGoogleCheck(req, callback) {
 		if (_.isUndefined(req.session.refresh_token)) {
 			//check the database for refresh token
-			try {
+			var everythingOK = true;
 				db.staff.find({username:getUser(req)}, function(err, data) {
 							if(err || !data || data.length < 1) {
 								console.log('There is an error when fetching refresh token for the user');
-								throw new Error('return false');
+								everythingOK = false;
 							} else {
 								if (_.isUndefined(data[0].refresh_token)) { //if there is no refresh token,
-									throw new Error('return false');
+									everythingOK = false;
 								} else { //if there is one for the user
 									req.session.refresh_token = data[0].refresh_token;
 									refreshAccessToken({}, req, callback);
+									everythingOK = true;
 								}
 							}
 						});
-			} catch(e) {
-				return false;
-			}
+			return everythingOK;
 		} else {
 			if(_.isFunction(callback)){ callback(); }
+			return true;
 		}
 	}
 	app.get('/gCalEvents/', cas.blocker, function(req, res) {
