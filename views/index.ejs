@@ -342,13 +342,17 @@
 		</div>
 	    <table class="table table-bordered table-hover table-condensed">
 		<thead><th><i class="icon-user"></i>  Staff</th><th><i class="icon-time"></i> From</th><th><i class="icon-time"></i> To</th>
-		{{ if(permission == 10) { }}<th><i class="icon-edit"></i></th>{{ } }}</thead>
+		<th><i class="icon-edit"></i></th></thead>
 		<tbody>
-		{{ if(permission == 10) { }}
+		
 			<tr>
 				<td>
-					<select class="combobox input-medium" name="normal">
-		              </select>
+					{{ if(permission == 10) { }}
+						<select class="combobox input-medium" name="normal">
+						</select>
+					{{ } else { }}
+						<input id="disabledInput" type="text" value="({{=username}})" disabled>
+					{{ } }}
 				</td>
 				<td>
 					<div class="input-append bootstrap-timepicker">
@@ -376,7 +380,13 @@
 				<td><%= op.item.staffname %> (<%= op.item.staff %>)</td>
 				<td><%= Spec.formatAMPM(new Date(Date.parse(op.item.start))) %></td>
 				<td><%= Spec.formatAMPM(new Date(Date.parse(op.item.end))) %></td>
-				{{ if(permission == 10) { }}<td><span class="btn btn-danger btn-mini removeStaff" type="button" href="<%= op.item.id %>"><i class="icon-remove icon-white"></i></span></td>{{ } }}
+				<td>
+					<% if(Spec.username === op.item.staff) { %>
+						<span class="btn btn-danger btn-mini removeStaff" type="button" href="<%= op.item.id %>">
+							<i class="icon-remove icon-white"></i>
+						</span>
+					<% } %>
+				</td>
 			</tr>
 	</script>
 	<script>

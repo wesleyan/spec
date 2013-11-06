@@ -831,12 +831,16 @@
 				res.writeHead(200, {
 					'Content-Type': 'application/json'
 				});
-				if(permission(req) != 10) {
+				var chosenStaff = req.body.staff;
+				if(staffUsernameArray.indexOf(getUser(req)) === -1) { //if user is not in staff list, don't allow
 					res.write(JSON.stringify(false).toString("utf-8"));
 					res.end();
 					return false;
 				}
-				console.log("Req for adding shift \"" + req.body.staff + "\" to Event ID " + req.body.eventid);
+				if(permission(req) != 10) {
+					chosenStaff = getUser(req); //this will only add 
+				}
+				console.log("Req for adding shift \"" + chosenStaff + "\" to Event ID " + req.body.eventid);
 				var eventStart = new Date(Date.parse(req.body.eventStart));
 				var eventEnd = new Date(Date.parse(req.body.eventEnd));
 				var generatedID = new mongo.ObjectID();
@@ -844,7 +848,7 @@
 				var endDate = new Date(Date.parse(eventEnd.getFullYear() + "-" + (eventStart.getMonth()+1) + "-" + eventEnd.getDate() + " " +req.body.end));
 				db.events.update(
 					{_id: new mongo.ObjectID(req.body.eventid)},
-					{ $addToSet: {'shifts': {'id': generatedID, 'start': startDate,'end': endDate, 'staff': req.body.staff}} }, 
+					{ $addToSet: {'shifts': {'id': generatedID, 'start': startDate,'end': endDate, 'staff': chosenStaff}} }, 
 					function(err, updated) {
 						if (err || !updated) {
 							console.log("Shift not added:" + err);
@@ -860,15 +864,15 @@
 				res.writeHead(200, {
 					'Content-Type': 'application/json'
 				});
-				if(permission(req) != 10) {
-					res.write(JSON.stringify(false).toString("utf-8"));
-					res.end();
-					return false;
+				var query = {'shifts': {'id': new mongo.ObjectID(req.body.id)} };
+				if(permission(req) != 10) { //users other than the manager 
+					query['shifts']['staff'] = getUser(req);
 				}
 				console.log("Req for removing shift ID " + req.body.id + " from Event ID " + req.body.eventid);
+				
 				db.events.update(
 					{_id: new mongo.ObjectID(req.body.eventid)},
-					{ $pull: {'shifts': {'id': new mongo.ObjectID(req.body.id)} } }, 
+					{ $pull: query }, 
 					function(err, updated) {
 						if (err || !updated) {
 							console.log("Shift not removed:" + err);
