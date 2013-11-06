@@ -308,31 +308,26 @@
 		})
 	}
 
-	function overallGoogleCheck(req, callback) {
+	function overallGoogleCheck(req, res, callback) {
 		if (_.isUndefined(req.session.refresh_token)) {
 			//check the database for refresh token
-			var everythingOK = true;
 				db.staff.find({username:getUser(req)}, function(err, data) {
 							if(err || !data || data.length < 1) {
 								console.log('There is an error when fetching refresh token for the user');
-								everythingOK = false;
+								res.redirect('/authorize');
 								return;
 							} else {
 								if (_.isUndefined(data[0].refresh_token)) { //if there is no refresh token,
-									everythingOK = false;
+									res.redirect('/authorize');
 									return;
 								} else { //if there is one for the user
 									req.session.refresh_token = data[0].refresh_token;
 									refreshAccessToken({}, req, callback);
-									everythingOK = true;
 								}
 							}
 						});
-			console.log(everythingOK);
-			return everythingOK;
 		} else {
 			if(_.isFunction(callback)){ callback(); }
-			return true;
 		}
 	}
 	app.get('/gCalEvents/', cas.blocker, function(req, res) {
@@ -354,11 +349,7 @@
 				}
 			});
 		}
-		if(overallGoogleCheck(req, all) === false) {
-			res.write(JSON.stringify(false).toString("utf-8"));
-			res.end();
-			return false;
-		}
+		overallGoogleCheck(req, res, all);
 
 	});
 
