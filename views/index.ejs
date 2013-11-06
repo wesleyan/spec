@@ -378,11 +378,15 @@
 				<td><%= Spec.formatAMPM(new Date(Date.parse(op.item.start))) %></td>
 				<td><%= Spec.formatAMPM(new Date(Date.parse(op.item.end))) %></td>
 				<td>
-					<% if(Spec.username === op.item.staff) { %>
-						<span class="btn btn-danger btn-mini removeStaff" type="button" href="<%= op.item.id %>">
-							<i class="icon-remove icon-white"></i>
-						</span>
-					<% } %>
+					{{ if(permission != 10) { }}
+						<% if(Spec.username === op.item.staff) { %>
+					{{ } }}
+							<span class="btn btn-danger btn-mini removeStaff" type="button" href="<%= op.item.id %>">
+								<i class="icon-remove icon-white"></i>
+							</span>
+					{{ if(permission != 10) { }}
+						<% } %>
+					{{ } }}
 				</td>
 			</tr>
 	</script>
