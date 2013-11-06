@@ -1111,6 +1111,7 @@
 
 							var changeNumbers = {add:0, update:0, remove: 0};
 							var parallel = [];
+							var whatToReport = {update:[], remove: []};
 							//push update functions in an array, in order to have a final callback function to end response after the async.parallel process
 							whatToChange.add.forEach(function(event) { 
 								parallel.push(function(callback) {
@@ -1136,6 +1137,7 @@
 																	console.log(event.title);
 																} else {
 																	changeNumbers.update++;
+																	whatToReport.remove.push(updated);
 																	callback();
 																}
 															});
@@ -1152,6 +1154,7 @@
 																	console.log(event.title);
 																} else {
 																	changeNumbers.remove++;
+																	whatToReport.remove.push(removed);
 																	callback();
 																}
 															});
@@ -1164,6 +1167,7 @@
 								res.writeHead(200);
 								res.write(changeNumbers.add + ' events added, ' + changeNumbers.update + ' updated and ' + changeNumbers.remove + ' removed, upload and saving progress ended successfully.');
 								res.end();
+								reportUpdate(whatToReport); //send messages to the staff and managers
 
 								// delete the old last.xml file and rename the new uploaded file as last.xml
 								(function(path) {
@@ -1202,6 +1206,11 @@
 			});		
 		});
 
+		//this will send messages to the managers and the people who are registered in those events
+		function reportUpdate(whatToReport) {
+			console.log(whatToReport);
+		}
+		
 // MAIN PAGE RENDERING
 
 	app.get('/', cas.blocker, function (req, res) {
