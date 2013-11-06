@@ -315,10 +315,10 @@
 				db.staff.find({username:getUser(req)}, function(err, data) {
 							if(err || !data || data.length < 1) {
 								console.log('There is an error when fetching refresh token for the user');
-								throw 'return false';
+								throw new Error('return false');
 							} else {
 								if (_.isUndefined(data[0].refresh_token)) { //if there is no refresh token,
-									throw 'return false';
+									throw new Error('return false');
 								} else { //if there is one for the user
 									req.session.refresh_token = data[0].refresh_token;
 									refreshAccessToken({}, req, callback);

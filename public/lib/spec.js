@@ -150,12 +150,17 @@ Spec = {
 	}, //end gCalEventSource
 	boolGCal: false,
 	toggleGCalEvents: function() {
+		Spec.boolGCal = !Spec.boolGCal;
 		if(Spec.boolGCal === false) {
-			$('#calendar').fullCalendar('addEventSource', Spec.gCalEventSource);
+			try {
+				$('#calendar').fullCalendar('addEventSource', Spec.gCalEventSource);
+			} catch(e) {
+				window.location.href = '/authorize';
+			}
 		} else {
 			$('#calendar').fullCalendar('removeEventSource', Spec.gCalEventSource);
 		}
-		Spec.boolGCal = !Spec.boolGCal;
+		
 	}, //end toggleGCalEvents
 	refetchEvents: function() {
 		$('#calendar').fullCalendar('changeView', 'month');
