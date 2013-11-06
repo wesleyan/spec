@@ -1211,13 +1211,55 @@
 		//this will send messages to the managers and the people who are registered in those events
 		function reportUpdate(whatToReport) {
 			//we have an object {update:[], remove:[]}, and the arrays have the XMLid's of these events, we need to find the people involved
+			var whatToSend = {};
+			var parallel = [];
 			whatToReport.update.forEach(function(id) {
-				db.events.find({'XMLid':id}, function(err, event) {
-					console.log(event);
+				parallel.push(function(callback) {
+					db.events.find({'XMLid':id}, function(err, event) {
+						event.shifts.forEach(function(shift) {
+							//do something to each shift.staff
+							if(_.isUndefined(whatToSend[shift.staff])) { whatToSend[shift.staff] = []; }
+							whatToSend[shift.staff].push([event, shift]); //this is the structure of the array elements, be careful
+						}
+						callback();
+					});
 				});
 			});
+			async.parallel(parallel, function() {
+				//now we have a complete whatToSend object, so we can start to send notifications
+				var nodemailer = require("nodemailer");
 
-		}
+				// create reusable transport method (opens pool of SMTP connections)
+				var smtpTransport = nodemailer.createTransport("SMTP", {
+				    service: "Gmail",
+				    auth: {
+				        user: "wesleyanspec@gmail.com",
+				        pass: "#thisiswhy"
+				    }
+				});
+
+				_.each(whatToSend, function(items, user) {
+					var mailOptions = {
+					    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
+					    to: user + "@wesleyan.edu",
+					    subject: "Event Updates (IMPORTANT)",
+					}
+					mailOptions.html = ejs.render(fs.readFileSync('./views/mail/normalUpdate.ejs', 'utf8'), items);
+
+					smtpTransport.sendMail(mailOptions, function(error, response) {
+					    if (error) {
+					        console.log(error);
+					    } else {
+					        console.log("Message sent: " + response.message);
+					    }
+					});
+				}
+				smtpTransport.close();
+			}); //end of async.parallel
+
+			//now it's time to report all updates to the managers (all staff with level 10), with whatToReport
+
+		} //end of reportUpdate
 
 // MAIN PAGE RENDERING
 
