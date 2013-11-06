@@ -152,11 +152,7 @@ Spec = {
 	toggleGCalEvents: function() {
 		Spec.boolGCal = !Spec.boolGCal;
 		if(Spec.boolGCal === false) {
-			try {
-				$('#calendar').fullCalendar('addEventSource', Spec.gCalEventSource);
-			} catch(e) {
-				window.location.href = '/authorize';
-			}
+			$('#calendar').fullCalendar('addEventSource', Spec.gCalEventSource);
 		} else {
 			$('#calendar').fullCalendar('removeEventSource', Spec.gCalEventSource);
 		}
@@ -743,4 +739,9 @@ $(document).ajaxStart(function() {
 $(document).ajaxStop(function() {
 	$("#eventButton i").removeClass('icon-refresh');
 	$("#eventButton i").addClass('icon-book');
+});
+$(document).ajaxError(function(event, jqxhr, settings, exception) {
+  if (settings.url.substring(0,11) == "gCalEvents/") { //if not authorized by google, get authorization
+    window.location.href = '/authorize';
+  }
 });
