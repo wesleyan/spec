@@ -1246,7 +1246,6 @@
 		async.parallel(parallel, function() {
 			//now we have a complete whatToSend object, so we can start to send notifications
 
-
 			_.each(whatToSend, function(items, user) {
 				var staffMailOptions = {
 				    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
@@ -1269,6 +1268,7 @@
 
 		//now it's time to report all updates to the managers (all staff with level 10), with whatToReport
 			//var managerList = _.findWhere(app.locals.storeStaff, {level:10});
+			if(whatToReport.update.length < 1 && whatToReport.remove.length < 1) {return false;} //don't send any mail if there is no change
 			var managerList = [{'username':'ckorkut'}]; //only for testing
 			var managerMailOptions = {
 					    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
