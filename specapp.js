@@ -1209,6 +1209,16 @@
 
 	//this will send messages to the managers and the people who are registered in those events
 	function reportUpdate(whatToReport) {
+		var nodemailer = require("nodemailer");
+
+		// create reusable transport method (opens pool of SMTP connections)
+		var smtpTransport = nodemailer.createTransport("SMTP", {
+		    service: "Gmail",
+		    auth: {
+		        user: "wesleyanspec@gmail.com",
+		        pass: "#thisiswhy"
+		    }
+		});
 		//we have an object {update:[], remove:[]}, and the update array has the XMLid's of these events, we need to find the people involved
 		// NOTE THAT the remove array has the events themselves directly!!!
 		var whatToSend = {};
@@ -1235,26 +1245,18 @@
 		});
 		async.parallel(parallel, function() {
 			//now we have a complete whatToSend object, so we can start to send notifications
-			var nodemailer = require("nodemailer");
 
-			// create reusable transport method (opens pool of SMTP connections)
-			var smtpTransport = nodemailer.createTransport("SMTP", {
-			    service: "Gmail",
-			    auth: {
-			        user: "wesleyanspec@gmail.com",
-			        pass: "#thisiswhy"
-			    }
-			});
 
 			_.each(whatToSend, function(items, user) {
-				var mailOptions = {
+				var staffMailOptions = {
 				    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
 				    to: user + "@wesleyan.edu",
-				    subject: "Event Updates for " + user + " (IMPORTANT)",
-				}
-				mailOptions.html = ejs.render(fs.readFileSync('./views/mail/normalUpdate.ejs', 'utf8'), items);
+				    subject: "Updated Event for " + user + " (IMPORTANT)",
+				};
 
-				smtpTransport.sendMail(mailOptions, function(error, response) {
+				staffMailOptions.html = ejs.render(fs.readFileSync('./views/mail/normalUpdate.ejs', 'utf8'), {'items': items});
+
+				smtpTransport.sendMail(staffMailOptions, function(error, response) {
 				    if (error) {
 				        console.log(error);
 				    } else {
@@ -1262,11 +1264,30 @@
 				    }
 				});
 			});
-			smtpTransport.close();
+			
 		}); //end of async.parallel
 
 		//now it's time to report all updates to the managers (all staff with level 10), with whatToReport
+			//var managerList = _.findWhere(app.locals.storeStaff, {level:10});
+			var managerList = [{'username':'ckorkut'}]; //only for testing
+			var managerMailOptions = {
+					    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
+					    subject: "General Event Update Report (IMPORTANT)",
+					};
 
+			managerMailOptions.html = ejs.render(fs.readFileSync('./views/mail/managerUpdate.ejs', 'utf8'), {'items': whatToReport});
+			managerList.forEach(function (manager) {
+				managerMailOptions.to = manager.username + "@wesleyan.edu"
+				smtpTransport.sendMail(staffMailOptions, function(error, response) {
+					    if (error) {
+					        console.log(error);
+					    } else {
+					        console.log("Message sent: " + response.message);
+					    }
+					});
+			});
+
+		//smtpTransport.close(); //this should wait for the callbacks to end
 	} //end of reportUpdate
 
 // MAIN PAGE RENDERING

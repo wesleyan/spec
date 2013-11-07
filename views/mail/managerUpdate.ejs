@@ -1,0 +1,24 @@
+<h1>There are updated events!</h1>
+{{ if(items.update.length > 1) { }}
+	<h3>These events are changed:</h3>
+	<ul>
+		{{ items.update.forEach(function(item) { }}
+			<li>
+				{{=item.title}} - {{=getFormattedDate(item.start)}} -> from {{=formatAMPM(item.start)}} to {{=formatAMPM(item.end)}}
+			</li>
+			<hr>
+		{{ }); }}
+	</ul>
+{{ } }}
+{{ if(items.remove.length > 1) { }}
+	<h3>These events are removed:</h3>
+	<ul>
+		{{ items.remove.forEach(function(item) { }}
+			<li>
+				{{=item.title}} - {{=getFormattedDate(item.start)}} -> from {{=formatAMPM(item.start)}} to {{=formatAMPM(item.end)}}
+			</li>
+			<hr>
+		{{ }); }}
+	</ul>
+{{ } }}
+<p>Even if it seems all right, you should check Spec to see if anything about time, location or description is changed. The staff who have signed up for the event before the update are also notified by Spec.</p>
