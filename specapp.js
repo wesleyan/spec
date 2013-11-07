@@ -1196,9 +1196,9 @@
 								});
 							})(req.files.myFile.path);
 						}
-						res.writeHead(400);
-						res.end();
 						console.log(err);
+						//res.writeHead(400);
+						res.end();
 						return false;
 					}
 
