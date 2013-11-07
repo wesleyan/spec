@@ -991,283 +991,283 @@
 					});
 				});
 
-	// FILE UPLOAD
-		app.get('/fileUpload', cas.blocker, function(req, res) {
-			if(permission(req) != 10) {
-				res.write(JSON.stringify(false).toString("utf-8"));
-				res.end();
-				return false;
-			}
-		  res.render('upload');
-		});
+// FILE UPLOAD
+	app.get('/fileUpload', cas.blocker, function(req, res) {
+		if(permission(req) != 10) {
+			res.write(JSON.stringify(false).toString("utf-8"));
+			res.end();
+			return false;
+		}
+	  res.render('upload');
+	});
 
 
-		app.post('/fileUpload', cas.blocker, function(req, res) {
-			var today = new Date(); today.setHours(0,0,0,0);
-			var twoWeeksLater = new Date((new Date).getTime() + 2 * 7 * 24 * 60 * 60 * 1000); twoWeeksLater.setHours(23,59,59,999);
-			db.events.find({'start': {$gte: today, $lt: twoWeeksLater}}, function(err, events) {
-				if (err || !events) {
-					console.log("No events found");
-				} else {
-					// events loaded. let's check for every event
+	app.post('/fileUpload', cas.blocker, function(req, res) {
+		var today = new Date(); today.setHours(0,0,0,0);
+		var twoWeeksLater = new Date((new Date).getTime() + 2 * 7 * 24 * 60 * 60 * 1000); twoWeeksLater.setHours(23,59,59,999);
+		db.events.find({'start': {$gte: today, $lt: twoWeeksLater}}, function(err, events) {
+			if (err || !events) {
+				console.log("No events found");
+			} else {
+				// events loaded. let's check for every event
 
-						var parser = require('xml2json');
-						if(permission(req) != 10) {
-							res.write(JSON.stringify(false).toString("utf-8"));
-							res.end();
-							return false;
-						}
-						console.log('Upload and saving progress started');
-						//you should check if it's an xml file
-						try {
-							// Freshly uploaded XML and last.xml are read
-								var xml = fs.readFileSync(req.files.myFile.path);
-								var last = fs.readFileSync(Preferences.path_last_xml);
-							// Both XML files are parsed
-								xml = parser.toJson(xml, {
-									object: true,
-									trim: true,
-									arrayNotation: true
-								})['CopyofIMSforExport']['Data'];
-								last = parser.toJson(last, {
-									object: true,
-									trim: true,
-									arrayNotation: true
-								})['CopyofIMSforExport']['Data'];
+					var parser = require('xml2json');
+					if(permission(req) != 10) {
+						res.write(JSON.stringify(false).toString("utf-8"));
+						res.end();
+						return false;
+					}
+					console.log('Upload and saving progress started');
+					//you should check if it's an xml file
+					try {
+						// Freshly uploaded XML and last.xml are read
+							var xml = fs.readFileSync(req.files.myFile.path);
+							var last = fs.readFileSync(Preferences.path_last_xml);
+						// Both XML files are parsed
+							xml = parser.toJson(xml, {
+								object: true,
+								trim: true,
+								arrayNotation: true
+							})['CopyofIMSforExport']['Data'];
+							last = parser.toJson(last, {
+								object: true,
+								trim: true,
+								arrayNotation: true
+							})['CopyofIMSforExport']['Data'];
 
-								if(last == 0) {last = [];} //this is only for the first setup of spec on any machine
+							if(last == 0) {last = [];} //this is only for the first setup of spec on any machine
 
-							var whatToChange = { update: [], add: [], remove: events };
-							// Parsed XML files are compared according to their unique ID's, event by event
-							xml.forEach(function(xmlEntry) {
-								//try to find an object with the same unique ID
-								var entryInLast = _.findWhere(last, {
-									'Service_x0020_Order_x0020_Detail_x0020_ID': xmlEntry['Service_x0020_Order_x0020_Detail_x0020_ID']
-								});
-								if (typeof entryInLast != 'undefined') { //if exists, then compare if they are the same
-									if(!_.isEqual(xmlEntry, entryInLast)) {
-										whatToChange.update.push(xmlEntry); //if they are the same, store to update later
-									}
-								} else { //if it doesn't exist in the last.xml, then store it to add later.
-									whatToChange.add.push(xmlEntry);
-								}
-								/*
-								find the event with the same XMLid, delete that event from the array
-								the remaining events are apparently deleted from EMS
-								*/
-								whatToChange.remove = _.reject(whatToChange.remove, function(el) { return el['XMLid'] === xmlEntry['Service_x0020_Order_x0020_Detail_x0020_ID']; });
+						var whatToChange = { update: [], add: [], remove: events };
+						// Parsed XML files are compared according to their unique ID's, event by event
+						xml.forEach(function(xmlEntry) {
+							//try to find an object with the same unique ID
+							var entryInLast = _.findWhere(last, {
+								'Service_x0020_Order_x0020_Detail_x0020_ID': xmlEntry['Service_x0020_Order_x0020_Detail_x0020_ID']
 							});
-							//should write a part that distinguishes new events and updated events.
-							var process = function(data) {
-								var bookingDate = data['Booking_x0020_Date'].split(" ")[0]
-								var reservedStart = new Date(Date.parse(bookingDate + ' ' + data['Reserved_x0020_Start']));
-								var reservedEnd = new Date(Date.parse(bookingDate + ' ' + data['Reserved_x0020_End']));
-								var eventStart = new Date(Date.parse(bookingDate + ' ' + data['Event_x0020_Start']));
-								var eventEnd = new Date(Date.parse(bookingDate + ' ' + data['Event_x0020_End']));
-								if (data['Booking_x0020_Status'] == 'Cancelled') {
-									var valid = false;
-								} else {
-									var valid = true;
+							if (typeof entryInLast != 'undefined') { //if exists, then compare if they are the same
+								if(!_.isEqual(xmlEntry, entryInLast)) {
+									whatToChange.update.push(xmlEntry); //if they are the same, store to update later
 								}
-								var video = false;
-								['video','recording'].forEach(function(word) {
-									if(String(data['Notes']).indexOf(word) != -1) {
-										video = true;
-									}
-								});
-								return {
-									XMLid: data['Service_x0020_Order_x0020_Detail_x0020_ID'],
-									title: data['Event_x0020_Name'],
-									desc:  data['Notes'],
-									loc:   data['Room_x0020_Description'],
-									//staffNeeded: 1,
-									start: reservedStart,
-									end:   reservedEnd,
-									'eventStart': eventStart,
-									'eventEnd':   eventEnd,
-									'valid':  valid,
-									duration: true,
-									'video':  video,
-									//inventory: [], //we don't want to reset these for the events that are only updated
-									//notes:     [],
-									//shifts:    [],
-									customer: {
-										'name':  data['Customer'],
-										'phone': data['Customer_x0020_Phone_x0020_1'],
-									}
-								};
-							};
-
-							var cleanSheet = function(data) { //these are for the new events to be added.
-								data.inventory = [];
-								data.notes = [];
-								data.shifts = [];
-								data.staffNeeded = 1;
-								return data;
+							} else { //if it doesn't exist in the last.xml, then store it to add later.
+								whatToChange.add.push(xmlEntry);
 							}
+							/*
+							find the event with the same XMLid, delete that event from the array
+							the remaining events are apparently deleted from EMS
+							*/
+							whatToChange.remove = _.reject(whatToChange.remove, function(el) { return el['XMLid'] === xmlEntry['Service_x0020_Order_x0020_Detail_x0020_ID']; });
+						});
+						//should write a part that distinguishes new events and updated events.
+						var process = function(data) {
+							var bookingDate = data['Booking_x0020_Date'].split(" ")[0]
+							var reservedStart = new Date(Date.parse(bookingDate + ' ' + data['Reserved_x0020_Start']));
+							var reservedEnd = new Date(Date.parse(bookingDate + ' ' + data['Reserved_x0020_End']));
+							var eventStart = new Date(Date.parse(bookingDate + ' ' + data['Event_x0020_Start']));
+							var eventEnd = new Date(Date.parse(bookingDate + ' ' + data['Event_x0020_End']));
+							if (data['Booking_x0020_Status'] == 'Cancelled') {
+								var valid = false;
+							} else {
+								var valid = true;
+							}
+							var video = false;
+							['video','recording'].forEach(function(word) {
+								if(String(data['Notes']).indexOf(word) != -1) {
+									video = true;
+								}
+							});
+							return {
+								XMLid: data['Service_x0020_Order_x0020_Detail_x0020_ID'],
+								title: data['Event_x0020_Name'],
+								desc:  data['Notes'],
+								loc:   data['Room_x0020_Description'],
+								//staffNeeded: 1,
+								start: reservedStart,
+								end:   reservedEnd,
+								'eventStart': eventStart,
+								'eventEnd':   eventEnd,
+								'valid':  valid,
+								duration: true,
+								'video':  video,
+								//inventory: [], //we don't want to reset these for the events that are only updated
+								//notes:     [],
+								//shifts:    [],
+								customer: {
+									'name':  data['Customer'],
+									'phone': data['Customer_x0020_Phone_x0020_1'],
+								}
+							};
+						};
 
-							whatToChange.update = whatToChange.update.map(process);
-							whatToChange.add = whatToChange.add.map(process).map(cleanSheet);
+						var cleanSheet = function(data) { //these are for the new events to be added.
+							data.inventory = [];
+							data.notes = [];
+							data.shifts = [];
+							data.staffNeeded = 1;
+							return data;
+						}
 
-							var changeNumbers = {add:0, update:0, remove: 0};
-							var parallel = [];
-							var whatToReport = {update:[], remove: whatToChange.remove};
-							//push update functions in an array, in order to have a final callback function to end response after the async.parallel process
-							whatToChange.add.forEach(function(event) { 
-								parallel.push(function(callback) {
-														db.events.save(event, function(err, saved) {
-															if (err || !saved) {
-																console.log("New event is not saved");
+						whatToChange.update = whatToChange.update.map(process);
+						whatToChange.add = whatToChange.add.map(process).map(cleanSheet);
+
+						var changeNumbers = {add:0, update:0, remove: 0};
+						var parallel = [];
+						var whatToReport = {update:[], remove: whatToChange.remove};
+						//push update functions in an array, in order to have a final callback function to end response after the async.parallel process
+						whatToChange.add.forEach(function(event) { 
+							parallel.push(function(callback) {
+													db.events.save(event, function(err, saved) {
+														if (err || !saved) {
+															console.log("New event is not saved");
+														} else {
+															changeNumbers.add++;
+															callback();
+														}
+													});
+												});
+						});
+
+						whatToChange.update.forEach(function(event) {
+							parallel.push(function(callback) {
+													db.events.update(
+														{XMLid: event.XMLid}, 
+														{$set: event },
+														function(err, updated) {
+															if (err || !updated) {
+																console.log("Event could not be updated: " + err);
+																console.log(event.title);
 															} else {
-																changeNumbers.add++;
+																changeNumbers.update++;
+																whatToReport.update.push(event.XMLid);
 																callback();
 															}
 														});
-													});
-							});
-
-							whatToChange.update.forEach(function(event) {
-								parallel.push(function(callback) {
-														db.events.update(
-															{XMLid: event.XMLid}, 
-															{$set: event },
-															function(err, updated) {
-																if (err || !updated) {
-																	console.log("Event could not be updated: " + err);
-																	console.log(event.title);
-																} else {
-																	changeNumbers.update++;
-																	whatToReport.update.push(event.XMLid);
-																	callback();
-																}
-															});
-													});
-							});
-
-							whatToChange.remove.forEach(function(event) { //events removed from EMS detected, now delete them from db
-								parallel.push(function(callback) {
-														db.events.remove(
-															{XMLid: event.XMLid},
-															function(err, removed) {
-																if (err || !removed) {
-																	console.log("Event could not be removed:" + err);
-																	console.log(event.title);
-																} else {
-																	changeNumbers.remove++;
-																	callback();
-																}
-															});
-													});
-							});
-
-
-							async.parallel(parallel, function() {
-								console.log("Upload and saving progress ended successfully");
-								res.writeHead(200);
-								res.write(changeNumbers.add + ' events added, ' + changeNumbers.update + ' updated and ' + changeNumbers.remove + ' removed, upload and saving progress ended successfully.');
-								res.end();
-								reportUpdate(whatToReport); //send messages to the staff and managers
-
-								// delete the old last.xml file and rename the new uploaded file as last.xml
-								(function(path) {
-									fs.unlink(Preferences.path_last_xml, function(err) {
-										if (err) {
-											console.log(err);
-											return false;
-										}
-										console.log('Old last.xml file successfully deleted');
-										fs.rename(path, Preferences.path_last_xml, function(err) {
-											if (err) throw err;
-											console.log('Uploaded file renamed to last.xml');
-										});
-									});
-								})(req.files.myFile.path);
-							});
-						} catch (err) {
-							// delete the newly uploaded file because there is no need to store it
-							if(!_.isUndefined(req.files)) { //if there is actually a file, then delete it
-								(function(path) {
-									fs.unlink(path, function(err) {
-										if (err) {
-											console.log(err);
-											return false;
-										}
-										console.log('File with error successfully deleted');
-									});
-								})(req.files.myFile.path);
-							}
-							res.writeHead(400);
-							res.end();
-							console.log(err);
-							return false;
-						}
-
-					// first db query and if else, and other functions end
-				}
-			});		
-		});
-
-		//this will send messages to the managers and the people who are registered in those events
-		function reportUpdate(whatToReport) {
-			//we have an object {update:[], remove:[]}, and the update array has the XMLid's of these events, we need to find the people involved
-			// NOTE THAT the remove array has the events themselves directly!!!
-			var whatToSend = {};
-			var parallel = [];
-			whatToReport.update.forEach(function(id) {
-				parallel.push(function(callback) {
-					db.events.find({'XMLid':id}, function(err, event) {
-						event.shifts.forEach(function(shift) {
-							if(_.isUndefined(whatToSend[shift.staff])) { whatToSend[shift.staff] = {remove:[], update:[]}; }
-							whatToSend[shift.staff].update.push({'event': event, 'shift': shift}); //this is the structure of the array elements, be careful
+												});
 						});
-						callback();
-					});
-				});
-			});
-			whatToReport.remove.forEach(function(event) {
-				parallel.push(function(callback) {
+
+						whatToChange.remove.forEach(function(event) { //events removed from EMS detected, now delete them from db
+							parallel.push(function(callback) {
+													db.events.remove(
+														{XMLid: event.XMLid},
+														function(err, removed) {
+															if (err || !removed) {
+																console.log("Event could not be removed:" + err);
+																console.log(event.title);
+															} else {
+																changeNumbers.remove++;
+																callback();
+															}
+														});
+												});
+						});
+
+
+						async.parallel(parallel, function() {
+							console.log("Upload and saving progress ended successfully");
+							res.writeHead(200);
+							res.write(changeNumbers.add + ' events added, ' + changeNumbers.update + ' updated and ' + changeNumbers.remove + ' removed, upload and saving progress ended successfully.');
+							res.end();
+							reportUpdate(whatToReport); //send messages to the staff and managers
+
+							// delete the old last.xml file and rename the new uploaded file as last.xml
+							(function(path) {
+								fs.unlink(Preferences.path_last_xml, function(err) {
+									if (err) {
+										console.log(err);
+										return false;
+									}
+									console.log('Old last.xml file successfully deleted');
+									fs.rename(path, Preferences.path_last_xml, function(err) {
+										if (err) throw err;
+										console.log('Uploaded file renamed to last.xml');
+									});
+								});
+							})(req.files.myFile.path);
+						});
+					} catch (err) {
+						// delete the newly uploaded file because there is no need to store it
+						if(!_.isUndefined(req.files)) { //if there is actually a file, then delete it
+							(function(path) {
+								fs.unlink(path, function(err) {
+									if (err) {
+										console.log(err);
+										return false;
+									}
+									console.log('File with error successfully deleted');
+								});
+							})(req.files.myFile.path);
+						}
+						res.writeHead(400);
+						res.end();
+						console.log(err);
+						return false;
+					}
+
+				// first db query and if else, and other functions end
+			}
+		});		
+	});
+
+	//this will send messages to the managers and the people who are registered in those events
+	function reportUpdate(whatToReport) {
+		//we have an object {update:[], remove:[]}, and the update array has the XMLid's of these events, we need to find the people involved
+		// NOTE THAT the remove array has the events themselves directly!!!
+		var whatToSend = {};
+		var parallel = [];
+		whatToReport.update.forEach(function(id) {
+			parallel.push(function(callback) {
+				db.events.find({'XMLid':id}, function(err, event) {
 					event.shifts.forEach(function(shift) {
 						if(_.isUndefined(whatToSend[shift.staff])) { whatToSend[shift.staff] = {remove:[], update:[]}; }
-						whatToSend[shift.staff].remove.push({'event': event, 'shift': shift}); //this is the structure of the array elements, be careful
+						whatToSend[shift.staff].update.push({'event': event, 'shift': shift}); //this is the structure of the array elements, be careful
 					});
 					callback();
 				});
 			});
-			async.parallel(parallel, function() {
-				//now we have a complete whatToSend object, so we can start to send notifications
-				var nodemailer = require("nodemailer");
+		});
+		whatToReport.remove.forEach(function(event) {
+			parallel.push(function(callback) {
+				event.shifts.forEach(function(shift) {
+					if(_.isUndefined(whatToSend[shift.staff])) { whatToSend[shift.staff] = {remove:[], update:[]}; }
+					whatToSend[shift.staff].remove.push({'event': event, 'shift': shift}); //this is the structure of the array elements, be careful
+				});
+				callback();
+			});
+		});
+		async.parallel(parallel, function() {
+			//now we have a complete whatToSend object, so we can start to send notifications
+			var nodemailer = require("nodemailer");
 
-				// create reusable transport method (opens pool of SMTP connections)
-				var smtpTransport = nodemailer.createTransport("SMTP", {
-				    service: "Gmail",
-				    auth: {
-				        user: "wesleyanspec@gmail.com",
-				        pass: "#thisiswhy"
+			// create reusable transport method (opens pool of SMTP connections)
+			var smtpTransport = nodemailer.createTransport("SMTP", {
+			    service: "Gmail",
+			    auth: {
+			        user: "wesleyanspec@gmail.com",
+			        pass: "#thisiswhy"
+			    }
+			});
+
+			_.each(whatToSend, function(items, user) {
+				var mailOptions = {
+				    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
+				    to: user + "@wesleyan.edu",
+				    subject: "Event Updates for " + user + " (IMPORTANT)",
+				}
+				mailOptions.html = ejs.render(fs.readFileSync('./views/mail/normalUpdate.ejs', 'utf8'), items);
+
+				smtpTransport.sendMail(mailOptions, function(error, response) {
+				    if (error) {
+				        console.log(error);
+				    } else {
+				        console.log("Message sent: " + response.message);
 				    }
 				});
+			});
+			smtpTransport.close();
+		}); //end of async.parallel
 
-				_.each(whatToSend, function(items, user) {
-					var mailOptions = {
-					    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
-					    to: user + "@wesleyan.edu",
-					    subject: "Event Updates for " + user + " (IMPORTANT)",
-					}
-					mailOptions.html = ejs.render(fs.readFileSync('./views/mail/normalUpdate.ejs', 'utf8'), items);
+		//now it's time to report all updates to the managers (all staff with level 10), with whatToReport
 
-					smtpTransport.sendMail(mailOptions, function(error, response) {
-					    if (error) {
-					        console.log(error);
-					    } else {
-					        console.log("Message sent: " + response.message);
-					    }
-					});
-				}
-				smtpTransport.close();
-			}); //end of async.parallel
-
-			//now it's time to report all updates to the managers (all staff with level 10), with whatToReport
-
-		} //end of reportUpdate
+	} //end of reportUpdate
 
 // MAIN PAGE RENDERING
 
@@ -1355,6 +1355,40 @@
 			staff: userObj[0],
 		});
 	});
+
+// TEXT REMINDERS
+	setInterval(function() {
+		//check if there is an event
+
+		//if there is, send an e-mail
+		if(false == true) { //this will actually run if there is an event approaching
+			var providers = ['vtext.com', 'txt.att.net', 'tomomail.net', 'messaging.sprintpcs.com', 'vmobl.com']
+			var smtpTransport = nodemailer.createTransport("SMTP", {
+			    service: "Gmail",
+			    auth: {
+			        user: "wesleyanspec@gmail.com",
+			        pass: "#thisiswhy"
+			    }
+			});
+
+			var mailOptions = {
+			    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
+			    subject: "Text reminder for " + user,
+			}
+			mailOptions.html = ejs.render(fs.readFileSync('./views/mail/normalUpdate.ejs', 'utf8'), items);
+			_.each(providers, function(provider) {
+				mailOptions.to = phone + "@" + provider; //we need to fetch the phone actually
+				smtpTransport.sendMail(mailOptions, function(error, response) {
+				    if (error) {
+				        console.log(error);
+				    } else {
+				        console.log("Message sent: " + response.message);
+				    }
+				});
+			});
+			smtpTransport.close();
+		}
+	}, 1000 * 60 * 5); //every 5 minutes
 
 // STARTING THE SERVER
 	/* //options for using SSL, not used right now
