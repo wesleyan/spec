@@ -1,7 +1,24 @@
 <h1>You have updated events!</h1>
-{{ items.forEach(function(item) { }}
-<p>
-{{=item.title}}
-</p>
-<hr>
-{{ }); }}
+{{ if(items.update.length > 1) { }}
+	<h3>Since these events are changed, you should check your shifts and let your manager know if there is any problem:</h3>
+	<ul>
+		{{ items.update.forEach(function(item) { }}
+			<li>
+				{{=item.event.title}} - {{=getFormattedDate(item.event.start)}} -> from {{=formatAMPM(item.shift.start)}} to {{=formatAMPM(item.shift.end)}}
+			</li>
+			<hr>
+		{{ }); }}
+	</ul>
+{{ } }}
+{{ if(items.remove.length > 1) { }}
+	<h3>Since these events are removed, you don't have these shifts anymore:</h3>
+	<ul>
+		{{ items.remove.forEach(function(item) { }}
+			<li>
+				{{=item.event.title}} - {{=getFormattedDate(item.event.start)}} -> from {{=formatAMPM(item.shift.start)}} to {{=formatAMPM(item.shift.end)}}
+			</li>
+			<hr>
+		{{ }); }}
+	</ul>
+{{ } }}
+<p>Even if it seems all right, you should check Spec to see if anything about time, location or description is changed.</p>

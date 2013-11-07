@@ -1111,7 +1111,7 @@
 
 							var changeNumbers = {add:0, update:0, remove: 0};
 							var parallel = [];
-							var whatToReport = {update:[], remove: []};
+							var whatToReport = {update:[], remove: whatToChange.remove};
 							//push update functions in an array, in order to have a final callback function to end response after the async.parallel process
 							whatToChange.add.forEach(function(event) { 
 								parallel.push(function(callback) {
@@ -1154,7 +1154,6 @@
 																	console.log(event.title);
 																} else {
 																	changeNumbers.remove++;
-																	whatToReport.remove.push(event.XMLid);
 																	callback();
 																}
 															});
@@ -1210,19 +1209,28 @@
 
 		//this will send messages to the managers and the people who are registered in those events
 		function reportUpdate(whatToReport) {
-			//we have an object {update:[], remove:[]}, and the arrays have the XMLid's of these events, we need to find the people involved
+			//we have an object {update:[], remove:[]}, and the update array has the XMLid's of these events, we need to find the people involved
+			// NOTE THAT the remove array has the events themselves directly!!!
 			var whatToSend = {};
 			var parallel = [];
 			whatToReport.update.forEach(function(id) {
 				parallel.push(function(callback) {
 					db.events.find({'XMLid':id}, function(err, event) {
 						event.shifts.forEach(function(shift) {
-							//do something to each shift.staff
-							if(_.isUndefined(whatToSend[shift.staff])) { whatToSend[shift.staff] = []; }
-							whatToSend[shift.staff].push([event, shift]); //this is the structure of the array elements, be careful
-						}
+							if(_.isUndefined(whatToSend[shift.staff])) { whatToSend[shift.staff] = {remove:[], update:[]}; }
+							whatToSend[shift.staff].update.push({'event': event, 'shift': shift}); //this is the structure of the array elements, be careful
+						});
 						callback();
 					});
+				});
+			});
+			whatToReport.remove.forEach(function(event) {
+				parallel.push(function(callback) {
+					event.shifts.forEach(function(shift) {
+						if(_.isUndefined(whatToSend[shift.staff])) { whatToSend[shift.staff] = {remove:[], update:[]}; }
+						whatToSend[shift.staff].remove.push({'event': event, 'shift': shift}); //this is the structure of the array elements, be careful
+					});
+					callback();
 				});
 			});
 			async.parallel(parallel, function() {
@@ -1242,7 +1250,7 @@
 					var mailOptions = {
 					    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
 					    to: user + "@wesleyan.edu",
-					    subject: "Event Updates (IMPORTANT)",
+					    subject: "Event Updates for " + user + " (IMPORTANT)",
 					}
 					mailOptions.html = ejs.render(fs.readFileSync('./views/mail/normalUpdate.ejs', 'utf8'), items);
 
