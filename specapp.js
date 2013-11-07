@@ -1278,7 +1278,7 @@
 			managerMailOptions.html = ejs.render(fs.readFileSync('./views/mail/managerUpdate.ejs', 'utf8'), {'items': whatToReport});
 			managerList.forEach(function (manager) {
 				managerMailOptions.to = manager.username + "@wesleyan.edu"
-				smtpTransport.sendMail(staffMailOptions, function(error, response) {
+				smtpTransport.sendMail(managerMailOptions, function(error, response) {
 					    if (error) {
 					        console.log(error);
 					    } else {
