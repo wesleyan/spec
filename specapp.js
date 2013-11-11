@@ -1280,7 +1280,7 @@
 		var parallel = [];
 		whatToReport.update.forEach(function(id) {
 			parallel.push(function(callback) {
-				db.events.find({'XMLid':id}, function(err, event) {
+				db.events.findOne({'XMLid':id}, function(err, event) {
 					event.shifts.forEach(function(shift) {
 						if(_.isUndefined(whatToSend[shift.staff])) { whatToSend[shift.staff] = {remove:[], update:[]}; }
 						whatToSend[shift.staff].update.push({'event': event, 'shift': shift}); //this is the structure of the array elements, be careful
