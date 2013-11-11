@@ -656,9 +656,9 @@ $(document).ready(function() {
 		}
 			var chosenStaff;
 			try {
-				$('#staffInput').val().match(/\(([^)]+)\)/)[1];
+				chosenStaff = $('#staffInput').val().match(/\(([^)]+)\)/)[1];
 			} catch(e) {
-				$('.combobox').val().match(/\(([^)]+)\)/)[1];
+				chosenStaff = $('.combobox').val().match(/\(([^)]+)\)/)[1];
 			}
 		$.ajax({
 			type: "POST",
