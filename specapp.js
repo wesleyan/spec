@@ -880,7 +880,7 @@
 									query: {_id: new mongo.ObjectID(req.body.eventid)},
 									update: { $addToSet: {'shifts': {'id': generatedID, 'start': startDate,'end': endDate, 'staff': chosenStaff}} }, 
 									new: true
-								}
+								},
 					function(err, updated) {
 						if (err || !updated) {
 							console.log("Shift not added:" + err);
