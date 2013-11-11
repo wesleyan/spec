@@ -891,7 +891,7 @@
 							res.end();
 							sendSingleMail({
 								to: chosenStaff + '@wesleyan.edu',
-								subject:'You have a new shift!',
+								subject:'You have a new shift! : ' + updated.title,
 								html: ejs.render(fs.readFileSync('./views/mail/newShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': newShift})
 							});
 						}
@@ -919,16 +919,20 @@
 							console.log("Shift removed");
 							res.write(JSON.stringify(true).toString("utf-8"));
 							res.end();
+							updated.shifts = updated.shifts.map(function(shift) {
+								shift.id = shift.id + '';
+								return shift;
+							});
 							console.log(updated.shifts);
-							console.log(typeof updated.shifts[0]['id'])
-							var oldShift = _.findWhere(updated.shifts, {'id': new mongo.ObjectID(req.body.id)});
+							console.log(typeof updated.shifts[0]['id']);
+							var oldShift = _.findWhere(updated.shifts, {'id': req.body.id});
 							if(_.isUndefined(oldShift)) {
 								console.log('old shift could not be found');
 								return false;
 							}
 							sendSingleMail({
 								to: chosenStaff + '@wesleyan.edu',
-								subject:'You have a removed shift!',
+								subject:'You have a removed shift! : ' + updated.title,
 								html: ejs.render(fs.readFileSync('./views/mail/removedShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': oldShift})
 							});
 						}
