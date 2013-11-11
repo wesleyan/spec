@@ -4,7 +4,7 @@
 	<ul>
 		{{ items.update.forEach(function(item) { }}
 			<li>
-				{{=item.event.title}} - {{=getFormattedDate(item.event.start)}} -> from {{=formatAMPM(item.shift.start)}} to {{=formatAMPM(item.shift.end)}}
+				{{=item.event.title}} - {{=app.locals.getFormattedDate(item.event.start)}} -> from {{=app.locals.formatAMPM(item.shift.start)}} to {{=app.locals.formatAMPM(item.shift.end)}}
 			</li>
 			<hr>
 		{{ }); }}
@@ -15,7 +15,7 @@
 	<ul>
 		{{ items.remove.forEach(function(item) { }}
 			<li>
-				{{=item.event.title}} - {{=getFormattedDate(item.event.start)}} -> from {{=formatAMPM(item.shift.start)}} to {{=formatAMPM(item.shift.end)}}
+				{{=item.event.title}} - {{=app.locals.getFormattedDate(item.event.start)}} -> from {{=app.locals.formatAMPM(item.shift.start)}} to {{=app.locals.formatAMPM(item.shift.end)}}
 			</li>
 			<hr>
 		{{ }); }}
