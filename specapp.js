@@ -919,19 +919,18 @@
 							console.log("Shift removed");
 							res.write(JSON.stringify(true).toString("utf-8"));
 							res.end();
+							//below is needed because id's are ObjectID, so we convert them to string to compare with req.body.id
 							updated.shifts = updated.shifts.map(function(shift) {
 								shift.id = shift.id + '';
 								return shift;
 							});
-							console.log(updated.shifts);
-							console.log(typeof updated.shifts[0]['id']);
 							var oldShift = _.findWhere(updated.shifts, {'id': req.body.id});
 							if(_.isUndefined(oldShift)) {
 								console.log('old shift could not be found');
 								return false;
 							}
 							sendSingleMail({
-								to: chosenStaff + '@wesleyan.edu',
+								to: oldShift.staff + '@wesleyan.edu',
 								subject:'You have a removed shift! : ' + updated.title,
 								html: ejs.render(fs.readFileSync('./views/mail/removedShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': oldShift})
 							});
