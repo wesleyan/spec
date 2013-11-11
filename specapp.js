@@ -16,7 +16,7 @@
 			service:'Gmail',
 			user:'wesleyanspec@gmail.com',
 			pass:'#thisiswhy'
-		}
+		},
 		//MongoDB preferences
 		databaseUrl: "127.0.0.1:27017/spec",
 		collections: ['events','staff']
