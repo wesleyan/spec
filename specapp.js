@@ -1263,6 +1263,7 @@
 
 	//this will send messages to the managers and the people who are registered in those events
 	function reportUpdate(whatToReport) {
+		if(whatToReport.update.length < 1 && whatToReport.remove.length < 1) {return false;} //don't send any mail if there is no change
 		//not using a function for e-mail sending because we need to close the connection after all stuff
 
 		// create reusable transport method (opens pool of SMTP connections)
@@ -1321,8 +1322,8 @@
 		}); //end of async.parallel
 
 		//now it's time to report all updates to the managers (all staff with level 10), with whatToReport
+			
 			//var managerList = _.findWhere(app.locals.storeStaff, {level:10});
-			if(whatToReport.update.length < 1 && whatToReport.remove.length < 1) {return false;} //don't send any mail if there is no change
 			var managerList = [{'username':'ckorkut'}]; //only for testing
 			var managerMailOptions = {
 					    from: "Wesleyan Spec <wesleyanspec@gmail.com>",

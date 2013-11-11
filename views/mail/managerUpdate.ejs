@@ -1,5 +1,5 @@
 <h1>There are updated events!</h1>
-{{ if(items.update.length > 1) { }}
+{{ if(items.update.length > 0) { }}
 	<h3>These events are changed:</h3>
 	<ul>
 		{{ items.update.forEach(function(item) { }}
@@ -10,7 +10,7 @@
 		{{ }); }}
 	</ul>
 {{ } }}
-{{ if(items.remove.length > 1) { }}
+{{ if(items.remove.length > 0) { }}
 	<h3>These events are removed:</h3>
 	<ul>
 		{{ items.remove.forEach(function(item) { }}
