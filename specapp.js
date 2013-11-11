@@ -876,9 +876,11 @@
 				var generatedID = new mongo.ObjectID();
 				var startDate = new Date(Date.parse(eventStart.getFullYear() + "-" + (eventStart.getMonth()+1) + "-" + eventStart.getDate() + " " +req.body.start));
 				var endDate = new Date(Date.parse(eventEnd.getFullYear() + "-" + (eventStart.getMonth()+1) + "-" + eventEnd.getDate() + " " +req.body.end));
-				db.events.update(
-					{_id: new mongo.ObjectID(req.body.eventid)},
-					{ $addToSet: {'shifts': {'id': generatedID, 'start': startDate,'end': endDate, 'staff': chosenStaff}} }, 
+				db.events.findAndModify({
+									query: {_id: new mongo.ObjectID(req.body.eventid)},
+									update: { $addToSet: {'shifts': {'id': generatedID, 'start': startDate,'end': endDate, 'staff': chosenStaff}} }, 
+									new: true
+								}
 					function(err, updated) {
 						if (err || !updated) {
 							console.log("Shift not added:" + err);
@@ -905,9 +907,11 @@
 					query['shifts']['staff'] = getUser(req);
 				}
 				console.log("Req for removing shift ID " + req.body.id + " from Event ID " + req.body.eventid);
-				db.events.update(
-					{_id: new mongo.ObjectID(req.body.eventid)},
-					{ $pull: query }, 
+				db.events.findAndModify({
+									query: {_id: new mongo.ObjectID(req.body.eventid)},
+									update: { $pull: query }, 
+									new: true
+								},
 					function(err, updated) {
 						if (err || !updated) {
 							console.log("Shift not removed:" + err);
@@ -1390,7 +1394,6 @@
 			if (err || !events) {
 				console.log("No events found");
 			} else {
-				
 				res.render('mobile/event', {
 					username: getUser(req),
 					permission: permission(req),
