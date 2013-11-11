@@ -920,7 +920,7 @@
 							res.write(JSON.stringify(true).toString("utf-8"));
 							res.end();
 							var oldShift = _.findWhere(updated.shifts, {'_id': new mongo.ObjectID(req.body.id)});
-							if(isUndefined(oldShift)) {
+							if(_.isUndefined(oldShift)) {
 								console.log('old shift could not be found');
 								return false;
 							}
@@ -1446,7 +1446,7 @@
 				events.forEach(function(event) {
 					event.shifts.forEach(function(shift) {
 						var phone = _.findWhere(app.locals.storeStaff, {'username': shift.staff});
-						if(isUndefined(phone) || phone == false || phone.toString().length !== 10) {
+						if(_.isUndefined(phone) || phone == false || phone.toString().length !== 10) {
 							return false;
 						}
 						var mailOptions = {
