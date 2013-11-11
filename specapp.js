@@ -876,9 +876,10 @@
 				var generatedID = new mongo.ObjectID();
 				var startDate = new Date(Date.parse(eventStart.getFullYear() + "-" + (eventStart.getMonth()+1) + "-" + eventStart.getDate() + " " +req.body.start));
 				var endDate = new Date(Date.parse(eventEnd.getFullYear() + "-" + (eventStart.getMonth()+1) + "-" + eventEnd.getDate() + " " +req.body.end));
+				var newShift = {'id': generatedID, 'start': startDate,'end': endDate, 'staff': chosenStaff};
 				db.events.findAndModify({
 									query: {_id: new mongo.ObjectID(req.body.eventid)},
-									update: { $addToSet: {'shifts': {'id': generatedID, 'start': startDate,'end': endDate, 'staff': chosenStaff}} }, 
+									update: { $addToSet: {'shifts': newShift} }, 
 									new: true
 								},
 					function(err, updated) {
@@ -888,12 +889,11 @@
 							console.log("Shift added");
 							res.write(JSON.stringify({'id':generatedID.toString(),'start':startDate, 'end':endDate}).toString("utf-8"));
 							res.end();
-							console.log(updated);
-							// sendSingleMail({
-							// 	to: chosenStaff + '@wesleyan.edu',
-							// 	subject:'You have a new shift!',
-							// 	html
-							// });
+							sendSingleMail({
+								to: chosenStaff + '@wesleyan.edu',
+								subject:'You have a new shift!',
+								html: ejs.render(fs.readFileSync('./views/mail/newShift.ejs', 'utf8'), {'event': updated, 'shift': newShift})
+							});
 						}
 					});
 			});
@@ -910,7 +910,7 @@
 				db.events.findAndModify({
 									query: {_id: new mongo.ObjectID(req.body.eventid)},
 									update: { $pull: query }, 
-									new: true
+									new: false //return the data before the update
 								},
 					function(err, updated) {
 						if (err || !updated) {
@@ -919,6 +919,16 @@
 							console.log("Shift removed");
 							res.write(JSON.stringify(true).toString("utf-8"));
 							res.end();
+							var oldShift = _.findWhere(updated.shifts, {'_id': new mongo.ObjectID(req.body.id)});
+							if(isUndefined(oldShift)) {
+								console.log('old shift could not be found');
+								return false;
+							}
+							sendSingleMail({
+								to: chosenStaff + '@wesleyan.edu',
+								subject:'You have a removed shift!',
+								html: ejs.render(fs.readFileSync('./views/mail/removedShift.ejs', 'utf8'), {'event': updated, 'shift': oldShift})
+							});
 						}
 					});
 			});
