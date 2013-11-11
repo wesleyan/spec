@@ -920,8 +920,8 @@
 							res.write(JSON.stringify(true).toString("utf-8"));
 							res.end();
 							console.log(updated.shifts);
-							console.log(typeof updated.shifts[0]['_id'])
-							var oldShift = _.findWhere(updated.shifts, {'_id': req.body.id});
+							console.log(typeof updated.shifts[0]['id'])
+							var oldShift = _.findWhere(updated.shifts, {'id': req.body.id});
 							if(_.isUndefined(oldShift)) {
 								console.log('old shift could not be found');
 								return false;
