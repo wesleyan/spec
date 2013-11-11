@@ -1384,8 +1384,8 @@
 // TEXT REMINDERS
 	setInterval(function() {
 		//check if there is an event
-		var 5minCheck = {'start': {$gte: new Date((new Date()).getTime() + 55*60*1000), $lt: new Date((new Date()).getTime() + 60*6*10000)}};
-		db.events.find(5minCheck, function(err, events) {
+		var fiveMinCheck = {'start': {$gte: new Date((new Date()).getTime() + 55*60*1000), $lt: new Date((new Date()).getTime() + 60*6*10000)}};
+		db.events.find(fiveMinCheck, function(err, events) {
 			if (err || !events) {
 				console.log(err);
 			} else {
