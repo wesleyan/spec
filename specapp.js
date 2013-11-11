@@ -932,7 +932,7 @@
 							sendSingleMail({
 								to: oldShift.staff + '@wesleyan.edu',
 								subject:'You have a removed shift! : ' + updated.title,
-								html: ejs.render(fs.readFileSync('./views/mail/removedShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': oldShift})
+								html: ejs.render(fs.readFileSync('./views/mail/removeShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': oldShift})
 							});
 						}
 					});
