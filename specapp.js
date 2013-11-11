@@ -892,7 +892,7 @@
 							sendSingleMail({
 								to: chosenStaff + '@wesleyan.edu',
 								subject:'You have a new shift!',
-								html: ejs.render(fs.readFileSync('./views/mail/newShift.ejs', 'utf8'), {'event': updated, 'shift': newShift})
+								html: ejs.render(fs.readFileSync('./views/mail/newShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': newShift})
 							});
 						}
 					});
@@ -919,7 +919,7 @@
 							console.log("Shift removed");
 							res.write(JSON.stringify(true).toString("utf-8"));
 							res.end();
-							var oldShift = _.findWhere(updated.shifts, {'_id': new mongo.ObjectID(req.body.id)});
+							var oldShift = _.findWhere(updated.shifts, {'_id': req.body.id});
 							if(_.isUndefined(oldShift)) {
 								console.log('old shift could not be found');
 								return false;
@@ -927,7 +927,7 @@
 							sendSingleMail({
 								to: chosenStaff + '@wesleyan.edu',
 								subject:'You have a removed shift!',
-								html: ejs.render(fs.readFileSync('./views/mail/removedShift.ejs', 'utf8'), {'event': updated, 'shift': oldShift})
+								html: ejs.render(fs.readFileSync('./views/mail/removedShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': oldShift})
 							});
 						}
 					});
@@ -1303,7 +1303,7 @@
 				    subject: "Updated Event for " + user + " (IMPORTANT)",
 				};
 
-				staffMailOptions.html = ejs.render(fs.readFileSync('./views/mail/normalUpdate.ejs', 'utf8'), {'items': items});
+				staffMailOptions.html = ejs.render(fs.readFileSync('./views/mail/normalUpdate.ejs', 'utf8'), {'app': app, 'items': items});
 
 				smtpTransport.sendMail(staffMailOptions, function(error, response) {
 				    if (error) {
@@ -1325,7 +1325,7 @@
 					    subject: "General Event Update Report (IMPORTANT)",
 					};
 
-			managerMailOptions.html = ejs.render(fs.readFileSync('./views/mail/managerUpdate.ejs', 'utf8'), {'items': whatToReport});
+			managerMailOptions.html = ejs.render(fs.readFileSync('./views/mail/managerUpdate.ejs', 'utf8'), {'app': app, 'items': whatToReport});
 			managerList.forEach(function (manager) {
 				managerMailOptions.to = manager.username + "@wesleyan.edu"
 				smtpTransport.sendMail(managerMailOptions, function(error, response) {
@@ -1453,7 +1453,7 @@
 						    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
 						    subject: "Text reminder for " + user,
 						};
-						mailOptions.html = ejs.render(fs.readFileSync('./views/mail/textReminder.ejs', 'utf8'), {'event':event,'shift':shift});
+						mailOptions.html = ejs.render(fs.readFileSync('./views/mail/textReminder.ejs', 'utf8'), {'app': app, 'event':event,'shift':shift});
 						providers.each(function(provider) {
 							mailOptions.to = phone + "@" + provider; //we need to fetch the phone actually
 							smtpTransport.sendMail(mailOptions, function(error, response) {
