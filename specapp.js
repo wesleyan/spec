@@ -31,7 +31,7 @@
 	var mongo = require('mongodb-wrapper');
 	var fs = require('fs');
 	var cas = require('./modules/grand_master_cas.js');
-
+	var nodemailer = require("nodemailer");
 	//CAS Configurations
 	cas.configure({
 		casHost: 'sso.wesleyan.edu',
@@ -55,6 +55,50 @@
 	// Template engine tags are changed to {{ }} because underscore uses <% %> as well in the front end
 	ejs.open = '{{';
 	ejs.close = '}}';
+
+// UTILITY FUNCTIONS
+	function sendSingleMail(options, callback) {
+		var smtpTransport = nodemailer.createTransport("SMTP", {
+			service: Preferences.mail.service,
+			auth: {
+				user: Preferences.mail.user,
+				pass: Preferences.mail.pass
+			}
+		});
+		var mailOptions = {
+			from: "Wesleyan Spec <wesleyanspec@gmail.com>",
+			subject: options.subject,
+			html: options.html,
+			to: options.to
+		};
+
+		smtpTransport.sendMail(mailOptions, function(error, response) {
+			if (error) {
+				console.log(error);
+			} else {
+				if(typeof callback === 'function') {callback(response);}
+			}
+		});
+		smtpTransport.close();
+	}
+	app.locals.formatAMPM = function(date) {
+		var hours = date.getHours();
+		var minutes = date.getMinutes();
+		var ampm = hours >= 12 ? 'PM' : 'AM';
+		hours = hours % 12;
+		hours = hours ? hours : 12; // the hour '0' should be '12'
+		minutes = minutes < 10 ? '0' + minutes : minutes;
+		var strTime = hours + ':' + minutes + ' ' + ampm;
+		return strTime;
+	} //end formatAMPM
+	app.locals.getFormattedDate = function(date) {
+		var year = date.getFullYear();
+		var month = (1 + date.getMonth()).toString();
+		month = month.length > 1 ? month : '0' + month;
+		var day = date.getDate().toString();
+		day = day.length > 1 ? day : '0' + day;
+		return month + '/' + day + '/' + year;
+	};
 
 // STUFF TO LOAD AT INITIATION
 	//We can store all staff in memory, since it is not a big array and it will be used VERY frequently, will save time.
@@ -581,24 +625,6 @@
 					}
 				});
 		});
-  app.locals.formatAMPM = function(date) {
-	  var hours = date.getHours();
-	  var minutes = date.getMinutes();
-	  var ampm = hours >= 12 ? 'PM' : 'AM';
-	  hours = hours % 12;
-	  hours = hours ? hours : 12; // the hour '0' should be '12'
-	  minutes = minutes < 10 ? '0'+minutes : minutes;
-	  var strTime = hours + ':' + minutes + ' ' + ampm;
-	  return strTime;
-	} //end formatAMPM
-	app.locals.getFormattedDate = function(date) {
-	  var year = date.getFullYear();
-	  var month = (1 + date.getMonth()).toString();
-	  month = month.length > 1 ? month : '0' + month;
-	  var day = date.getDate().toString();
-	  day = day.length > 1 ? day : '0' + day;
-	  return month + '/' + day + '/' + year;
-	};
 
 	app.get('/printtoday', cas.blocker, function(req, res) {
 		console.log('Req for seeing today\'s events list');
@@ -860,6 +886,12 @@
 							console.log("Shift added");
 							res.write(JSON.stringify({'id':generatedID.toString(),'start':startDate, 'end':endDate}).toString("utf-8"));
 							res.end();
+							console.log(updated);
+							// sendSingleMail({
+							// 	to: chosenStaff + '@wesleyan.edu',
+							// 	subject:'You have a new shift!',
+							// 	html
+							// });
 						}
 					});
 			});
@@ -1213,7 +1245,7 @@
 
 	//this will send messages to the managers and the people who are registered in those events
 	function reportUpdate(whatToReport) {
-		var nodemailer = require("nodemailer");
+		//not using a function for e-mail sending because we need to close the connection after all stuff
 
 		// create reusable transport method (opens pool of SMTP connections)
 		var smtpTransport = nodemailer.createTransport("SMTP", {
@@ -1390,6 +1422,7 @@
 				console.log(err);
 			} else {
 				var providers = ['vtext.com', 'txt.att.net', 'tomomail.net', 'messaging.sprintpcs.com', 'vmobl.com'];
+				//not using a function for e-mail sending because we need to close the connection after all stuff
 				var smtpTransport = nodemailer.createTransport("SMTP", {
 				    service: Preferences.mail.service,
 				    auth: {
