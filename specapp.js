@@ -1221,8 +1221,6 @@
 							res.writeHead(200);
 							res.write(changeNumbers.add + ' events added, ' + changeNumbers.update + ' updated and ' + changeNumbers.remove + ' removed, upload and saving progress ended successfully.');
 							res.end();
-							reportUpdate(whatToReport); //send messages to the staff and managers
-
 							// delete the old last.xml file and rename the new uploaded file as last.xml
 							(function(path) {
 								fs.unlink(Preferences.path_last_xml, function(err) {
@@ -1237,6 +1235,7 @@
 									});
 								});
 							})(req.files.myFile.path);
+							reportUpdate(whatToReport); //send messages to the staff and managers
 						});
 					} catch (err) {
 						// delete the newly uploaded file because there is no need to store it
