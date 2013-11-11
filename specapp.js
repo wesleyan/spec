@@ -12,7 +12,11 @@
 		debug: true, //making it false will overwrite console.log
 		path_last_xml: './uploads/last.xml',
 		port: 8080,
-
+		mail: {
+			service:'Gmail',
+			user:'wesleyanspec@gmail.com',
+			pass:'#thisiswhy'
+		}
 		//MongoDB preferences
 		databaseUrl: "127.0.0.1:27017/spec",
 		collections: ['events','staff']
@@ -1213,10 +1217,10 @@
 
 		// create reusable transport method (opens pool of SMTP connections)
 		var smtpTransport = nodemailer.createTransport("SMTP", {
-		    service: "Gmail",
+		    service: Preferences.mail.service,
 		    auth: {
-		        user: "wesleyanspec@gmail.com",
-		        pass: "#thisiswhy"
+		        user: Preferences.mail.user,
+		        pass: Preferences.mail.pass
 		    }
 		});
 		//we have an object {update:[], remove:[]}, and the update array has the XMLid's of these events, we need to find the people involved
@@ -1380,35 +1384,45 @@
 // TEXT REMINDERS
 	setInterval(function() {
 		//check if there is an event
-
-		//if there is, send an e-mail
-		if(false == true) { //this will actually run if there is an event approaching
-			var providers = ['vtext.com', 'txt.att.net', 'tomomail.net', 'messaging.sprintpcs.com', 'vmobl.com']
-			var smtpTransport = nodemailer.createTransport("SMTP", {
-			    service: "Gmail",
-			    auth: {
-			        user: "wesleyanspec@gmail.com",
-			        pass: "#thisiswhy"
-			    }
-			});
-
-			var mailOptions = {
-			    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
-			    subject: "Text reminder for " + user,
-			}
-			mailOptions.html = ejs.render(fs.readFileSync('./views/mail/normalUpdate.ejs', 'utf8'), items);
-			_.each(providers, function(provider) {
-				mailOptions.to = phone + "@" + provider; //we need to fetch the phone actually
-				smtpTransport.sendMail(mailOptions, function(error, response) {
-				    if (error) {
-				        console.log(error);
-				    } else {
-				        console.log("Message sent: " + response.message);
+		var 5minCheck = {'start': {$gte: new Date((new Date()).getTime() + 55*60*1000), $lt: new Date((new Date()).getTime() + 60*6*10000)}};
+		db.events.find(5minCheck, function(err, events) {
+			if (err || !events) {
+				console.log(err);
+			} else {
+				var providers = ['vtext.com', 'txt.att.net', 'tomomail.net', 'messaging.sprintpcs.com', 'vmobl.com'];
+				var smtpTransport = nodemailer.createTransport("SMTP", {
+				    service: Preferences.mail.service,
+				    auth: {
+				        user: Preferences.mail.user,
+				        pass: Preferences.mail.pass
 				    }
 				});
-			});
-			smtpTransport.close();
-		}
+				events.forEach(function(event) {
+					event.shifts.forEach(function(shift) {
+						var phone = _.findWhere(app.locals.storeStaff, {'username': shift.staff});
+						if(isUndefined(phone) || phone == false || phone.toString().length !== 10) {
+							return false;
+						}
+						var mailOptions = {
+						    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
+						    subject: "Text reminder for " + user,
+						};
+						mailOptions.html = ejs.render(fs.readFileSync('./views/mail/textReminder.ejs', 'utf8'), {'event':event,'shift':shift});
+						providers.each(function(provider) {
+							mailOptions.to = phone + "@" + provider; //we need to fetch the phone actually
+							smtpTransport.sendMail(mailOptions, function(error, response) {
+							    if (error) {
+							        console.log(error);
+							    } else {
+							        console.log("Message sent: " + response.message);
+							    }
+							});
+						});
+					}); //event.shifts.forEach ends
+				}); //events.forEach ends
+				smtpTransport.close();
+			}
+		});
 	}, 1000 * 60 * 5); //every 5 minutes
 
 // STARTING THE SERVER
