@@ -43,7 +43,7 @@
 		nodemailer = require("nodemailer"),
 		async = require('async'),
 		ejs = require('ejs');
-		
+
 	//CAS Configurations
 	cas.configure({
 		casHost: 'sso.wesleyan.edu',
@@ -196,7 +196,7 @@
 		oauth_cache = {};
 
 	try {
-	oauth_cache = JSON.parse(fs.readFileSync(Preferences.path_client_secrets, 'utf8'));
+	oauth_cache = JSON.parse(fs.readFileSync(Preferences.path_client_secret, 'utf8'));
 	} catch (e) {
 		console.log("Could not read client secret file from the config directory\nError: " + e);
 	}
@@ -1182,19 +1182,21 @@
 
 						whatToChange.update.forEach(function(event) {
 							parallel.push(function(callback) {
-													db.events.update(
-														{XMLid: event.XMLid}, 
-														{$set: event },
-														function(err, updated) {
-															if (err || !updated) {
-																console.log("Event could not be updated: " + err);
-																console.log(event.title);
-															} else {
-																changeNumbers.update++;
-																whatToReport.update.push(event.XMLid);
-																callback();
-															}
-														});
+													db.events.findAndModify({
+														query: {XMLid: event.XMLid},
+														update: {$set: event }, 
+														new: true
+													},
+													function(err, updated) {
+														if (err || !updated) {
+															console.log("Event could not be updated: " + err);
+															console.log(event.title);
+														} else {
+															changeNumbers.update++;
+															whatToReport.update.push(updated);
+															callback();
+														}
+													});
 												});
 						});
 
@@ -1273,19 +1275,16 @@
 		        pass: Preferences.mail.pass
 		    }
 		});
-		//we have an object {update:[], remove:[]}, and the update array has the XMLid's of these events, we need to find the people involved
-		// NOTE THAT the remove array has the events themselves directly!!!
+		//we have an object {update:[], remove:[]}, and the update array has the these events
 		var whatToSend = {},
 			parallel = [];
-		whatToReport.update.forEach(function(id) {
+		whatToReport.update.forEach(function(event) {
 			parallel.push(function(callback) {
-				db.events.findOne({'XMLid':id}, function(err, event) {
-					event.shifts.forEach(function(shift) {
-						if(_.isUndefined(whatToSend[shift.staff])) { whatToSend[shift.staff] = {remove:[], update:[]}; }
-						whatToSend[shift.staff].update.push({'event': event, 'shift': shift}); //this is the structure of the array elements, be careful
-					});
-					callback();
+				event.shifts.forEach(function(shift) {
+					if(_.isUndefined(whatToSend[shift.staff])) { whatToSend[shift.staff] = {remove:[], update:[]}; }
+					whatToSend[shift.staff].update.push({'event': event, 'shift': shift}); //this is the structure of the array elements, be careful
 				});
+				callback();
 			});
 		});
 		whatToReport.remove.forEach(function(event) {
