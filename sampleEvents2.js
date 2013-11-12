@@ -193,3 +193,36 @@ events.forEach(function(event) {
 		else console.log("Event saved");
 	});
 });
+
+//sample inventory
+var allInventory = [
+		{
+			"id": 4,
+			"text": "Video Camera",
+			"title": "This item needs to be recorded."
+		}, {
+			"id": 6,
+			"text": "Camera",
+			"title": "This item needs to be recorded."
+		}, {
+			"id": 7,
+			"text": "Tripod",
+			"title": "This item needs to be recorded."
+		}, {
+			"id": 5,
+			"text": "HDMI Cable",
+			"title": "This item needs to be recorded."
+		}, {
+			"id": 1,
+			"text": "Projector",
+			"title": "This item needs to be recorded."
+		},	{
+			"id": 2,
+			"text": "Macbook Pro 13",
+			"title": "This item needs to be recorded."
+		}, {
+			"id": 3,
+			"text": "iMac 21.5",
+			"title": "This item needs to be recorded."
+		}
+	];
