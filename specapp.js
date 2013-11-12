@@ -7,31 +7,43 @@
         |_|                
 */
 // CONFIGURATION AND MODULES
+	require('ofe').call();
 	var Preferences = {
 		//general preferences
 		debug: true, //making it false will overwrite console.log
 		path_last_xml: './uploads/last.xml',
+		path_client_secret: './config/client_secret.json',
+		//the one below must match with the one you have saved in https://code.google.com/apis/console
+		googleRedirectUrl: 'http://ims-dev.wesleyan.edu:8080/oauth2callback',
 		port: 8080,
 		mail: {
 			service:'Gmail',
 			user:'wesleyanspec@gmail.com',
 			pass:'#thisiswhy'
 		},
+		backgroundColors: {
+			'green': '#097054',
+			'red': '#9E3B33',
+			'yellow': '#E48743',
+			'gray': '#666666'
+		},
 		//MongoDB preferences
 		databaseUrl: "127.0.0.1:27017/spec",
 		collections: ['events','staff']
 	}
 
-	require('ofe').call();
-	var express = require('express');
-	var app = express();
-	var $ = require('jquery');
-	var _ = require('underscore');
-	var db = require("mongojs").connect(Preferences.databaseUrl, Preferences.collections);
-	var mongo = require('mongodb-wrapper');
-	var fs = require('fs');
-	var cas = require('./modules/grand_master_cas.js');
-	var nodemailer = require("nodemailer");
+	var express = require('express'),
+		app = express(),
+		$ = require('jquery'),
+		_ = require('underscore'),
+		db = require("mongojs").connect(Preferences.databaseUrl, Preferences.collections);
+		mongo = require('mongodb-wrapper');
+		fs = require('fs');
+		cas = require('./modules/grand_master_cas.js'),
+		nodemailer = require("nodemailer"),
+		async = require('async'),
+		ejs = require('ejs');
+		
 	//CAS Configurations
 	cas.configure({
 		casHost: 'sso.wesleyan.edu',
@@ -39,7 +51,6 @@
 		service: 'http://ims-dev.wesleyan.edu:8080/',
 		redirectUrl: '/login'
 	});
-	var async = require('async');
 
 	app.configure(function() {
 		app.set('views', __dirname + '/views');
@@ -51,7 +62,7 @@
 		app.use(app.router);
 		app.use(express.static(__dirname + '/public'));
 	});
-	var ejs = require('ejs');
+	
 	// Template engine tags are changed to {{ }} because underscore uses <% %> as well in the front end
 	ejs.open = '{{';
 	ejs.close = '}}';
@@ -179,24 +190,21 @@
 	});
 
 // GOOGLE CALENDAR INTEGRATION
-	var request = require('request');
-	var googleapis = require('googleapis');
+	var request = require('request'),
+		googleapis = require('googleapis'),
+		OAuth2Client = googleapis.OAuth2Client,
+		oauth_cache = {};
 
-	var OAuth2Client = googleapis.OAuth2Client;
-	var oauth_cache = {};
-
-	//this one must match with the one you have saved in https://code.google.com/apis/console
-	var REDIRECT_URL = 'http://ims-dev.wesleyan.edu:8080/oauth2callback'; 
 	try {
-	oauth_cache = JSON.parse(fs.readFileSync('./config/client_secret.json', 'utf8'));
+	oauth_cache = JSON.parse(fs.readFileSync(Preferences.path_client_secrets, 'utf8'));
 	} catch (e) {
-		console.log("Could not read client_secret.json from the config directory\nError: " + e);
+		console.log("Could not read client secret file from the config directory\nError: " + e);
 	}
 
 	// TODO: Replace with or add a button on frontend
 	app.get('/authorize', cas.blocker, function(req, res) {
 		//if we have the refresh token for the user, then we just need to refreshAccessToken, otherwise take permission
-		var oauth2Client = new OAuth2Client(oauth_cache.web.client_id, oauth_cache.web.client_secret, REDIRECT_URL);
+		var oauth2Client = new OAuth2Client(oauth_cache.web.client_id, oauth_cache.web.client_secret, Preferences.googleRedirectUrl);
 		getFirstToken(oauth2Client, app, req, res);
 	});
 
@@ -380,8 +388,8 @@
 		}
 	}
 	app.get('/gCalEvents/', cas.blocker, function(req, res) {
-		var start = new Date(req.query.start * 1000);
-		var end = new Date(req.query.end * 1000);
+		var start = new Date(req.query.start * 1000),
+			end = new Date(req.query.end * 1000);
 
 		var all = function() {
 			res.writeHead(200, {
@@ -403,33 +411,24 @@
 	});
 
 // EVENTS
-	var date = new Date();
-	//var diff = date.getTimezoneOffset()/60;
-	var diff = 0;
-
-	var d = date.getDate();
-	var m = date.getMonth();
-	var y = date.getFullYear();
+	var date = new Date(),
+		d = date.getDate(),
+		m = date.getMonth(),
+		y = date.getFullYear();
 	function addBackgroundColor(events) { //changes the events object
-		var color = {
-			'green': '#097054',
-			'red': '#9E3B33',
-			'yellow': '#E48743',
-			'gray': '#666666'
-		};
 		for (index = 0; index < events.length; ++index) {
 			event = events[index];
 			if(event.duration == false) {
 				events[index]['className'] = ['striped']; //handles the setup and breakdown events as well
 			}
 			if (event.valid == false) {
-				events[index]['backgroundColor'] = color.gray;
+				events[index]['backgroundColor'] = Preferences.backgroundColors.gray;
 			} else if (event.shifts.length == 0) {
-				events[index]['backgroundColor'] = color.red;
+				events[index]['backgroundColor'] = Preferences.backgroundColors.red;
 			} else if (event.shifts.length < event.staffNeeded) {
-				events[index]['backgroundColor'] = color.yellow;
+				events[index]['backgroundColor'] = Preferences.backgroundColors.yellow;
 			} else if (event.shifts.length == event.staffNeeded) {
-				events[index]['backgroundColor'] = color.green;
+				events[index]['backgroundColor'] = Preferences.backgroundColors.green;
 			}
 		}
 		return events;
@@ -438,9 +437,9 @@
 	//Event fetching should be filtered according to the time variables, still not done after MongoDB
 	app.get("/events", cas.blocker, function(req, res) {
 		//86400s = 1d
-		var start = new Date(req.query.start * 1000);
-		var end = new Date(req.query.end * 1000);
-		var query = {};
+		var start = new Date(req.query.start * 1000),
+			end = new Date(req.query.end * 1000),
+			query = {};
 		if(req.query.filter == 'hideCancelled') {
 			query = {valid: true};
 		} else if(req.query.filter == 'unstaffed') {
@@ -633,13 +632,13 @@
 			today.setMinutes(0);
 			today.setSeconds(0);
 			today.setMilliseconds(0);
-			var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
-			db.events.find({start: {$gte: today, $lt: tomorrow}, valid:true}).sort({start: 1},
-				function(err, data) {
-						res.render('printtoday', {
-							events: data
-						});
-				});
+		var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+		db.events.find({start: {$gte: today, $lt: tomorrow}, valid:true}).sort({start: 1},
+			function(err, data) {
+					res.render('printtoday', {
+						events: data
+					});
+			});
 	});
 
 // TRIVIAL STUFF
@@ -871,12 +870,12 @@
 					chosenStaff = getUser(req); //this will only add 
 				}
 				console.log("Req for adding shift \"" + chosenStaff + "\" to Event ID " + req.body.eventid);
-				var eventStart = new Date(Date.parse(req.body.eventStart));
-				var eventEnd = new Date(Date.parse(req.body.eventEnd));
-				var generatedID = new mongo.ObjectID();
-				var startDate = new Date(Date.parse(eventStart.getFullYear() + "-" + (eventStart.getMonth()+1) + "-" + eventStart.getDate() + " " +req.body.start));
-				var endDate = new Date(Date.parse(eventEnd.getFullYear() + "-" + (eventStart.getMonth()+1) + "-" + eventEnd.getDate() + " " +req.body.end));
-				var newShift = {'id': generatedID, 'start': startDate,'end': endDate, 'staff': chosenStaff};
+				var eventStart = new Date(Date.parse(req.body.eventStart)),
+					eventEnd = new Date(Date.parse(req.body.eventEnd)),
+					generatedID = new mongo.ObjectID(),
+					startDate = new Date(Date.parse(eventStart.getFullYear() + "-" + (eventStart.getMonth()+1) + "-" + eventStart.getDate() + " " +req.body.start)),
+					endDate = new Date(Date.parse(eventEnd.getFullYear() + "-" + (eventStart.getMonth()+1) + "-" + eventEnd.getDate() + " " +req.body.end)),
+					newShift = {'id': generatedID, 'start': startDate,'end': endDate, 'staff': chosenStaff};
 				db.events.findAndModify({
 									query: {_id: new mongo.ObjectID(req.body.eventid)},
 									update: { $addToSet: {'shifts': newShift} }, 
@@ -942,8 +941,8 @@
 			app.get("/staff/available/today", cas.blocker, function(req, res) {
 				var busyStaff = [];
 				//86400s = 1d
-				var start = new Date(req.query.start * 1000);
-				var end = new Date(req.query.end * 1000);
+				var start = new Date(req.query.start * 1000),
+					end = new Date(req.query.end * 1000);
 				console.log("Req for staff available starting at " + start.toDateString() + " and ending before " + end.toDateString());
 				res.writeHead(200, {
 					'Content-Type': 'application/json'
@@ -972,8 +971,8 @@
 					res.end();
 					return false;
 				}
-				var start = new Date(Date.parse(req.query.start));
-				var end = new Date(Date.parse(req.query.end));
+				var start = new Date(Date.parse(req.query.start)),
+					end = new Date(Date.parse(req.query.end));
 				end = new Date(end.getTime() + 24 * 60 * 60 * 1000);
 				console.log(start);
 				console.log("Req for staff check for " + req.query.user);
@@ -994,8 +993,8 @@
 					res.end();
 					return false;
 				}
-				var start = new Date(Date.parse(req.query.start));
-				var end = new Date(Date.parse(req.query.end));
+				var start = new Date(Date.parse(req.query.start)),
+					end = new Date(Date.parse(req.query.end));
 				end = new Date(end.getTime() + 24 * 60 * 60 * 1000);
 				console.log(start);
 				console.log("Req for staff table for " + req.query.user);
@@ -1058,8 +1057,8 @@
 
 
 	app.post('/fileUpload', cas.blocker, function(req, res) {
-		var today = new Date(); today.setHours(0,0,0,0);
-		var twoWeeksLater = new Date((new Date).getTime() + 2 * 7 * 24 * 60 * 60 * 1000); twoWeeksLater.setHours(23,59,59,999);
+		var today = new Date(); today.setHours(0,0,0,0),
+			twoWeeksLater = new Date((new Date).getTime() + 2 * 7 * 24 * 60 * 60 * 1000); twoWeeksLater.setHours(23,59,59,999);
 		db.events.find({'start': {$gte: today, $lt: twoWeeksLater}}, function(err, events) {
 			if (err || !events) {
 				console.log("No events found");
@@ -1076,8 +1075,8 @@
 					//you should check if it's an xml file
 					try {
 						// Freshly uploaded XML and last.xml are read
-							var xml = fs.readFileSync(req.files.myFile.path);
-							var last = fs.readFileSync(Preferences.path_last_xml);
+							var xml = fs.readFileSync(req.files.myFile.path),
+								last = fs.readFileSync(Preferences.path_last_xml);
 						// Both XML files are parsed
 							xml = parser.toJson(xml, {
 								object: true,
@@ -1114,11 +1113,11 @@
 						});
 						//should write a part that distinguishes new events and updated events.
 						var process = function(data) {
-							var bookingDate = data['Booking_x0020_Date'].split(" ")[0]
-							var reservedStart = new Date(Date.parse(bookingDate + ' ' + data['Reserved_x0020_Start']));
-							var reservedEnd = new Date(Date.parse(bookingDate + ' ' + data['Reserved_x0020_End']));
-							var eventStart = new Date(Date.parse(bookingDate + ' ' + data['Event_x0020_Start']));
-							var eventEnd = new Date(Date.parse(bookingDate + ' ' + data['Event_x0020_End']));
+							var bookingDate = data['Booking_x0020_Date'].split(" ")[0],
+								reservedStart = new Date(Date.parse(bookingDate + ' ' + data['Reserved_x0020_Start'])),
+								reservedEnd = new Date(Date.parse(bookingDate + ' ' + data['Reserved_x0020_End'])),
+								eventStart = new Date(Date.parse(bookingDate + ' ' + data['Event_x0020_Start'])),
+								eventEnd = new Date(Date.parse(bookingDate + ' ' + data['Event_x0020_End']));
 							if (data['Booking_x0020_Status'] == 'Cancelled') {
 								var valid = false;
 							} else {
@@ -1164,9 +1163,9 @@
 						whatToChange.update = whatToChange.update.map(process);
 						whatToChange.add = whatToChange.add.map(process).map(cleanSheet);
 
-						var changeNumbers = {add:0, update:0, remove: 0};
-						var parallel = [];
-						var whatToReport = {update:[], remove: whatToChange.remove};
+						var changeNumbers = {add:0, update:0, remove: 0},
+							parallel = [],
+							whatToReport = {update:[], remove: whatToChange.remove};
 						//push update functions in an array, in order to have a final callback function to end response after the async.parallel process
 						whatToChange.add.forEach(function(event) { 
 							parallel.push(function(callback) {
@@ -1276,8 +1275,8 @@
 		});
 		//we have an object {update:[], remove:[]}, and the update array has the XMLid's of these events, we need to find the people involved
 		// NOTE THAT the remove array has the events themselves directly!!!
-		var whatToSend = {};
-		var parallel = [];
+		var whatToSend = {},
+			parallel = [];
 		whatToReport.update.forEach(function(id) {
 			parallel.push(function(callback) {
 				db.events.findOne({'XMLid':id}, function(err, event) {
@@ -1324,8 +1323,8 @@
 		//now it's time to report all updates to the managers (all staff with level 10), with whatToReport
 			
 			//var managerList = _.findWhere(app.locals.storeStaff, {level:10});
-			var managerList = [{'username':'ckorkut'}]; //only for testing
-			var managerMailOptions = {
+			var managerList = [{'username':'ckorkut'}], //only for testing
+				managerMailOptions = {
 					    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
 					    subject: "General Event Update Report (IMPORTANT)",
 					};
@@ -1372,8 +1371,8 @@
 		today.setMinutes(0);
 		today.setSeconds(0);
 		today.setMilliseconds(0);
-		var start = new Date(today.getTime() + 24 * 60 * 60 * 1000 * req.params.counter);
-		var end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+		var start = new Date(today.getTime() + 24 * 60 * 60 * 1000 * req.params.counter),
+			end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
 		
 		var title = '';
 		if (req.params.counter == 0) {
