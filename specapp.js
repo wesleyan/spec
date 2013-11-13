@@ -8,30 +8,7 @@
 */
 // CONFIGURATION AND MODULES
 	require('ofe').call();
-	var Preferences = {
-		//general preferences
-		debug: true, //making it false will overwrite console.log
-		path_last_xml: './uploads/last.xml',
-		path_client_secret: './config/client_secret.json',
-		//the one below must match with the one you have saved in https://code.google.com/apis/console
-		googleRedirectUrl: 'http://ims-dev.wesleyan.edu:8080/oauth2callback',
-		port: 8080,
-		mail: {
-			service:'Gmail',
-			user:'wesleyanspec@gmail.com',
-			pass:'#thisiswhy'
-		},
-		backgroundColors: {
-			'green': '#097054',
-			'red': '#9E3B33',
-			'yellow': '#E48743',
-			'gray': '#666666'
-		},
-		//MongoDB preferences
-		databaseUrl: "127.0.0.1:27017/spec",
-		collections: ['events','staff','inventory']
-	}
-
+	var Preferences = require('./config/Preferences.js')
 	var express = require('express'),
 		app = express(),
 		$ = require('jquery'),
@@ -43,14 +20,7 @@
 		nodemailer = require("nodemailer"),
 		async = require('async'),
 		ejs = require('ejs');
-
-	//CAS Configurations
-	cas.configure({
-		casHost: 'sso.wesleyan.edu',
-		ssl: true,
-		service: 'http://ims-dev.wesleyan.edu:8080/',
-		redirectUrl: '/login'
-	});
+	cas.configure(Preferences.casOptions);
 
 	app.configure(function() {
 		app.set('views', __dirname + '/views');
@@ -68,7 +38,7 @@
 	ejs.close = '}}';
 
 // UTILITY FUNCTIONS
-	function sendSingleMail(options, callback) {
+	var sendSingleMail = function(options, callback) {
 		var smtpTransport = nodemailer.createTransport("SMTP", {
 			service: Preferences.mail.service,
 			auth: {
@@ -391,11 +361,7 @@
 	});
 
 // EVENTS
-	var date = new Date(),
-		d = date.getDate(),
-		m = date.getMonth(),
-		y = date.getFullYear();
-	function addBackgroundColor(events) { //changes the events object
+	var addBackgroundColor = function(events) { //changes the events object
 		for (index = 0; index < events.length; ++index) {
 			event = events[index];
 			if(event.duration == false) {
@@ -1057,7 +1023,6 @@
 	  res.render('upload');
 	});
 
-
 	app.post('/fileUpload', cas.blocker, function(req, res) {
 		var today = new Date(); today.setHours(0,0,0,0),
 			twoWeeksLater = new Date((new Date).getTime() + 2 * 7 * 24 * 60 * 60 * 1000); twoWeeksLater.setHours(23,59,59,999);
@@ -1347,7 +1312,6 @@
 	} //end of reportUpdate
 
 // MAIN PAGE RENDERING
-
 	app.get('/', cas.blocker, function (req, res) {
 		if(req.query.ticket) {res.redirect('/');} //redirect to the base if there is a ticket in the URL
 		  var currentUser = _.findWhere(app.locals.storeStaff, { 'username': getUser(req) });
@@ -1481,13 +1445,6 @@
 	}, 1000 * 60 * 5); //every 5 minutes
 
 // STARTING THE SERVER
-	/* //options for using SSL, not used right now
-	var options = {
-	        key: fs.readFileSync('../ssl-key.pem'),
-	        cert: fs.readFileSync('/etc/pki/tls/certs/ca-bundle.crt'),
-	        };
-	*/
 	app.listen(Preferences.port, function() {
 		console.log("Express server listening on port " + Preferences.port);
-		if(Preferences.debug == false) {console.log = function(){};} //cancel console logs if debug
 	});
