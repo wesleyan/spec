@@ -38,7 +38,8 @@
 	ejs.close = '}}';
 
 // UTILITY FUNCTIONS
-	var sendSingleMail = function(options, callback) {
+	var Utility = {};
+	Utility.sendSingleMail = function(options, callback) {
 		var smtpTransport = nodemailer.createTransport("SMTP", {
 			service: Preferences.mail.service,
 			auth: {
@@ -61,7 +62,7 @@
 			}
 		});
 		smtpTransport.close();
-	}
+	};
 	app.locals.formatAMPM = function(date) {
 		var hours = date.getHours();
 		var minutes = date.getMinutes();
@@ -71,7 +72,7 @@
 		minutes = minutes < 10 ? '0' + minutes : minutes;
 		var strTime = hours + ':' + minutes + ' ' + ampm;
 		return strTime;
-	} //end formatAMPM
+	};
 	app.locals.getFormattedDate = function(date) {
 		var year = date.getFullYear();
 		var month = (1 + date.getMonth()).toString();
@@ -79,6 +80,9 @@
 		var day = date.getDate().toString();
 		day = day.length > 1 ? day : '0' + day;
 		return month + '/' + day + '/' + year;
+	};
+	app.locals.fixParantheses = function(s) {
+		return s.replace("&#35;","#").replace("&#41;",")").replace("&amp;#40;","(");
 	};
 
 // STUFF TO LOAD AT INITIATION
@@ -361,7 +365,7 @@
 	});
 
 // EVENTS
-	var addBackgroundColor = function(events) { //changes the events object
+	Utility.addBackgroundColor = function(events) { //changes the events object
 		for (index = 0; index < events.length; ++index) {
 			event = events[index];
 			if(event.duration == false) {
@@ -401,7 +405,7 @@
 				console.log(req.url);
 				console.log("No events found:" + err);
 			} else {
-				events = addBackgroundColor(events);
+				events = Utility.addBackgroundColor(events);
 				res.write(JSON.stringify(events).toString("utf-8"));
 				res.end();
 			}
@@ -852,7 +856,7 @@
 							//console.log("Shift added");
 							res.write(JSON.stringify({'id':generatedID.toString(),'start':startDate, 'end':endDate}).toString("utf-8"));
 							res.end();
-							sendSingleMail({
+							Utility.sendSingleMail({
 								to: chosenStaff + '@wesleyan.edu',
 								subject:'You have a new shift! : ' + updated.title,
 								html: ejs.render(fs.readFileSync('./views/mail/newShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': newShift})
@@ -893,7 +897,7 @@
 								console.log('old shift could not be found');
 								return false;
 							}
-							sendSingleMail({
+							Utility.sendSingleMail({
 								to: oldShift.staff + '@wesleyan.edu',
 								subject:'You have a removed shift! : ' + updated.title,
 								html: ejs.render(fs.readFileSync('./views/mail/removeShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': oldShift})
@@ -1289,8 +1293,7 @@
 
 		//now it's time to report all updates to the managers (all staff with level 10), with whatToReport
 			
-			//var managerList = _.findWhere(app.locals.storeStaff, {level:10});
-			var managerList = [{'username':'ckorkut'}], //only for testing
+			var managerList = _.findWhere(app.locals.storeStaff, {level:10});
 				managerMailOptions = {
 					    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
 					    subject: "General Event Update Report (IMPORTANT)",
@@ -1328,9 +1331,6 @@
 		if(req.query.ticket) {res.redirect('/m/');} //redirect to the base if there is a ticket in the URL
 		res.redirect('/m/0/');
 	});
-	app.locals.fixParantheses = function(s) {
-		return s.replace("&#35;","#").replace("&#41;",")").replace("&amp;#40;","(");
-	}
 	app.get('/m/:counter/', cas.blocker, function (req, res) {
 		var today = new Date();
 		today.setHours(0);
