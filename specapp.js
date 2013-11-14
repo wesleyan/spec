@@ -25,7 +25,7 @@
 	app.configure(function() {
 		app.set('views', __dirname + '/views');
 		app.set('view engine', 'ejs');
-		app.use(express.bodyParser({keepExtensions: true, uploadDir:'uploads'}));
+		app.use(express.bodyParser({keepExtensions: true, uploadDir:'./uploads'}));
 		app.use(express.methodOverride());
 		app.use(express.cookieParser('secret'));
 		app.use(express.session());
@@ -1225,6 +1225,9 @@
 									console.log('File with error successfully deleted');
 								});
 							})(req.files.myFile.path);
+						} else {
+							console.log('There is a file:');
+							console.log(JSON.stringify(req.files.myFile));
 						}
 						console.log(err);
 						//res.writeHead(400);
