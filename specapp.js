@@ -1320,7 +1320,7 @@
 			res.redirect('/'); //redirect to the base if there is a ticket in the URL
 		}
 		var currentUser = _.findWhere(app.locals.storeStaff, { 'username': getUser(req) });
-		if(isUndefined(currentUser)) { //the user is not in the staff database
+		if(_.isUndefined(currentUser)) { //the user is not in the staff database
 			res.render('notStaff', {cas_user: getUser(req)});
 		} else {
 			res.render('index', {
