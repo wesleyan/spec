@@ -1,4 +1,4 @@
 spec
 ====
 
-Spec is Instructional Media Services' event management application.
+spec is Instructional Media Services' event management application.
