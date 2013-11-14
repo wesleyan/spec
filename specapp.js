@@ -25,7 +25,7 @@
 	app.configure(function() {
 		app.set('views', __dirname + '/views');
 		app.set('view engine', 'ejs');
-		app.use(express.bodyParser({keepExtensions: true, uploadDir:'./uploads'}));
+		app.use(express.bodyParser({keepExtensions: true, uploadDir: __dirname + '/uploads'}));
 		app.use(express.methodOverride());
 		app.use(express.cookieParser('secret'));
 		app.use(express.session());
@@ -1217,6 +1217,7 @@
 						// delete the newly uploaded file because there is no need to store it
 						if(!_.isUndefined(req.files)) { //if there is actually a file, then delete it
 							(function(path) {
+								console.log(path);
 								fs.unlink(path, function(err) {
 									if (err) {
 										console.log(err);
@@ -1226,8 +1227,7 @@
 								});
 							})(req.files.myFile.path);
 						} else {
-							console.log('There is a file:');
-							console.log(JSON.stringify(req.files.myFile));
+							console.log('There is no file uploaded.');
 						}
 						console.log(err);
 						//res.writeHead(400);
