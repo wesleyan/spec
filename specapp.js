@@ -1316,15 +1316,20 @@
 
 // MAIN PAGE RENDERING
 	app.get('/', cas.blocker, function (req, res) {
-		if(req.query.ticket) {res.redirect('/');} //redirect to the base if there is a ticket in the URL
-		  var currentUser = _.findWhere(app.locals.storeStaff, { 'username': getUser(req) });
-		  res.render('index',
-			{
+		if(req.query.ticket) {
+			res.redirect('/'); //redirect to the base if there is a ticket in the URL
+		}
+		var currentUser = _.findWhere(app.locals.storeStaff, { 'username': getUser(req) });
+		if(isUndefined(currentUser)) { //the user is not in the staff database
+			res.render('notStaff', {cas_user: getUser(req)});
+		} else {
+			res.render('index', {
 				username: currentUser.username,
 				permission: currentUser.level,
 				staffname: currentUser.name,
 			});
-		});
+		}
+	});
 
 // MOBILE
 	app.get('/m', cas.blocker, function (req, res) {
