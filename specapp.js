@@ -147,7 +147,7 @@
 		oauth_cache = {};
 
 	try {
-	oauth_cache = JSON.parse(fs.readFileSync(Preferences.path_client_secret, 'utf8'));
+	oauth_cache = JSON.parse(fs.readFileSync(__dirname + Preferences.path_client_secret, 'utf8'));
 	} catch (e) {
 		console.log("Could not read client secret file from the config directory\nError: " + e);
 	}
@@ -859,7 +859,7 @@
 							Utility.sendSingleMail({
 								to: chosenStaff + '@wesleyan.edu',
 								subject:'You have a new shift! : ' + updated.title,
-								html: ejs.render(fs.readFileSync('./views/mail/newShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': newShift})
+								html: ejs.render(fs.readFileSync(__dirname + '/views/mail/newShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': newShift})
 							});
 						}
 					});
@@ -900,7 +900,7 @@
 							Utility.sendSingleMail({
 								to: oldShift.staff + '@wesleyan.edu',
 								subject:'You have a removed shift! : ' + updated.title,
-								html: ejs.render(fs.readFileSync('./views/mail/removeShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': oldShift})
+								html: ejs.render(fs.readFileSync(__dirname + '/views/mail/removeShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': oldShift})
 							});
 						}
 					});
@@ -1047,8 +1047,8 @@
 					//you should check if it's an xml file
 					try {
 						// Freshly uploaded XML and last.xml are read
-							var xml = fs.readFileSync(req.files.myFile.path),
-								last = fs.readFileSync(Preferences.path_last_xml);
+							var xml = fs.readFileSync(__dirname + req.files.myFile.path),
+								last = fs.readFileSync(__dirname + Preferences.path_last_xml);
 						// Both XML files are parsed
 							xml = parser.toJson(xml, {
 								object: true,
@@ -1199,18 +1199,18 @@
 							res.end();
 							// delete the old last.xml file and rename the new uploaded file as last.xml
 							(function(path) {
-								fs.unlink(Preferences.path_last_xml, function(err) {
+								fs.unlink(__dirname + Preferences.path_last_xml, function(err) {
 									if (err) {
 										console.log(err);
 										return false;
 									}
 									console.log('Old last.xml file successfully deleted');
-									fs.rename(path, Preferences.path_last_xml, function(err) {
+									fs.rename(path, __dirname + Preferences.path_last_xml, function(err) {
 										if (err) throw err;
 										console.log('Uploaded file renamed to last.xml');
 									});
 								});
-							})(req.files.myFile.path);
+							})(__dirname + req.files.myFile.path);
 							reportUpdate(whatToReport); //send messages to the staff and managers
 						});
 					} catch (err) {
@@ -1225,7 +1225,7 @@
 									}
 									console.log('File with error successfully deleted');
 								});
-							})(req.files.myFile.path);
+							})(__dirname + req.files.myFile.path);
 						} else {
 							console.log('There is no file uploaded.');
 						}
@@ -1284,7 +1284,7 @@
 				    subject: "Updated Event for " + user + " (IMPORTANT)",
 				};
 
-				staffMailOptions.html = ejs.render(fs.readFileSync('./views/mail/normalUpdate.ejs', 'utf8'), {'app': app, 'items': items});
+				staffMailOptions.html = ejs.render(fs.readFileSync(__dirname + '/views/mail/normalUpdate.ejs', 'utf8'), {'app': app, 'items': items});
 
 				smtpTransport.sendMail(staffMailOptions, function(error, response) {
 				    if (error) {
@@ -1305,7 +1305,7 @@
 					    subject: "General Event Update Report (IMPORTANT)",
 					};
 
-			managerMailOptions.html = ejs.render(fs.readFileSync('./views/mail/managerUpdate.ejs', 'utf8'), {'app': app, 'items': whatToReport});
+			managerMailOptions.html = ejs.render(fs.readFileSync(__dirname + '/views/mail/managerUpdate.ejs', 'utf8'), {'app': app, 'items': whatToReport});
 			managerList.forEach(function (manager) {
 				managerMailOptions.to = manager.username + "@wesleyan.edu"
 				smtpTransport.sendMail(managerMailOptions, function(error, response) {
@@ -1437,7 +1437,7 @@
 						    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
 						    subject: "Text reminder for " + user,
 						};
-						mailOptions.html = ejs.render(fs.readFileSync('./views/mail/textReminder.ejs', 'utf8'), {'app': app, 'event':event,'shift':shift});
+						mailOptions.html = ejs.render(fs.readFileSync(__dirname + '/views/mail/textReminder.ejs', 'utf8'), {'app': app, 'event':event,'shift':shift});
 						providers.each(function(provider) {
 							mailOptions.to = phone + "@" + provider; //we need to fetch the phone actually
 							smtpTransport.sendMail(mailOptions, function(error, response) {
