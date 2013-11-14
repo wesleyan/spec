@@ -1047,7 +1047,7 @@
 					//you should check if it's an xml file
 					try {
 						// Freshly uploaded XML and last.xml are read
-							var xml = fs.readFileSync(__dirname + req.files.myFile.path),
+							var xml = fs.readFileSync(req.files.myFile.path),
 								last = fs.readFileSync(__dirname + Preferences.path_last_xml);
 						// Both XML files are parsed
 							xml = parser.toJson(xml, {
@@ -1210,7 +1210,7 @@
 										console.log('Uploaded file renamed to last.xml');
 									});
 								});
-							})(__dirname + req.files.myFile.path);
+							})(req.files.myFile.path);
 							reportUpdate(whatToReport); //send messages to the staff and managers
 						});
 					} catch (err) {
@@ -1225,7 +1225,7 @@
 									}
 									console.log('File with error successfully deleted');
 								});
-							})(__dirname + req.files.myFile.path);
+							})(req.files.myFile.path);
 						} else {
 							console.log('There is no file uploaded.');
 						}
