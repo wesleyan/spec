@@ -1299,7 +1299,7 @@
 
 		//now it's time to report all updates to the managers (all staff with level 10), with whatToReport
 			
-			var managerList = _.findWhere(app.locals.storeStaff, {level:10});
+			var managerList = _.where(app.locals.storeStaff, {level:10});
 				managerMailOptions = {
 					    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
 					    subject: "General Event Update Report (IMPORTANT)",
