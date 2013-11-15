@@ -4,518 +4,485 @@ var db = require("mongojs").connect(databaseUrl, collections);
 var mongo = require('mongodb-wrapper');
 
 var staff = [{
-	"username": "bmorgan",
-	"level": 10,
-	"phone": 8606851173,
-	"name": "Brent M.",
-	"text": 1,
-	"class_year": 0
-}, {
-	"username": "hflores",
-	"level": 10,
-	"email": 0,
-	"phone": false,
-	"name": "Heric F.",
-	"text": 0,
-	"class_year": 0
-}, {
-	"username": "sshachat",
-	"level": 10,
-	"phone": 5044504913,
-	"name": "Sarah H.",
-	"text": 1,
-	"class_year": 0
-}, {
-	"username": "jher",
-	"level": 10,
-	"phone": 8284613416,
-	"name": "Judy H.",
-	"text": 1,
-	"class_year": 0
-}, {
-	"username": "kakoi",
-	"level": 0,
-	"phone": 8607595611,
-	"name": "Kwaku A.",
-	"text": 0,
-	"class_year": 2014
-}, {
-	"username": "sbarth",
-	"level": 10,
-	"phone": false,
-	"name": "Sam B.",
-	"text": 0,
-	"class_year": 0
-}, {
-	"username": "tskim",
-	"level": 10,
-	"phone": 8605389580,
-	"name": "Ted K.",
-	"text": 0,
-	"class_year": 2015
-}, {
-	"username": "elopez01",
-	"level": 0,
-	"phone": 3106132482,
-	"name": "Eric L.",
-	"text": 1,
-	"class_year": 2015
-}, {
-	"username": "jthall",
-	"level": 3,
-	"phone": 8609429342,
-	"name": "James H.",
-	"text": 0,
-	"class_year": 2015
-}, {
-	"username": "llin01",
-	"level": 3,
-	"phone": 6468947380,
-	"name": "Li L.",
-	"text": 0,
-	"class_year": 2014
-}, {
-	"username": "eislo",
-	"level": 3,
-	"phone": 4146873311,
-	"name": "Erik I.",
-	"text": 1,
-	"class_year": 2015
-}, {
-	"username": "rfonticoba",
-	"level": 3,
-	"phone": false,
-	"name": "Becky F.",
-	"text": 0,
-	"class_year": 0
-}, {
-	"username": "echon",
-	"level": 10,
-	"phone": false,
-	"name": "Erica C.",
-	"text": 0,
-	"class_year": 0
-}, {
-	"username": "jnyange",
-	"level": 0,
-	"phone": false,
-	"name": "Huong N.",
-	"text": 0,
-	"class_year": 0
-}, {
-	"username": "omay",
-	"level": 0,
-	"phone": 7033048805,
-	"name": "Olivia M.",
-	"text": 0,
-	"class_year": 2014
-}, {
-	"username": "mchang01",
-	"level": 0,
-	"phone": 9174068962,
-	"name": "Megan C.",
-	"text": 0,
-	"class_year": 2014
-}, {
-	"username": "jxu",
-	"level": 0,
-	"phone": 8607547378,
-	"name": "Chelsea X.",
-	"text": 1,
-	"class_year": 0
-}, {
-	"username": "cmartinson",
-	"level": 0,
-	"phone": 8438170364,
-	"name": "Christopher M.",
-	"text": 1,
-	"class_year": 2014
-}, {
-	"username": "lmunsil",
-	"level": 3,
-	"phone": 4805163115,
-	"name": "Laura M.",
-	"text": 0,
-	"class_year": 2014
-}, {
-	"username": "jrobles",
-	"level": 0,
-	"phone": false,
-	"name": "Jiovani R.",
-	"text": 0,
-	"class_year": 0
-}, {
-	"username": "tdupreetan",
-	"level": 10,
-	"phone": 8608905597,
-	"name": "Tai T.",
-	"text": 1,
-	"class_year": 2015
-}, {
-	"username": "ndoungkaew",
-	"level": 0,
-	"phone": 8607595743,
-	"name": "Mint D.",
-	"text": 1,
-	"class_year": 2014
-}, {
-	"username": "aprempeh",
-	"level": 0,
-	"phone": 3477532395,
-	"name": "Achiaa P.",
-	"text": 1,
-	"class_year": 2015
-}, {
-	"username": "syang",
-	"level": 10,
-	"phone": false,
-	"name": "Joseph Y.",
-	"text": 0,
-	"class_year": 0
-}, {
-	"username": "kgibbel",
-	"level": 0,
-	"phone": 7187444392,
-	"name": "Katherine G.",
-	"text": 0,
-	"class_year": 2015
-}, {
-	"username": "gmoskowitz",
-	"level": 3,
-	"phone": 8189174836,
-	"name": "Gavriela M.",
-	"text": 1,
-	"class_year": 2015
-}, {
-	"username": "hhadjeres",
-	"level": 0,
-	"phone": 8579195413,
-	"name": "Hichem H.",
-	"text": 1,
-	"class_year": 0
-}, {
-	"username": "pinoa",
-	"level": 3,
-	"phone": 2025383860,
-	"name": "Priscilla I.",
-	"text": 1,
-	"class_year": 2015
-}, {
-	"username": "avonpentz",
-	"level": 0,
-	"phone": 2026697862,
-	"name": "Annalora P.",
-	"text": 1,
-	"class_year": 2014
-}, {
-	"username": "pissaraviriy",
-	"level": 0,
-	"phone": false,
-	"name": "Som-o I.",
-	"text": 0,
-	"class_year": 0
-}, {
-	"username": "rchristensen",
-	"level": 10,
-	"phone": 2039367562,
-	"name": "Rob C.",
-	"text": 0,
-	"class_year": 0
-}, {
-	"username": "osarwar",
-	"level": 0,
-	"phone": 7815028950,
-	"name": "Ozair S.",
-	"text": 1,
-	"class_year": 2015
-}, {
-	"username": "cqoconnor",
-	"level": 0,
-	"phone": 6462362622,
-	"name": "Colin O.",
-	"text": 1,
-	"class_year": 2015
-}, {
-	"username": "ochavez",
-	"level": 0,
-	"phone": "347-743-63",
-	"name": "Olivia C.",
-	"text": 1,
-	"class_year": 0
-}, {
-	"username": "jsoon",
-	"level": 0,
-	"phone": false,
-	"name": "Sean S.",
-	"text": 0,
-	"class_year": 2014
-}, {
-	"username": "dsongcho",
-	"level": 0,
-	"phone": 8607703485,
-	"name": "Diego C.",
-	"text": 1,
-	"class_year": 2015
-}, {
-	"username": "gnwang",
-	"level": 0,
-	"phone": 8607548289,
-	"name": "Nathan W.",
-	"text": 1,
-	"class_year": 0
-}, {
-	"username": "dkim04",
-	"level": 0,
-	"phone": 7143454133,
-	"name": "Daniel K.",
-	"text": 1,
-	"class_year": 2014
-}, {
-	"username": "kwernick",
-	"level": 0,
-	"phone": 2404497471,
-	"name": "Kara W.",
-	"text": 1,
-	"class_year": 0
-}, {
-	"username": "jkim07",
-	"level": 3,
-	"phone": false,
-	"name": "Jamie K.",
-	"text": 0,
-	"class_year": 0
-}, {
-	"username": "pgerard",
-	"level": 3,
-	"phone": 4084976910,
-	"name": "Pierre G.",
-	"text": 1,
-	"class_year": 2015
-}, {
-	"username": "tstoop",
-	"level": 3,
-	"phone": 6094396131,
-	"name": "Tawni S.",
-	"text": 0,
-	"class_year": 2015
-}, {
-	"username": "aburkart",
-	"level": 0,
-	"phone": 8603984532,
-	"name": "Chachi B.",
-	"text": 0,
-	"class_year": 2014
-}, {
-	"username": "sdeng",
-	"level": 0,
-	"phone": 6262613846,
-	"name": "Shirley D.",
-	"text": 1,
-	"class_year": 2014
-}, {
-	"username": "kcho01",
-	"level": 3,
-	"phone": 7039460537,
-	"name": "Kang C.",
-	"text": 1,
-	"class_year": 2015
-}, {
-	"username": "rpruitt",
-	"level": 3,
-	"phone": 5732394463,
-	"name": "Ryan P.",
-	"text": 1,
-	"class_year": 2015
-}, {
-	"username": "mmearabainbr",
-	"level": 0,
-	"phone": false,
-	"name": false,
-	"text": 0,
-	"class_year": 0
-}, {
-	"username": "atetteyfio",
-	"level": 0,
-	"phone": false,
-	"name": "Afi T.",
-	"text": 0,
-	"class_year": 0
-}, {
-	"username": "okuti",
-	"level": 3,
-	"phone": 8608341330,
-	"name": "Kumbi K.",
-	"text": 1,
-	"class_year": 2016
-}, {
-	"username": "tqiao",
-	"level": 0,
-	"phone": "860-807-58",
-	"name": "Tien Q.",
-	"text": 1,
-	"class_year": 2015
-}, {
-	"username": "mleung",
-	"level": 0,
-	"phone": 9174599838,
-	"name": "Melissa L.",
-	"text": 1,
-	"class_year": 2016
-}, {
-	"username": "bforde",
-	"level": 3,
-	"phone": 3017423434,
-	"name": "Ben F.",
-	"text": 1,
-	"class_year": 2016
-}, {
-	"username": "jgoh",
-	"level": 0,
-	"phone": false,
-	"name": "Jin G.",
-	"text": 1,
-	"class_year": 2016
-}, {
-	"username": "vdeng",
-	"level": 0,
-	"phone": 7189748943,
-	"name": "Vivian D.",
-	"text": 1,
-	"class_year": 2015
-}, {
-	"username": "mdietz",
-	"level": 0,
-	"phone": 6467054230,
-	"name": "Max D.",
-	"text": 1,
-	"class_year": 2016
-}, {
-	"username": "rpodell",
-	"level": 0,
-	"phone": 3235788168,
-	"name": "Rhys P.",
-	"text": 1,
-	"class_year": 2016
-}, {
-	"username": "xzhu01",
-	"level": 0,
-	"phone": 4155298574,
-	"name": "Xinyu Z.",
-	"text": 0,
-	"class_year": 2016
-}, {
-	"username": "gyatich",
-	"level": 0,
-	"phone": 8603010012,
-	"name": "Geofrey Y.",
-	"text": 1,
-	"class_year": 2016
-}, {
-	"username": "cfrancisco",
-	"level": 0,
-	"phone": 7814686010,
-	"name": "Denise F.",
-	"text": 0,
-	"class_year": 2016
-}, {
-	"username": "aasonye",
-	"level": 0,
-	"phone": 3373423294,
-	"name": "Amarachi A.",
-	"text": 1,
-	"class_year": 2016
-}, {
-	"username": "rbabajide",
-	"level": 3,
-	"phone": 8323754438,
-	"name": "Rilwan B.",
-	"text": 1,
-	"class_year": 2016
-}, {
-	"username": "rmoye",
-	"level": 0,
-	"phone": 6466965708,
-	"name": "Ryan M.",
-	"text": 1,
-	"class_year": 2016
-}, {
-	"username": "jrnelson",
-	"level": 0,
-	"phone": 8585310700,
-	"name": "John N.",
-	"text": 0,
-	"class_year": 2016
-}, {
-	"username": "sho01",
-	"level": 0,
-	"phone": 8608075684,
-	"name": "Samantha H.",
-	"text": 1,
-	"class_year": 2016
-}, {
-	"username": "olawal",
-	"level": 0,
-	"phone": 3472575294,
-	"name": "Yinka L.",
-	"text": 1,
-	"class_year": 2015
-}, {
-	"username": "hjung01",
-	"level": 0,
-	"phone": false,
-	"name": false,
-	"text": 0,
-	"class_year": 2016
-}, {
-	"username": "szaman",
-	"level": 0,
-	"phone": false,
-	"name": false,
-	"text": 0,
-	"class_year": 0
-}, {
-	"username": "yeom",
-	"level": 0,
-	"phone": false,
-	"name": false,
-	"text": 0,
-	"class_year": 0
-}, {
-	"username": "yrapten",
-	"level": 0,
-	"phone": false,
-	"name": false,
-	"text": 0,
-	"class_year": 0
-}, {
-	"username": "mspiegelman",
-	"level": 0,
-	"phone": 9542409063,
-	"name": false,
-	"text": 0,
-	"class_year": 0
-}, {
-	"username": "pkumar",
-	"level": 0,
-	"phone": 8609186163,
-	"name": false,
-	"text": 0,
-	"class_year": 0
-}, {
-	"username": "crchandler",
-	"level": 0,
-	"phone": false,
-	"name": false,
-	"text": 0,
-	"class_year": 0
-},
-{
-	"username": "ckorkut",
-	"level": 10,
-	"phone": false,
-	"name": 'Cumhur K.',
-	"text": 0,
-	"class_year": 2017
+  'name': 'Babajide Rilwan',
+  'phone': 8323754438,
+  'username': 'rbabajide',
+  'class_year': 2016,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Chamberlin Cabri',
+  'phone': 7204213994,
+  'username': 'cchamberlin',
+  'class_year': 2016,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Chandler Coleman',
+  'phone': 5059204486,
+  'username': 'crchandler',
+  'class_year': 2016,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Deng Vivian',
+  'phone': 7189748943,
+  'username': 'vdeng',
+  'class_year': 2015,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Deng Shirley',
+  'phone': 6262613846,
+  'username': 'sdeng',
+  'class_year': 2014,
+  'permission': 10,
+  'task': ['events']
+}, {
+  'name': 'Dupree Tan Tai',
+  'phone': 8608905597,
+  'username': 'tdupreetan',
+  'class_year': 2015,
+  'permission': 10,
+  'task': ['events']
+}, {
+  'name': 'Eom Andrew',
+  'phone': 8609186207,
+  'username': 'yeom',
+  'class_year': 2016,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Forde Benjamin',
+  'phone': 3017423434,
+  'username': 'bforde',
+  'class_year': 2016,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Francisco Denise',
+  'phone': 7814676010,
+  'username': 'cfrancisco',
+  'class_year': 2016,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Gerard Pierre',
+  'phone': 4084976910,
+  'username': 'pgerard',
+  'class_year': 2015,
+  'permission': 10,
+  'task': ['events']
+}, {
+  'name': 'Gibbel Katherine',
+  'phone': 7187444392,
+  'username': 'kgibbel',
+  'class_year': 2015,
+  'permission': 3,
+  'task': ['events']
+}, {
+  'name': 'Goh Victor (Jin Chieh)',
+  'phone': 8607592403,
+  'username': 'jgoh',
+  'class_year': 2016,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Hall James ',
+  'phone': 8609429342,
+  'username': 'jthall',
+  'class_year': 2015,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Hildebrand Reid',
+  'phone': 4344669905,
+  'username': 'rhildebrand',
+  'class_year': 2015,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Ho Samantha',
+  'phone': 8608075684,
+  'username': 'sho01',
+  'class_year': 2016,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Inoa Priscilla',
+  'phone': 2025383860,
+  'username': 'pinoa',
+  'class_year': 2015,
+  'permission': 3,
+  'task': ['events']
+}, {
+  'name': 'Jung Harim',
+  'phone': 2016632552,
+  'username': 'hjung01',
+  'class_year': 2016,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Kim Daniel',
+  'phone': 7143454133,
+  'username': 'dkim04',
+  'class_year': 2014,
+  'permission': 3,
+  'task': ['events']
+}, {
+  'name': 'Kim Theodore',
+  'phone': 8605389580,
+  'username': 'tskim',
+  'class_year': 2015,
+  'permission': 10,
+  'task': ['events']
+}, {
+  'name': 'Kumar Purnima',
+  'phone': 8609186163,
+  'username': 'pkumar',
+  'class_year': 2016,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Kuti Olakumbi',
+  'phone': 8608341330,
+  'username': 'okuti',
+  'class_year': 2016,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Lawal Olayinka',
+  'phone': 3472575294,
+  'username': 'olawal',
+  'class_year': 2015,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Leung Melissa',
+  'phone': 9174599838,
+  'username': 'mleung',
+  'class_year': 2016,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Lopez Eric',
+  'phone': 3106132482,
+  'username': 'elopez01',
+  'class_year': 2015,
+  'permission': 10,
+  'task': ['events']
+}, {
+  'name': 'Munsil Laura',
+  'phone': 4805163115,
+  'username': 'lmunsil',
+  'class_year': 2014,
+  'permission': 3,
+  'task': ['events']
+}, {
+  'name': 'Moskowitz Gavriela ',
+  'phone': 8189174836,
+  'username': 'gmoskowitz',
+  'class_year': 2015,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Moye Ryan',
+  'phone': 6466965708,
+  'username': 'rmoye',
+  'class_year': 2016,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Nelson John',
+  'phone': 8585310700,
+  'username': 'jrnelson',
+  'class_year': 2016,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': "O'Connor Colin Quinn",
+  'phone': 6462362622,
+  'username': 'cqoconnor',
+  'class_year': 2015,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Podell Rhys',
+  'phone': 3235788168,
+  'username': 'rpodell',
+  'class_year': 2016,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Prempeh Achiaa',
+  'phone': 8605388064,
+  'username': 'aprempeh',
+  'class_year': 2015,
+  'permission': 3,
+  'task': ['events']
+}, {
+  'name': 'Song Diego',
+  'phone': 8607703485,
+  'username': 'dsongcho',
+  'class_year': 2015,
+  'permission': 10,
+  'task': ['events']
+}, {
+  'name': 'Sieminski Dominic',
+  'phone': 7732166552,
+  'username': 'dsieminski',
+  'class_year': 2015,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Spiegelman Max',
+  'phone': 9542409063,
+  'username': 'mspiegelman',
+  'class_year': 2016,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Stoop Tawni',
+  'phone': 6094396131,
+  'username': 'tstoop',
+  'class_year': 2015,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Qiao Tian',
+  'phone': 8608075814,
+  'username': 'tqiao',
+  'class_year': 2016,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'von Pentz Annalora',
+  'phone': 2026697862,
+  'username': 'avonpentz',
+  'class_year': 2014,
+  'permission': 3,
+  'task': ['events']
+}, {
+  'name': 'Yatich Geofrey',
+  'phone': 8603010012,
+  'username': 'gyatich',
+  'class_year': 2016,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Zaman Saarim',
+  'phone': 2014175770,
+  'username': 'szaman',
+  'class_year': 2016,
+  'permission': 1,
+  'task': ['events']
+}, {
+  'name': 'Janamanchi Abhimanyu',
+  'phone': 7272046391,
+  'username': 'ajanamanchi',
+  'class_year': 2017,
+  'trainee': true,
+  'permission': 1,
+}, {
+  'name': 'Garcia Alex',
+  'phone': 8583426797,
+  'username': 'asgarcia',
+  'class_year': 2017,
+  'trainee': true,
+  'permission': 1,
+}, {
+  'name': 'Lyons Aliya',
+  'phone': 7185415966,
+  'username': 'aclyons',
+  'class_year': 2017,
+  'trainee': true,
+  'permission': 1,
+}, {
+  'name': 'Neupane Ankur',
+  'phone': 8607596791,
+  'username': 'aneupane',
+  'class_year': 2016,
+  'trainee': true,
+  'permission': 1,
+}, {
+  'name': 'Monroe Callie',
+  'phone': 2155192022,
+  'username': 'cmonroe',
+  'class_year': 2017,
+  'trainee': true,
+  'permission': 1,
+}, {
+  'name': 'Froot Daniel',
+  'phone': 9176476413,
+  'username': 'dfroot',
+  'class_year': 2016,
+  'trainee': true,
+  'permission': 1,
+}, {
+  'name': 'Pham Dung',
+  'phone': 8607594972,
+  'username': 'dpham',
+  'class_year': 2017,
+  'trainee': true,
+  'permission': 1,
+}, {
+  'name': 'Selig Ian',
+  'phone': 8606344723,
+  'username': 'iselig',
+  'class_year': 2016,
+  'trainee': true,
+  'permission': 1,
+}, {
+  'name': 'Fitzgerald Isabella',
+  'phone': 3109936852,
+  'username': 'ifitzgeraldh',
+  'class_year': 2017,
+  'trainee': true,
+  'permission': 1,
+}, {
+  'name': 'Wangsadinata Jason',
+  'phone': 8608075387,
+  'username': 'jwangsadinat',
+  'class_year': 2017,
+  'trainee': true,
+  'permission': 1,
+}, {
+  'name': 'Rossetter Kiley',
+  'phone': 4074156621,
+  'username': 'krossetter',
+  'class_year': 2017,
+  'trainee': true,
+  'permission': 1,
+}, {
+  'name': 'Trifunovski Maksim',
+  'phone': 8607599861,
+  'username': 'mtrifunovski',
+  'class_year': 2017,
+  'trainee': true,
+  'permission': 1,
+}, {
+  'name': 'Montanez Matt',
+  'phone': 2036925244,
+  'username': 'mmontanez',
+  'class_year': 2017,
+  'trainee': true,
+  'permission': 1,
+}, {
+  'name': 'Archibald Nkosi',
+  'phone': 5162360921,
+  'username': 'narchibald',
+  'class_year': 2016,
+  'trainee': true,
+  'permission': 1,
+}, {
+  'name': 'Harden Tyler',
+  'phone': 6036864110,
+  'username': 'tharden',
+  'class_year': 2017,
+  'trainee': true,
+  'permission': 1,
+}, {
+  "name": "Burkart Arthur",
+  'phone': 8603984532,
+  "username": "aburkart",
+  'class_year': 2014,
+  'task': ['programming'],
+  'permission': 10,
+}, {
+  "name": "Gapinski Brian",
+  'phone': 7192323977,
+  "username": "bgapinski",
+  'class_year': 2014,
+  'task': ['programming', 'cs'],
+  'permission': 10,
+}, {
+  "name": "Islo Erik",
+  'phone': 4146873311,
+  "username": "eislo",
+  'class_year': 2015,
+  'task': ['programming', 'cs'],
+  'permission': 10,
+}, {
+  "name": "Dietz Max",
+  'phone': 6467054230,
+  "username": "mdietz",
+  'class_year': 2016,
+  'task': ['programming'],
+  'permission': 10,
+}, {
+  "name": "Giagtzoglou Sam",
+  'phone': 2022476496,
+  "username": "sgiagtzoglou",
+  'class_year': 2016,
+  'task': ['programming'],
+  'permission': 10,
+}, {
+  "name": "Korkut Cumhur",
+  'phone': 8602561103,
+  "username": "ckorkut",
+  'class_year': 2017,
+  'task': ['programming'],
+  'permission': 10,
+}, {
+  "name": "Lashner Jack",
+  'phone': 6109084797,
+  "username": "jlashner",
+  'class_year': 2016,
+  'task': ['programming'],
+  'permission': 10,
+}, {
+  "name": "Raymond Justin",
+  'phone': 9786217567,
+  "username": "jraymond",
+  'class_year': 2014,
+  'task': ['programming'],
+  'permission': 10,
+}, {
+  'name': 'Haydar Rashedul',
+  'phone': 8609080560,
+  'username': 'rhaydar',
+  'class_year': 2014,
+  'permission': 1,
+  'task': ['cs']
+}, {
+  'name': 'Laidley Everton',
+  'phone': 9179325910,
+  'username': 'elaidley',
+  'class_year': 2014,
+  'permission': 1,
+  'task': ['cs']
+}, {
+  'name': 'May Olivia',
+  'phone': 7033048805,
+  'username': 'omay',
+  'class_year': 2014,
+  'permission': 1,
+  'task': ['cs']
+}, {
+  'name': 'Watson Alexander',
+  'phone': 3522781788,
+  'username': 'amwatson',
+  'class_year': 2014,
+  'permission': 1,
+  'task': ['cs']
+}, {
+  'name': 'Flores Heric',
+  'phone': 8602622017,
+  'username': 'hflores',
+  'permission': 10,
+  'professional': true
+}, {
+  'name': 'Morgan Brent',
+  'phone': 8606851173,
+  'username': 'bmorgan',
+  'permission': 10,
+  'professional': true
+}, {
+  'name': 'Christensen Rob',
+  'phone': 2039367562,
+  'username': 'rchristensen',
+  'permission': 10,
+  'professional': true
 }];
 
 staff.forEach(function(event) {
