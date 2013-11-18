@@ -1049,27 +1049,22 @@
 						// Freshly uploaded XML and last.xml are read
 							var xml = fs.readFileSync(req.files.myFile.path),
 								last = fs.readFileSync(__dirname + Preferences.path_last_xml);
-							//console.log(__dirname + Preferences.path_last_xml);
 						// Both XML files are parsed
 							xml = parser.toJson(xml, {
 								object: true,
 								trim: true,
 								arrayNotation: true
 							})['CopyofIMSforExport']['Data'];
-							//console.log(last);
 							last = parser.toJson(last, {
 								object: true,
 								trim: true,
 								arrayNotation: true
 							})['CopyofIMSforExport']['Data'];
-							//console.log(last);
 							if(last == 0) {last = [];} //this is only for the first setup of spec on any machine
 
 						var whatToChange = { update: [], add: [], remove: events };
 						console.log(xml.length + ' events in the new XML file');
 						console.log(last.length + ' events in the last XML file');
-						//console.log(last[0]);
-						//var added = 0;
 						// Parsed XML files are compared according to their unique ID's, event by event
 						xml.forEach(function(xmlEntry) {
 							//try to find an object with the same unique ID
@@ -1082,7 +1077,6 @@
 								}
 							} else { //if it doesn't exist in the last.xml, then store it to add later.
 								whatToChange.add.push(xmlEntry);
-								//added++;
 							}
 							/*
 							find the event with the same XMLid, delete that event from the array
@@ -1090,7 +1084,6 @@
 							*/
 							whatToChange.remove = _.reject(whatToChange.remove, function(el) { return el['XMLid'] === xmlEntry['Service_x0020_Order_x0020_Detail_x0020_ID']; });
 						});
-						//console.log('supposed to add ' + added);
 						//should write a part that distinguishes new events and updated events.
 						var process = function(data) {
 							var bookingDate = data['Booking_x0020_Date'].split(" ")[0],
