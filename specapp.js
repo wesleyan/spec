@@ -1049,22 +1049,25 @@
 						// Freshly uploaded XML and last.xml are read
 							var xml = fs.readFileSync(req.files.myFile.path),
 								last = fs.readFileSync(__dirname + Preferences.path_last_xml);
+							console.log(__dirname + Preferences.path_last_xml);
 						// Both XML files are parsed
 							xml = parser.toJson(xml, {
 								object: true,
 								trim: true,
 								arrayNotation: true
 							})['CopyofIMSforExport']['Data'];
+							console.log(last);
 							last = parser.toJson(last, {
 								object: true,
 								trim: true,
 								arrayNotation: true
 							})['CopyofIMSforExport']['Data'];
-
+							console.log(last);
 							if(last == 0) {last = [];} //this is only for the first setup of spec on any machine
 
 						var whatToChange = { update: [], add: [], remove: events };
-						console.log(last.length + ' events in the last XML files');
+						console.log(xml.length + ' events in the new XML file');
+						console.log(last.length + ' events in the last XML file');
 						console.log(last[0]);
 						var added = 0;
 						// Parsed XML files are compared according to their unique ID's, event by event
