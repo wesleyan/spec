@@ -1071,7 +1071,7 @@
 							var entryInLast = _.findWhere(last, {
 								'Service_x0020_Order_x0020_Detail_x0020_ID': xmlEntry['Service_x0020_Order_x0020_Detail_x0020_ID']
 							});
-							if (typeof entryInLast !== 'undefined') { //if exists, then compare if they are the same
+							if (!_.isUndefined(entryInLast)) { //if exists, then compare if they are the same
 								if(!_.isEqual(xmlEntry, entryInLast)) {
 									whatToChange.update.push(xmlEntry); //if they are the same, store to update later
 								}
