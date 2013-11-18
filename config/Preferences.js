@@ -23,6 +23,7 @@ module.exports = {
 			user:'wesleyanspec@gmail.com',
 			pass:'#thisiswhy'
 		},
+		managerEmails: ['specialeventsmanagers@gmail.com'],
 
 		backgroundColors: {
 			'green': '#097054',
