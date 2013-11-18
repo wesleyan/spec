@@ -168,7 +168,7 @@ Spec = {
 		$('#calendar').fullCalendar('changeView', 'agendaWeek');
 	}, //end refetchEvents
 	techTemplateUpdate: function() {
-		if(Spec.lastClickedEvent.duration === false) {
+		if(Spec.lastClickedEvent.techMustStay === false) {
 	    	$('#technician').html('<b>setup and breakdown</b> only.');
 	    } else {
 	    	$('#technician').html('<b>duration of event</b>.');
@@ -569,16 +569,16 @@ $(document).ready(function() {
 	$('body').on('click','.toggleDuration',function(e) {
 		$.ajax({
 			type: "POST",
-			url: "event/duration",
+			url: "event/techMustStay",
 			data: {
 				eventid: Spec.lastClickedEvent['_id'],
-				make: !Spec.lastClickedEvent['duration']
+				make: !Spec.lastClickedEvent['techMustStay']
 			}
 		}).done(function(msg) {
 			Spec.refetchEvents();
-			Spec.lastClickedEvent['duration'] = !Spec.lastClickedEvent['duration'];
+			Spec.lastClickedEvent['techMustStay'] = !Spec.lastClickedEvent['techMustStay'];
 			Spec.techTemplateUpdate();
-			console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' duration toggled');
+			console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' techMustStay toggled');
 		});
 	});
 	$('body').on('click','.toggleVideo',function(e) {

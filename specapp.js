@@ -368,7 +368,7 @@
 	Utility.addBackgroundColor = function(events) { //changes the events object
 		for (index = 0; index < events.length; ++index) {
 			event = events[index];
-			if(event.duration == false) {
+			if(event.techMustStay == false) {
 				events[index]['className'] = ['striped']; //handles the setup and breakdown events as well
 			}
 			if (event.cancelled == true) {
@@ -419,7 +419,7 @@
 		
 	});
 
-		app.post("/event/duration", cas.blocker, function(req, res) {
+		app.post("/event/techMustStay", cas.blocker, function(req, res) {
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
@@ -429,16 +429,16 @@
 				return false;
 			}
 			//req.url
-			//console.log("Req for duration toggle Event ID " + req.body.eventid);
+			//console.log("Req for techMustStay toggle Event ID " + req.body.eventid);
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
-				{ $set: {'duration': JSON.parse(req.body.make) } }, 
+				{ $set: {'techMustStay': JSON.parse(req.body.make) } }, 
 				function(err, updated) {
 					if (err || !updated) {
 						console.log(req.url);
-						console.log("Event not duration toggled:" + err);
+						console.log("Event not techMustStay toggled:" + err);
 					} else {
-						//console.log("Event duration toggled");
+						//console.log("Event techMustStay toggled");
 						res.write(JSON.stringify(true).toString("utf-8"));
 						res.end();
 					}
@@ -454,7 +454,7 @@
 				res.end();
 				return false;
 			}
-			//console.log("Req for duration toggle Event ID " + req.body.eventid);
+			//console.log("Req for techMustStay toggle Event ID " + req.body.eventid);
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
 				{ $set: {'video': JSON.parse(req.body.make) } }, 
@@ -1114,7 +1114,7 @@
 								'eventStart': eventStart,
 								'eventEnd':   eventEnd,
 								'cancelled':  cancelled,
-								duration: true,
+								techMustStay: true,
 								'video':  video,
 								//inventory: [], //we don't want to reset these for the events that are only updated
 								//notes:     [],
