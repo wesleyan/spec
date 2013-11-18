@@ -371,7 +371,7 @@
 			if(event.duration == false) {
 				events[index]['className'] = ['striped']; //handles the setup and breakdown events as well
 			}
-			if (event.valid == false) {
+			if (event.cancelled == true) {
 				events[index]['backgroundColor'] = Preferences.backgroundColors.gray;
 			} else if (event.shifts.length == 0) {
 				events[index]['backgroundColor'] = Preferences.backgroundColors.red;
@@ -391,9 +391,9 @@
 			end = new Date(req.query.end * 1000),
 			query = {};
 		if(req.query.filter == 'hideCancelled') {
-			query = {valid: true};
+			query = {cancelled: false};
 		} else if(req.query.filter == 'unstaffed') {
-			query = { $where: "this.shifts.length < this.staffNeeded", valid: true };
+			query = { $where: "this.shifts.length < this.staffNeeded", cancelled: false };
 		} else if(req.query.filter == 'onlyMine') {
 			query = {shifts: { $elemMatch: { staff: getUser(req) } }};
 		} else if(req.query.filter == 'recentVideo') {
@@ -545,7 +545,7 @@
 			//console.log("Req for cancel toggle Event ID " + req.body.eventid);
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
-				{ $set: {'valid': JSON.parse(req.body.make) } }, 
+				{ $set: {'cancelled': JSON.parse(req.body.make) } }, 
 				function(err, updated) {
 					if (err || !updated) {
 						console.log(req.url);
@@ -590,7 +590,7 @@
 			today.setSeconds(0);
 			today.setMilliseconds(0);
 		var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
-		db.events.find({start: {$gte: today, $lt: tomorrow}, valid:true}).sort({start: 1},
+		db.events.find({start: {$gte: today, $lt: tomorrow}, cancelled:false}).sort({start: 1},
 			function(err, data) {
 					res.render('printtoday', {
 						events: data
@@ -1093,10 +1093,9 @@
 								desc = data['Notes'];
 							if(_.isObject(desc)) { desc = '' }; //if it's an object rather than a string, make it a blank string
 
+							var cancelled = false;
 							if (data['Booking_x0020_Status'] == 'Cancelled') {
-								var valid = false;
-							} else {
-								var valid = true;
+								cancelled = true;
 							}
 							var video = false;
 							['video','recording'].forEach(function(word) {
@@ -1114,7 +1113,7 @@
 								end:   reservedEnd,
 								'eventStart': eventStart,
 								'eventEnd':   eventEnd,
-								'valid':  valid,
+								'cancelled':  cancelled,
 								duration: true,
 								'video':  video,
 								//inventory: [], //we don't want to reset these for the events that are only updated

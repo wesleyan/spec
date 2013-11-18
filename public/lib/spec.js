@@ -29,7 +29,7 @@ Spec = {
 	},
 	changePopupColor: function (event) {
 		$("#popupTitleButton").removeClass("btn-success btn-inverse btn-warning btn-danger btn-info");
-		if (event.valid == false) {
+		if (event.cancelled == true) {
 			$("#popupTitleButton").addClass("btn-inverse");
 		} else if (event.shifts.length == 0) {
 			$("#popupTitleButton").addClass("btn-danger");
@@ -432,7 +432,7 @@ $(document).ready(function() {
 		eventRightClick: function(calEvent, jsEvent, view) {
 			jsEvent.preventDefault(); //Right click event only prevents default because context menu is binded in eventRender
 			if(calEvent.gCal === true) { return false;} //do none of the stuff below, just show them
-			if(calEvent.valid == true) {
+			if(calEvent.cancelled == false) {
 				$('a[href="#cancelEvent"] span').text("Cancel this event");
 			} else {
 				$('a[href="#cancelEvent"] span').text("Uncancel this event");
@@ -557,7 +557,7 @@ $(document).ready(function() {
 			url: "event/cancel",
 			data: {
 				eventid: Spec.lastClickedEvent['_id'],
-				make: !Spec.lastClickedEvent['valid']
+				make: !Spec.lastClickedEvent['cancelled']
 			}
 		}).done(function(msg) {
 			console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' cancel toggled');
