@@ -1034,7 +1034,12 @@
 			res.end();
 			return false;
 		}
-	  res.render('upload');
+		var lastInfo = ['',''];
+		try {
+			lastInfo = fs.readFileSync(__dirname + Preferences.path_last_upload_info); //see the last upload time & user
+			lastInfo = lastInfo.split('&');
+		} catch(e) {}
+	 	res.render('upload', {lastUploadTime: lastInfo[0], lastUploadUser: lastInfo[1]});
 	});
 
 	app.post('/fileUpload', cas.blocker, function(req, res) {
@@ -1119,7 +1124,6 @@
 								title: data['Event_x0020_Name'],
 								desc:  data['Notes'],
 								loc:   data['Room_x0020_Description'],
-								//staffNeeded: 1,
 								start: reservedStart,
 								end:   reservedEnd,
 								'eventStart': eventStart,
@@ -1127,9 +1131,6 @@
 								'cancelled':  cancelled,
 								techMustStay: true,
 								'video':  video,
-								//inventory: [], //we don't want to reset these for the events that are only updated
-								//notes:     [],
-								//shifts:    [],
 								customer: {
 									'name':  data['Customer'],
 									'phone': data['Customer_x0020_Phone_x0020_1'],
@@ -1222,6 +1223,7 @@
 								});
 							})(req.files.myFile.path);
 							reportUpdate(whatToReport); //send messages to the staff and managers
+							fs.writeFileSync(__dirname + Preferences.path_last_upload_info, (new Date() + '&' + getUser(req))); //store the last upload time & user
 						});
 					} catch (err) {
 						// delete the newly uploaded file because there is no need to store it

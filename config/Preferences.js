@@ -1,6 +1,7 @@
 module.exports = {
 		//general preferences
 		path_last_xml: '/uploads/last.xml',
+		path_last_upload_info: '/logs/lastUpload.txt',
 		path_client_secret: '/config/client_secret.json',
 		
 		//the one below must match with the one you have saved in https://code.google.com/apis/console

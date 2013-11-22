@@ -26,6 +26,9 @@
         <li>In EMS, under Reports, run the saved Query 'Copy of IMS For Export'. Select a 2 week time-period beginning today.</li>
         <li>Select Export &rarr;  XML.</li>
         <li>Import the XML to Ned using the Upload File button right up there &uarr;</li>
+        <div class="alert alert-info">
+        Last upload in <b>{{=lastUploadTime}}</b>, by <b>{{=lastUploadUser}}</b>.
+        </div>
       </div>
       <hr/>
       <div class="row">
@@ -49,6 +52,7 @@
         $('div.progress').hide();
         $('strong.message').text(message);
         $('div.alert').show();
+        $('.alert-info').hide();
       };
       
       $('input[type="submit"]').on('click', function(evt) {
