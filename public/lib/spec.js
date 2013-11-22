@@ -395,8 +395,12 @@ $(document).ready(function() {
 
 			//Popover update with event information (can be hidden in a Backbone view)
 			$('#popupTitle').html(symbol + Spec.decodeEntities(calEvent.title));
-			var inside = 
-			Spec.decodeEntities(calEvent.desc);
+			var inside;
+			if (_.isObject(calEvent.desc)) {
+				inside = ''; 	//hide the description if it's an object
+			} else {
+				inside = Spec.decodeEntities(calEvent.desc);
+			}
 			$('#popupContentInside').html(inside);
 			try {
 			$('#popupContentHeader').html('<b>' + defaults.dayNames[calEvent.start.getDay()] + ' | ' + Spec.decodeEntities(calEvent.loc) + '</b>'+
