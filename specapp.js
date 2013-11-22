@@ -1122,7 +1122,7 @@
 							return {
 								XMLid: data['Service_x0020_Order_x0020_Detail_x0020_ID'],
 								title: data['Event_x0020_Name'],
-								desc:  data['Notes'],
+								desc:  desc,
 								loc:   data['Room_x0020_Description'],
 								start: reservedStart,
 								end:   reservedEnd,
