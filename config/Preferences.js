@@ -1,6 +1,6 @@
 module.exports = {
 		//general preferences
-		path_last_xml: '/uploads/last.xml',
+		path_last_xml: '/uploads/lastfile.xml',
 		path_last_upload_info: '/logs/lastUpload.txt',
 		path_client_secret: '/config/client_secret.json',
 		
