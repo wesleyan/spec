@@ -14,7 +14,7 @@ Spec = {
 	lastClickedEvent: {},
 	View: {},
 	filter: '',
-	defaultFilter: 'hideCancelled';
+	defaultFilter: 'hideCancelled',
 	updateUser: function() {
 		$.ajax({
 			type: "GET",

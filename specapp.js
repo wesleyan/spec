@@ -1036,8 +1036,8 @@
 		}
 		var lastInfo = ['',''];
 		try {
-			lastInfo = fs.readFileSync(__dirname + Preferences.path_last_upload_info); //see the last upload time & user
-			lastInfo = lastInfo.split('&');
+			var readFile = fs.readFileSync(__dirname + Preferences.path_last_upload_info); //see the last upload time & user
+			lastInfo = readFile.split('&');
 		} catch(e) {}
 	 	res.render('upload', {lastUploadTime: lastInfo[0], lastUploadUser: lastInfo[1]});
 	});
