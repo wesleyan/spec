@@ -390,14 +390,24 @@
 		var start = new Date(req.query.start * 1000),
 			end = new Date(req.query.end * 1000),
 			query = {};
-		if(req.query.filter == 'hideCancelled') {
-			query = {cancelled: false};
-		} else if(req.query.filter == 'unstaffed') {
-			query = { $where: "this.shifts.length < this.staffNeeded", cancelled: false };
-		} else if(req.query.filter == 'onlyMine') {
-			query = {shifts: { $elemMatch: { staff: getUser(req) } }};
-		} else if(req.query.filter == 'recentVideo') {
-			query = {video: true};
+		switch(req.query.filter) {
+			case 'all':
+				query = {};
+				break;
+			case 'hideCancelled':
+				query = {cancelled: false};
+				break;
+			case 'unstaffed':
+				query = { $where: "this.shifts.length < this.staffNeeded", cancelled: false };
+				break;
+			case 'onlyMine':
+				query = {shifts: { $elemMatch: { staff: getUser(req) } }};
+				break;
+			case 'recentVideo':
+				query = {video: true};
+				break;
+			default:
+				query = {};
 		}
 		$.extend(query, {'start': {$gte: start, $lt: end}});
 		db.events.find(query, function(err, events) {

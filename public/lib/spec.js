@@ -14,6 +14,7 @@ Spec = {
 	lastClickedEvent: {},
 	View: {},
 	filter: '',
+	defaultFilter: 'hideCancelled';
 	updateUser: function() {
 		$.ajax({
 			type: "GET",
@@ -193,7 +194,11 @@ Spec = {
 
 	Spec.app.on('route:all', function(filter) {
 		Spec.dropdownActiveFix();
-		Spec.filter = filter;
+		if(filter == null) {
+			Spec.app.navigate(Spec.defaultFilter, {trigger: true});
+		} else {
+			Spec.filter = filter;
+		}
 		Spec.refetchEvents();
 		console.log(filter);
 	});
