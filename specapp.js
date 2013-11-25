@@ -13,8 +13,8 @@
 		app = express(),
 		$ = require('jquery'),
 		_ = require('underscore'),
-		db = require("mongojs").connect(Preferences.databaseUrl, Preferences.collections);
-		mongo = require('mongodb-wrapper');
+		mongo = require('mongojs');
+		db = mongo.connect(Preferences.databaseUrl, Preferences.collections);
 		fs = require('fs');
 		cas = require('./modules/grand_master_cas.js'),
 		nodemailer = require("nodemailer"),
