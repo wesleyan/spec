@@ -79,6 +79,12 @@ Spec = {
 			});
 		}
 	}, //end setTimeline
+	updateTimeline: function() {
+		setInterval(function() {
+			$('.timeline').remove();
+			Spec.setTimeline();
+		}, 1000*60*5);
+	}
 	formatAMPM: function(date) {
 	  var hours = date.getHours();
 	  var minutes = date.getMinutes();
@@ -465,6 +471,7 @@ $(document).ready(function() {
 			//console.log(view.name);
 			try {
 				Spec.setTimeline();
+				Spec.updateTimeline();
 			} catch (err) {}
 		},
 		eventSources: [Spec.generateEventSource()]
