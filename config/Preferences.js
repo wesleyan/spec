@@ -35,7 +35,7 @@ module.exports = {
 		
 		//MongoDB preferences
 		databaseUrl: "127.0.0.1:27017/spec",
-		collections: ['events','staff','inventory']
+		collections: ['events','staff','inventory','removedShifts']
 	};
 
 /* //options for using SSL, not used right now
