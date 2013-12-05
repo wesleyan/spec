@@ -84,7 +84,7 @@ Spec = {
 			$('.timeline').remove();
 			Spec.setTimeline();
 		}, 1000*60*5);
-	}
+	}, //end updateTimeline
 	formatAMPM: function(date) {
 	  var hours = date.getHours();
 	  var minutes = date.getMinutes();
