@@ -913,7 +913,7 @@
 								html: ejs.render(fs.readFileSync(__dirname + '/views/mail/removeShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': oldShift})
 							});
 							//store the removed shift somewhere, just in case someone deletes their shift just before the event or something
-							db.removedShift.save(oldShift, function(err, saved) {
+							db.removedShifts.save(oldShift, function(err, saved) {
 														if (err || !saved) {
 															console.log("Removed shift could not be added");
 														}
