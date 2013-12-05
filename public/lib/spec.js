@@ -465,6 +465,14 @@ $(document).ready(function() {
 				element.contextmenu({
 					'target': '#context-menu'
 				});
+				if (event.shifts.length > 0) {
+					var list = 'Staff: ';
+					event.shifts.forEach(function(shift) {
+						list += shift.staff + ', ';
+					});
+					list = list.substring(0, list.length - 2);
+					element.tooltip({'title': list});
+				}
 			}
 		},
 		viewRender: function(view, element) {
