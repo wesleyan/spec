@@ -4,6 +4,13 @@ var db = require("mongojs").connect(databaseUrl, collections);
 var mongo = require('mongodb-wrapper');
 
 var staff = [{
+    'name': 'Sarwar Ozair',
+    'phone': 7815028950,
+    'username': 'osarwar',
+    'class_year': 2015,
+    'level': 10,
+    'task': ['events', 'hr']
+  }, {
   'name': 'Babajide Rilwan',
   'phone': 8323754438,
   'username': 'rbabajide',
