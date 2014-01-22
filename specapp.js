@@ -881,6 +881,7 @@
 							//console.log("Shift added");
 							res.write(JSON.stringify({'id':generatedID.toString(),'start':startDate, 'end':endDate}).toString("utf-8"));
 							res.end();
+							if(chosenStaff === '') { return; }
 							Utility.sendSingleMail({
 								to: chosenStaff + '@wesleyan.edu',
 								subject:'You have a new shift! : ' + updated.title,
@@ -922,17 +923,20 @@
 								console.log('old shift could not be found');
 								return false;
 							}
-							Utility.sendSingleMail({
-								to: oldShift.staff + '@wesleyan.edu',
-								subject:'You have a removed shift! : ' + updated.title,
-								html: ejs.render(fs.readFileSync(__dirname + '/views/mail/removeShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': oldShift})
-							});
+
 							//store the removed shift somewhere, just in case someone deletes their shift just before the event or something
 							db.removedShifts.save(oldShift, function(err, saved) {
 														if (err || !saved) {
 															console.log("Removed shift could not be added");
 														}
 													});
+
+							if(oldShift.staff === '') { return; }
+							Utility.sendSingleMail({
+								to: oldShift.staff + '@wesleyan.edu',
+								subject:'You have a removed shift! : ' + updated.title,
+								html: ejs.render(fs.readFileSync(__dirname + '/views/mail/removeShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': oldShift})
+							});
 						}
 					});
 			});
