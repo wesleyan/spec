@@ -318,11 +318,13 @@
         </thead>
         <tbody>
          <% _.each(rc.staff, function(value, key) { %>
-          <tr>
-            <td>(<%= key %>)</td>
-            <td><%= value.event %></td>
-            <td><%= value.hour.toFixed(2) %></td>
-          </tr>
+            <% if(key !== '') { %>
+              <tr>
+                <td>(<%= key %>)</td>
+                <td><%= value.event %></td>
+                <td><%= value.hour.toFixed(2) %></td>
+              </tr>
+            <% } %>
           <% }) %>
         </tbody>
       </table>
