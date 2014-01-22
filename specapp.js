@@ -928,7 +928,7 @@
 				});
 
 				//find the data to be updated (before update!)
-				db.events.find({_id: new mongo.ObjectID(req.body.eventid)},
+				db.events.findOne({_id: new mongo.ObjectID(req.body.eventid)},
 					function(err, updated) {
 						if (err || !updated) {
 							console.log(req.url);
@@ -977,7 +977,7 @@
 					});
 
 					//find the data to be updated (before update!)
-					db.events.find({_id: new mongo.ObjectID(req.body.eventid)},
+					db.events.findOne({_id: new mongo.ObjectID(req.body.eventid)},
 						function(err, updated) {
 							if (err || !updated) {
 								console.log(req.url);
