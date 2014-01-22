@@ -382,11 +382,11 @@
 			}
 			if (event.cancelled == true) {
 				events[index]['backgroundColor'] = Preferences.backgroundColors.gray;
-			} else if (Utilify.fullShiftNumber(event) == 0) {
+			} else if (Utility.fullShiftNumber(event) == 0) {
 				events[index]['backgroundColor'] = Preferences.backgroundColors.red;
-			} else if (Utilify.fullShiftNumber(event) < event.staffNeeded) {
+			} else if (Utility.fullShiftNumber(event) < event.staffNeeded) {
 				events[index]['backgroundColor'] = Preferences.backgroundColors.yellow;
-			} else if (Utilify.fullShiftNumber(event) == event.staffNeeded) {
+			} else if (Utility.fullShiftNumber(event) == event.staffNeeded) {
 				events[index]['backgroundColor'] = Preferences.backgroundColors.green;
 			}
 		}
@@ -427,7 +427,7 @@
 				if(req.query.filter === 'unstaffed') {
 					//filter them manually because empty shifts seem like real shifts
 					events = _.filter(events, function (event) {
-						return Utilify.fullShiftNumber(event) < event.staffNeeded;
+						return Utility.fullShiftNumber(event) < event.staffNeeded;
 					});
 				}
 				events = Utility.addBackgroundColor(events);
