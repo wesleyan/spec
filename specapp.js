@@ -922,7 +922,7 @@
 					});
 			});
 		//Sign up for an empty shift for an event (POST)
-			app.post("/staff/staffsignup", cas.blocker, function(req, res) {
+			app.post("/staff/shiftsignup", cas.blocker, function(req, res) {
 				res.writeHead(200, {
 					'Content-Type': 'application/json'
 				});
