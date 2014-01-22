@@ -348,7 +348,7 @@
 		<thead><th><i class="icon-user"></i>  Staff</th><th><i class="icon-time"></i> From</th><th><i class="icon-time"></i> To</th>
 		<th><i class="icon-edit"></i></th></thead>
 		<tbody>
-			<% if(!(Spec.permission == 0 && op.shifts.length > 0)) { %>
+			<% if(!(Spec.permission <3 && op.shifts.length > 0)) { %>
 				<tr>
 					<td>
 						{{ if(permission == 10) { }}
