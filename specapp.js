@@ -921,6 +921,104 @@
 						}
 					});
 			});
+		//Sign up for an empty shift for an event (POST)
+			app.post("/staff/staffsignup", cas.blocker, function(req, res) {
+				res.writeHead(200, {
+					'Content-Type': 'application/json'
+				});
+
+				//find the data to be updated (before update!)
+				db.events.find({_id: new mongo.ObjectID(req.body.eventid)},
+					function(err, updated) {
+						if (err || !updated) {
+							console.log(req.url);
+							console.log("Could not find after update:" + err);
+						} else {
+							//below is needed because id's are ObjectID, so we convert them to string to compare with req.body.id
+							updated.shifts = updated.shifts.map(function(shift) {
+														shift.id = shift.id + '';
+														return shift;
+													});
+							var signedUpShift = _.findWhere(updated.shifts, {'id': req.body.id});
+							if(_.isUndefined(signedUpShift)) {
+								console.log('the shift could not be found');
+								return false;
+							} else if(signedUpShift.staff !== '') {
+								console.log('someone is trying to sign up for a shift that already has a staff!');
+								return false;
+							}
+							//it is safe to update now
+							db.events.update({_id: new mongo.ObjectID(req.body.eventid), 'shifts.id': new mongo.ObjectID(req.body.id)},
+											 {$set: {'shifts.$.staff': getUser(req)}},
+											 function(err, ifUpdated) {
+												if (err || !ifUpdated) {
+													console.log(req.url);
+													console.log("Shift not signed up:" + err);
+												} else {
+													res.write(JSON.stringify(true).toString("utf-8"));
+													res.end();
+													
+													//now send e-mails
+													Utility.sendSingleMail({
+														to: signedUpShift.staff + '@wesleyan.edu',
+														subject:'You have a new shift! : ' + updated.title,
+														html: ejs.render(fs.readFileSync(__dirname + '/views/mail/newShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': signedUpShift})
+													});
+												}
+											}); //end of update
+						}
+					});				
+				//console.log("Req for signing up shift ID " + req.body.id + " from Event ID " + req.body.eventid);
+			});
+		//Withdrawing from a shift for an event (POST)
+			app.post("/staff/withdraw", cas.blocker, function(req, res) {
+					res.writeHead(200, {
+						'Content-Type': 'application/json'
+					});
+
+					//find the data to be updated (before update!)
+					db.events.find({_id: new mongo.ObjectID(req.body.eventid)},
+						function(err, updated) {
+							if (err || !updated) {
+								console.log(req.url);
+								console.log("Could not find after update:" + err);
+							} else {
+								//below is needed because id's are ObjectID, so we convert them to string to compare with req.body.id
+								updated.shifts = updated.shifts.map(function(shift) {
+															shift.id = shift.id + '';
+															return shift;
+														});
+								var withdrawnShift = _.findWhere(updated.shifts, {'id': req.body.id});
+								if(_.isUndefined(withdrawnShift)) {
+									console.log('the shift could not be found');
+									return false;
+								} else if(withdrawnShift.staff !== getUser(req)) {
+									console.log('someone is trying to withdraw for a shift that is not theirs!');
+									return false;
+								}
+								//it is safe to update now
+								db.events.update({_id: new mongo.ObjectID(req.body.eventid), 'shifts.id': new mongo.ObjectID(req.body.id)},
+												 {$set: {'shifts.$.staff': getUser(req)}},
+												 function(err, ifUpdated) {
+													if (err || !ifUpdated) {
+														console.log(req.url);
+														console.log("Shift not withdrawn:" + err);
+													} else {
+														res.write(JSON.stringify(true).toString("utf-8"));
+														res.end();
+														
+														//now send e-mails
+														Utility.sendSingleMail({
+															to: withdrawnShift.staff + '@wesleyan.edu',
+															subject:'You have a removed shift! : ' + updated.title,
+															html: ejs.render(fs.readFileSync(__dirname + '/views/mail/removeShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': withdrawnShift})
+														});
+													}
+												}); //end of update
+							}
+						});				
+					//console.log("Req for signing up shift ID " + req.body.id + " from Event ID " + req.body.eventid);
+				});
 
 			//this is determined by staff time checking, not shift time checking, therefore if 
 			app.get("/staff/available/today", cas.blocker, function(req, res) {
