@@ -28,7 +28,7 @@ Spec = {
 		$('a').removeClass('drop-active');
 		$('a[href="#' + Backbone.history.fragment + '"]').addClass('drop-active');
 	},
-	fullShiftNumber = function (event) {
+	fullShiftNumber: function (event) {
 		var fullShifts = 0;
 		for(var i = 0; i < event.shifts.length; i++) {
 			if(event.shifts[i].staff !== '') {
