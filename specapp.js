@@ -365,6 +365,15 @@
 	});
 
 // EVENTS
+	Utility.fullShiftNumber = function (event) {
+		var fullShifts = 0;
+		for(var i = 0; i < event.shifts.length; i++) {
+			if(event.shifts[i].staff !== '') {
+				fullShifts++;
+			}
+		}
+		return fullShifts;
+	}
 	Utility.addBackgroundColor = function(events) { //changes the events object
 		for (index = 0; index < events.length; ++index) {
 			event = events[index];
@@ -373,11 +382,11 @@
 			}
 			if (event.cancelled == true) {
 				events[index]['backgroundColor'] = Preferences.backgroundColors.gray;
-			} else if (event.shifts.length == 0) {
+			} else if (Utilify.fullShiftNumber(event) == 0) {
 				events[index]['backgroundColor'] = Preferences.backgroundColors.red;
-			} else if (event.shifts.length < event.staffNeeded) {
+			} else if (Utilify.fullShiftNumber(event) < event.staffNeeded) {
 				events[index]['backgroundColor'] = Preferences.backgroundColors.yellow;
-			} else if (event.shifts.length == event.staffNeeded) {
+			} else if (Utilify.fullShiftNumber(event) == event.staffNeeded) {
 				events[index]['backgroundColor'] = Preferences.backgroundColors.green;
 			}
 		}
@@ -398,7 +407,7 @@
 				query = {cancelled: false};
 				break;
 			case 'unstaffed':
-				query = { $where: "this.shifts.length < this.staffNeeded", cancelled: false };
+				query = {cancelled: false };
 				break;
 			case 'onlyMine':
 				query = {shifts: { $elemMatch: { staff: getUser(req) } }};
@@ -415,6 +424,12 @@
 				console.log(req.url);
 				console.log("No events found:" + err);
 			} else {
+				if(req.query.filter === 'unstaffed') {
+					//filter them manually because empty shifts seem like real shifts
+					events = _.filter(events, function (event) {
+						return Utilify.fullShiftNumber(event) < event.staffNeeded;
+					});
+				}
 				events = Utility.addBackgroundColor(events);
 				res.write(JSON.stringify(events).toString("utf-8"));
 				res.end();
@@ -1013,6 +1028,12 @@
 															subject:'You have a removed shift! : ' + updated.title,
 															html: ejs.render(fs.readFileSync(__dirname + '/views/mail/removeShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': withdrawnShift})
 														});
+														//store the removed shift somewhere, just in case someone deletes their shift just before the event or something
+															db.removedShifts.save(withdrawnShift, function(err, saved) {
+																	if (err || !saved) {
+																		console.log("Removed shift could not be added");
+																	}
+																});
 													}
 												}); //end of update
 							}

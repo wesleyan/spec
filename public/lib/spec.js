@@ -28,21 +28,30 @@ Spec = {
 		$('a').removeClass('drop-active');
 		$('a[href="#' + Backbone.history.fragment + '"]').addClass('drop-active');
 	},
+	fullShiftNumber = function (event) {
+		var fullShifts = 0;
+		for(var i = 0; i < event.shifts.length; i++) {
+			if(event.shifts[i].staff !== '') {
+				fullShifts++;
+			}
+		}
+		return fullShifts;
+	},
 	changePopupColor: function (event) {
 		$("#popupTitleButton").removeClass("btn-success btn-inverse btn-warning btn-danger btn-info");
 		if (event.cancelled == true) {
 			$("#popupTitleButton").addClass("btn-inverse");
-		} else if (event.shifts.length == 0) {
+		} else if (Spec.fullShiftNumber(event) == 0) {
 			$("#popupTitleButton").addClass("btn-danger");
-		} else if (event.shifts.length < event.staffNeeded) {
+		} else if (Spec.fullShiftNumber(event) < event.staffNeeded) {
 			$("#popupTitleButton").addClass("btn-warning");
-		} else if (event.shifts.length == event.staffNeeded) {
+		} else if (Spec.fullShiftNumber(event) == event.staffNeeded) {
 			$("#popupTitleButton").addClass("btn-success");
-		} else if (event.shifts.length > event.staffNeeded) {
+		} else if (Spec.fullShiftNumber(event) > event.staffNeeded) {
 			$("#popupTitleButton").addClass("btn-info");
 		}
 
-		$('#popupStaffInfo').html(event.shifts.length + '/' + event.staffNeeded);
+		$('#popupStaffInfo').html(Spec.fullShiftNumber(event) + '/' + event.staffNeeded);
 	},
 	resizeMap: function() {
 		var height = $(window).height() - 40;
@@ -465,7 +474,7 @@ $(document).ready(function() {
 				element.contextmenu({
 					'target': '#context-menu'
 				});
-				if (event.shifts.length > 0) {
+				if (Spec.fullShiftNumber(event) > 0) {
 					var list = 'Staff: ';
 					event.shifts.forEach(function(shift) {
 						list += shift.staff + ', ';
