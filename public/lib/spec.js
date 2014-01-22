@@ -547,7 +547,7 @@ $(document).ready(function() {
 	}).on('hide', function() {
 		$('#popup').css('opacity', 1);
 	});
-	$('a[href="#staffEvent"]').click(function(e) {
+	Spec.updateStaffModal = function() {
 		//This part should get the event data and update staff adding modal box
 		$.ajax({
 			type: "GET",
@@ -566,7 +566,8 @@ $(document).ready(function() {
 			}
 			var staff_view = new Spec.View.Staff({'shifts': shifts });
 		});
-	});
+	};
+	$('a[href="#staffEvent"]').click(Spec.updateStaffModal);
 	$('a[href="#editEvent"]').click(function(e) {
 		//This part should get the event data and update the event editing modal box
 		var edit_view = new Spec.View.Edit();
@@ -670,20 +671,18 @@ $(document).ready(function() {
 		return false;
 	});
 	$('body').on('click','#addNewStaff',function(e) {
+		var chosenStaff = '';
 		if($('.combobox').val() == '') {
-			$.bootstrapGrowl("You must choose a staff to add a valid shift.", {
-			  type: 'error',
-			  align: 'center',
-			  delay: 2000,
-			});
-			return false;		
-		}
-			var chosenStaff;
+			//empty shift added
+				
+		} else {
 			try {
 				chosenStaff = $('#staffInput').val().match(/\(([^)]+)\)/)[1];
 			} catch(e) {
 				chosenStaff = $('.combobox').val().match(/\(([^)]+)\)/)[1];
 			}
+		}
+
 		$.ajax({
 			type: "POST",
 			url: "staff/add",
@@ -710,7 +709,7 @@ $(document).ready(function() {
 			var each_staff_view2 = new Spec.View.EachStaff({ //Backbone new note view used
 				'item': newShift
 			});
-			if($.grep(Spec.lastClickedEvent.shifts, function(e){ return e.staff == chosenStaff; }).length > 0) {
+			if($.grep(Spec.lastClickedEvent.shifts, function(e){ return e.staff == chosenStaff; }).length > 0 && chosenStaff != '') {
 				$.bootstrapGrowl("You have chosen this staff for another shift before, shift is added but you may want to check it again.", {
 				  type: 'info',
 				  align: 'center',
@@ -722,6 +721,52 @@ $(document).ready(function() {
 			$('.combobox').val('');
 		}); //done function
 	}); 	//click event
+
+	Spec.updateShift = function (shiftID, newStaff) {
+		for (var i = 0, l = Spec.lastClickedEvent.shifts; i < l; i++) {
+		    if (Spec.lastClickedEvent.shifts[i]['_id'] === shiftID) {
+		        Spec.lastClickedEvent.shifts[i]['staff'] = newStaff;
+		        return;
+		    }
+		}
+	}
+
+	$('body').on('click','.shiftSignUp', function(e) {
+		removedItem = this;
+		var shiftid = $(this).attr('href');
+		$.ajax({
+			type: "POST",
+			url: "staff/shiftsignup",
+			data: {
+				'id': shiftid,
+				'eventid': Spec.lastClickedEvent['_id']
+			}
+		}).done(function(msg) {
+			Spec.updateShift(shiftid, Spec.username);
+			Spec.changePopupColor(Spec.lastClickedEvent);
+			Spec.refetchEvents();
+			Spec.updateStaffModal();
+		});
+		return false;
+	});
+	$('body').on('click','.shiftWithdraw', function(e) {
+		removedItem = this;
+		var shiftid = $(this).attr('href');
+		$.ajax({
+			type: "POST",
+			url: "staff/withdraw",
+			data: {
+				'id': shiftid,
+				'eventid': Spec.lastClickedEvent['_id']
+			}
+		}).done(function(msg) {
+			Spec.updateShift(shiftid, '');
+			Spec.changePopupColor(Spec.lastClickedEvent);
+			Spec.refetchEvents();
+			Spec.updateStaffModal();
+		});
+		return false;
+	});
 
 	$('#editEvent .modal-footer .btn-primary').click(function(e) {
 		var editTimepickers = [$('#timepickerResStart'), $('#timepickerResEnd'), $('#timepickerEventStart'), $('#timepickerEventEnd')];

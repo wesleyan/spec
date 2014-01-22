@@ -348,29 +348,31 @@
 		<thead><th><i class="icon-user"></i>  Staff</th><th><i class="icon-time"></i> From</th><th><i class="icon-time"></i> To</th>
 		<th><i class="icon-edit"></i></th></thead>
 		<tbody>
-			<tr>
-				<td>
-					{{ if(permission == 10) { }}
-						<select class="combobox input-medium" name="normal" id="staffInput">
-						</select>
-					{{ } else { }}
-						<input id="staffInput" class="input-medium" id="disabledInput" type="text" value="{{=staffname}} ({{=username}})" disabled>
-					{{ } }}
-				</td>
-				<td>
-					<div class="input-append bootstrap-timepicker">
-			            <input id="timepicker5" type="text" class="input-small">
-			            <span class="add-on"><i class="icon-time"></i></span>
-			        </div>
-			    </td>
-			    <td>
-	    		    <div class="input-append bootstrap-timepicker">
-			            <input id="timepicker6" type="text" class="input-small">
-			            <span class="add-on"><i class="icon-time"></i></span>
-			        </div>
-			    </td>
-			    <td><button class="btn btn-primary btn-mini" type="button" id="addNewStaff"><i class="icon-plus icon-white"></i></button></td>
-		    </tr>
+			<% if(!(Spec.permission == 0 && op.shifts.length > 0)) { %>
+				<tr>
+					<td>
+						{{ if(permission == 10) { }}
+							<select class="combobox input-medium" name="normal" id="staffInput">
+							</select>
+						{{ } else { }}
+							<input id="staffInput" class="input-medium" id="disabledInput" type="text" value="{{=staffname}} ({{=username}})" disabled>
+						{{ } }}
+					</td>
+					<td>
+						<div class="input-append bootstrap-timepicker">
+				            <input id="timepicker5" type="text" class="input-small">
+				            <span class="add-on"><i class="icon-time"></i></span>
+				        </div>
+				    </td>
+				    <td>
+		    		    <div class="input-append bootstrap-timepicker">
+				            <input id="timepicker6" type="text" class="input-small">
+				            <span class="add-on"><i class="icon-time"></i></span>
+				        </div>
+				    </td>
+				    <td><button class="btn btn-primary btn-mini" type="button" id="addNewStaff"><i class="icon-plus icon-white"></i></button></td>
+			    </tr>
+			<% } %>
 		</tbody>
 		</table>
 
@@ -378,7 +380,19 @@
 	</script>
 	<script type="text/template" id="each_staff_template">
 			<tr>
-				<td><%= op.item.staffname %> (<%= op.item.staff %>)</td>
+				<td>
+					<% if(op.item.staff == Spec.username) { %>
+						<span class="btn btn-danger btn-mini shiftWithdraw" type="button" href="<%= op.item.id %>">
+							<i class="icon-remove-sign icon-white"></i> Withdraw
+						</span>
+					<% } else if(op.item.staff == '') { %>
+						<span class="btn btn-primary btn-mini shiftSignUp" type="button" href="<%= op.item.id %>">
+							<i class="icon-plus-sign icon-white"></i> Sign up
+						</span>
+					<% } else { %>
+						<%= op.item.staffname %> (<%= op.item.staff %>)
+					<% } %>
+				</td>
 				<td><%= Spec.formatAMPM(new Date(Date.parse(op.item.start))) %></td>
 				<td><%= Spec.formatAMPM(new Date(Date.parse(op.item.end))) %></td>
 				<td>
