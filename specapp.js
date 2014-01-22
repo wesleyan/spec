@@ -998,7 +998,7 @@
 								}
 								//it is safe to update now
 								db.events.update({_id: new mongo.ObjectID(req.body.eventid), 'shifts.id': new mongo.ObjectID(req.body.id)},
-												 {$set: {'shifts.$.staff': getUser(req)}},
+												 {$set: {'shifts.$.staff': ''}},
 												 function(err, ifUpdated) {
 													if (err || !ifUpdated) {
 														console.log(req.url);
@@ -1017,7 +1017,7 @@
 												}); //end of update
 							}
 						});				
-					//console.log("Req for signing up shift ID " + req.body.id + " from Event ID " + req.body.eventid);
+					//console.log("Req for withdrawing shift ID " + req.body.id + " from Event ID " + req.body.eventid);
 				});
 
 			//this is determined by staff time checking, not shift time checking, therefore if 
