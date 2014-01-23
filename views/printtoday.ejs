@@ -190,7 +190,7 @@
               <tbody>
                {{ event.shifts.forEach(function(shift) { }}
                 <tr>
-                  <td>{{= if(shift.staff != '') {storeStaff.filter(function(staff) {return staff.username == shift.staff;})[0].name } }} ({{= shift.staff }})</td>
+                  <td>{{= if(shift.staff != '') { }} {{=storeStaff.filter(function(staff) {return staff.username == shift.staff;})[0].name }} {{ } }} ({{= shift.staff }})</td>
                   <td>{{= formatAMPM(shift.start) }}</td>
                   <td>{{= formatAMPM(shift.end) }}</td>
                 </tr>
