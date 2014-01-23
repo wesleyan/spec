@@ -17,6 +17,13 @@
       }
       var user = '';
       $(document).ready(function() {
+        //storeAllStaff loading...
+          $.ajax({
+            type: "GET",
+            url: "../staff/all/",
+          }).done(function(staff) {
+            storeAllStaff = staff;
+          });
          _.templateSettings.variable = "rc";
         $('body').html(fixParantheses($('body').html()));
         $('body').html(fixParantheses($('body').html())); 
@@ -42,11 +49,16 @@
             if(msg == 'false') {
               return false;
             }
-            var template = _.template( $(".template").html(), {'staff': JSON.parse(msg)});
+            msg = JSON.parse(msg);
+            lazy = _.filter(storeAllStaff, function (person) {
+              return typeof msg[person.username] === 'undefined';
+            });
+            var template = _.template( $(".template").html(), {'staff': msg, 'lazy': lazy});
             //console.log(template);
             $('#content').html(template);
           });
         });
+          
       });
       var formatAMPM = function(date) {
           var hours = date.getHours();
@@ -328,5 +340,10 @@
           <% }) %>
         </tbody>
       </table>
+      <div class="well">
+        <% _.each(rc.lazy, function(person) { %>
+          <%= person.username %>, 
+        <% }) %>
+      </div>
     </script>
 </html>
