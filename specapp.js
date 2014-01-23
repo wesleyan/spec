@@ -607,7 +607,7 @@
 				});
 		});
 
-	app.get('/print/', cas.blocker, function(req, res) {
+	app.get('/print', cas.blocker, function(req, res) {
 		//console.log('Req for seeing today\'s events list');
 			var today;
 			if(req.query.date) {

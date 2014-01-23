@@ -159,7 +159,7 @@
         <button class="btn btn-large btn-primary pull-right no-print" type="button" id="printButton">Print this page</button>
         <p class="lead">
         Events of 
-        {{if(req.query.date) { }}
+        {{ if(typeof req.query.date != 'undefined') { }}
           {{= (new Date(req.query.date)).toDateString() }}
         {{ } else { }}
           {{= (new Date()).toDateString() }}
