@@ -619,16 +619,19 @@
 				}
 			} else {
 				today = new Date();
+				dateString = (new Date()).toDateString();
 			}
 			today.setHours(0);
 			today.setMinutes(0);
 			today.setSeconds(0);
 			today.setMilliseconds(0);
 		var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+
 		db.events.find({start: {$gte: today, $lt: tomorrow}, cancelled:false}).sort({start: 1},
 			function(err, data) {
 					res.render('printtoday', {
-						events: data
+						'events': data,
+						'dateString': today.toDateString()
 					});
 			});
 	});
