@@ -332,7 +332,7 @@
          <% _.each(rc.staff, function(value, key) { %>
             <% if(key !== '') { %>
               <tr>
-                <td><%= _.findWhere(storeAllStaff, {'username': key}).name %>(<%= key %>)</td>
+                <td><%= _.findWhere(storeAllStaff, {'username': key}).name %> (<%= key %>)</td>
                 <td><%= value.event %></td>
                 <td><%= value.hour.toFixed(2) %></td>
               </tr>

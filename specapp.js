@@ -607,9 +607,19 @@
 				});
 		});
 
-	app.get('/printtoday', cas.blocker, function(req, res) {
+	app.get('/print/', cas.blocker, function(req, res) {
 		//console.log('Req for seeing today\'s events list');
-		var today = new Date();
+			var today;
+			if(req.query.date) {
+				try {
+					today = new Date(req.query.date);
+				} catch(e) {
+					res.send(false);
+					return false;
+				}
+			} else {
+				today = new Date();
+			}
 			today.setHours(0);
 			today.setMinutes(0);
 			today.setSeconds(0);
