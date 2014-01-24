@@ -637,6 +637,82 @@
 			});
 	});
 
+// API
+	app.get('/api/events', function (req, res) {
+		try {
+			//Allows to set the starting time
+			if(req.query.start) {
+				var start = new Date(req.query.start * 1000);
+			} else {
+				//just now if not set
+				var start = new Date();
+			}
+
+			//Allows to set the ending time
+			if(req.query.end) {
+				var end = new Date(req.query.end * 1000);
+			} else {
+				var end = new Date();
+				end.setTime(start.getTime() + (30 * 60 * 1000));
+			}
+
+			//Shows the events starting in next given number of minutes
+			if(req.query.minutes) {
+				var start = new Date();
+				var end = new Date();
+				end.setTime(start.getTime() + (parseInt(req.query.minutes) * 60 * 1000));
+			}
+		} catch(e) {
+			return false;
+		}
+		if(typeof req.query.filter == 'undefined') {
+			req.query.filter = 'hideCancelled';
+		}
+		query = {};
+		switch(req.query.filter) {
+			case 'all':
+				query = {};
+				break;
+			case 'hideCancelled':
+				query = {cancelled: false};
+				break;
+			case 'unstaffed':
+				query = {cancelled: false };
+				break;
+			case 'onlyMine':
+				query = {shifts: { $elemMatch: { staff: getUser(req) } }};
+				break;
+			case 'recentVideo':
+				query = {video: true};
+				break;
+			default:
+				query = {};
+		}
+		$.extend(query, {'start': {$gte: start, $lt: end}});
+		db.events.find(query, function(err, events) {
+			if (err || !events) {
+				console.log(req.url);
+				console.log("No events found:" + err);
+			} else {
+				if(req.query.filter === 'unstaffed') {
+					//filter them manually because empty shifts seem like real shifts
+					events = _.filter(events, function (event) {
+						return Utility.fullShiftNumber(event) < event.staffNeeded;
+					});
+				}
+				res.write(JSON.stringify(events).toString("utf-8"));
+				res.end();
+			}
+		});
+
+		//req.url
+		//console.log("Req for events starting at " + start.toDateString() + " and ending before " + end.toDateString());
+		res.writeHead(200, {
+			'Content-Type': 'application/json'
+		});
+	  return;
+	});
+
 // TRIVIAL STUFF
 
 	// INVENTORY
@@ -1615,89 +1691,4 @@
 // STARTING THE SERVER
 	app.listen(Preferences.port, function() {
 		console.log("Express server listening on port " + Preferences.port);
-	});
-
-// SPECULOOS (SPEC API)
-	var apiServer = express();
-	apiServer.configure(function () {
-	    apiServer.use(express.logger('dev'));     /* 'default', 'short', 'tiny', 'dev' */
-	    apiServer.use(express.bodyParser());
-	});
-	apiServer.get('/events', function (req, res) {
-		try {
-			//Allows to set the starting time
-			if(req.query.start) {
-				var start = new Date(req.query.start * 1000);
-			} else {
-				//just now if not set
-				var start = new Date();
-			}
-
-			//Allows to set the ending time
-			if(req.query.end) {
-				var end = new Date(req.query.end * 1000);
-			} else {
-				var end = new Date();
-				end.setTime(start.getTime() + (30 * 60 * 1000));
-			}
-
-			//Shows the events starting in next given number of minutes
-			if(req.query.minutes) {
-				var start = new Date();
-				var end = new Date();
-				end.setTime(start.getTime() + (parseInt(req.query.minutes) * 60 * 1000));
-			}
-		} catch(e) {
-			return false;
-		}
-		if(typeof req.query.filter == 'undefined') {
-			req.query.filter = 'hideCancelled';
-		}
-		query = {};
-		switch(req.query.filter) {
-			case 'all':
-				query = {};
-				break;
-			case 'hideCancelled':
-				query = {cancelled: false};
-				break;
-			case 'unstaffed':
-				query = {cancelled: false };
-				break;
-			case 'onlyMine':
-				query = {shifts: { $elemMatch: { staff: getUser(req) } }};
-				break;
-			case 'recentVideo':
-				query = {video: true};
-				break;
-			default:
-				query = {};
-		}
-		$.extend(query, {'start': {$gte: start, $lt: end}});
-		db.events.find(query, function(err, events) {
-			if (err || !events) {
-				console.log(req.url);
-				console.log("No events found:" + err);
-			} else {
-				if(req.query.filter === 'unstaffed') {
-					//filter them manually because empty shifts seem like real shifts
-					events = _.filter(events, function (event) {
-						return Utility.fullShiftNumber(event) < event.staffNeeded;
-					});
-				}
-				res.write(JSON.stringify(events).toString("utf-8"));
-				res.end();
-			}
-		});
-
-		//req.url
-		//console.log("Req for events starting at " + start.toDateString() + " and ending before " + end.toDateString());
-		res.writeHead(200, {
-			'Content-Type': 'application/json'
-		});
-	  return;
-	});
-
-	apiServer.listen(8081, function () {
-	  console.log('%s listening at %s', apiServer.name, apiServer.url);
 	});
