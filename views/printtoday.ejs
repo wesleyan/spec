@@ -86,7 +86,7 @@
       $('.date').datepicker();
       $('#d').datepicker('setValue', today);
       $('#send').click(function (e) {
-        window.location = '?date=' + $('#d1').data('datepicker').date.toDateString();
+        window.location = '?date=' + $('#d').data('datepicker').date.toDateString();
       });
       $('#printButton').click(function(e) {
         window.print();
@@ -94,6 +94,7 @@
     })
    </script>
   <link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css" rel="stylesheet" media="screen,print">
+  <link href="/lib/bootstrap-datepicker.css" rel="stylesheet">
     <style type="text/css">
 
       /* Sticky footer styles
@@ -199,8 +200,8 @@
             
             {{= event.desc }}
             <span class="pull-right"><h4>
-            {{ if(event.shifts.length < event.staffNeeded) { }}
-            {{= event.staffNeeded }} staff needed, has {{= event.shifts.length }}
+            {{ if(Utility.fullShiftNumber(event) < event.staffNeeded) { }}
+            {{= event.staffNeeded }} staff needed, has {{= Utility.fullShiftNumber(event) }}
             {{ } else { }}
             {{= event.staffNeeded }} staff assigned
             {{ } }}
@@ -209,17 +210,16 @@
          <table class="table table-striped table-bordered">
               <tbody>
                {{ event.shifts.forEach(function(shift) { }}
-                <tr>
-                  <td>
-                    {{ if(shift.staff != '') { }}
-                      {{=storeStaff.filter(function(staff) {return staff.username == shift.staff;})[0].name }} 
-                    {{ } }} 
-
-                    ({{= shift.staff }})
-                  </td>
-                  <td>{{= formatAMPM(shift.start) }}</td>
-                  <td>{{= formatAMPM(shift.end) }}</td>
-                </tr>
+                 {{ if(shift.staff != '') { }}
+                    <tr>
+                      <td>
+                        {{=storeStaff.filter(function(staff) {return staff.username == shift.staff;})[0].name }} 
+                        ({{= shift.staff }})
+                      </td>
+                      <td>{{= formatAMPM(shift.start) }}</td>
+                      <td>{{= formatAMPM(shift.end) }}</td>
+                    </tr>
+                  {{ } }} 
                 {{ }) }}
               </tbody>
             </table>

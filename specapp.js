@@ -631,7 +631,8 @@
 			function(err, data) {
 					res.render('printtoday', {
 						'events': data,
-						'dateString': today.toDateString()
+						'dateString': today.toDateString(),
+						'Utility': Utility
 					});
 			});
 	});
