@@ -51,7 +51,7 @@
               <p class="text-muted">optional</p>
             </td>
             <td>
-              Takes UNIX timestamp. Defaults to the the time the request is made.
+              Takes UNIX timestamp. Defaults to now if not specified.
               <p class="text-success"><strong>Example:</strong> <a href="/api/events?start=1388034000">?start=1388034000</a></p>
             </td>
           </tr>
@@ -61,7 +61,7 @@
               <p class="text-muted">optional</p>
             </td>
             <td>
-              Takes UNIX timestamp. Defaults to the 30 minutes later the time the request is made.
+              Takes UNIX timestamp. Defaults start + 30 minutes if not specified. If start is not specified either, it becomes now + 30 minutes.
               <p class="text-success"><strong>Example:</strong> <a href="/api/events?end=1391662800">?end=1391662800</a></p>
             </td>
           </tr>
@@ -71,7 +71,7 @@
               <p class="text-muted">optional</p>
             </td>
             <td>
-              Takes minutes. Overwrites <strong>start</strong> and <strong>end</strong> and returns the events in the next given minutes.
+              Takes minutes. Overwrites both <strong>start</strong> and <strong>end</strong> and just returns the events in the next given minutes.
               <p class="text-success"><strong>Example:</strong> <a href="/api/events?minutes=60">?minutes=60</a></p>
             </td>
           </tr>
