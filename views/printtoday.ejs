@@ -10,7 +10,7 @@
 
     <!-- CSS -->
      <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-     <script src="../lib/bootstrap-datepicker.js"></script>
+     <script src="/lib/bootstrap-datepicker.js"></script>
      <script>
     function htmlspecialchars_decode(string, quote_style) {
       // http://kevin.vanzonneveld.net
@@ -83,6 +83,7 @@
         today.setMinutes(0);
         today.setSeconds(0);
         today.setMilliseconds(0);
+      $('.date').datepicker();
       $('#d').datepicker('setValue', today);
       $('#send').click(function (e) {
         window.location = '?date=' + $('#d1').data('datepicker').date.toDateString();
@@ -165,11 +166,11 @@
     <div id="wrap">
       <!-- Begin page content -->
       <div class="container">
-      <div class="well no-print">
+      <div class="well form-inline no-print">
         <button class="btn btn-large btn-primary pull-right no-print" type="button" id="printButton">Print this page</button>
 
         Choose a date to see the printer-friendly list of events:<br>
-        <div class="input-append date" id="d2" data-date="00-00-0000" data-date-format="mm-dd-yyyy">
+        <div class="input-append date" id="d" data-date="00-00-0000" data-date-format="mm-dd-yyyy">
           <input class="input-small" size="16" type="text">
           <span class="add-on"><i class="icon-th"></i></span>
         </div>
