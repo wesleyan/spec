@@ -32,7 +32,13 @@
 		app.use(app.router);
 		app.use(express.static(__dirname + '/public'));
 	});
-	
+
+	app.all('/api/*', function(req, res, next) {
+	  res.header("Access-Control-Allow-Origin", "*"); //or just allowed domains if wanted
+	  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+	  next();
+	});
+		
 	// Template engine tags are changed to {{ }} because underscore uses <% %> as well in the front end
 	ejs.open = '{{';
 	ejs.close = '}}';
