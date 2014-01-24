@@ -116,6 +116,10 @@
 				allInventory = data;
 			}
 		});
+	Utility.inventoryName = function (id) {
+		var id = parseInt(id);
+		return _.findWhere(allInventory, {'id': id}).text;
+	}
 
 // CAS SESSION MANAGEMENT
 	function getUser(req) {
