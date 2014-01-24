@@ -679,10 +679,7 @@
 			case 'unstaffed':
 				query = {cancelled: false };
 				break;
-			case 'onlyMine':
-				query = {shifts: { $elemMatch: { staff: getUser(req) } }};
-				break;
-			case 'recentVideo':
+			case 'video':
 				query = {video: true};
 				break;
 			default:
