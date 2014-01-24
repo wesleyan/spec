@@ -50,9 +50,15 @@
               return false;
             }
             msg = JSON.parse(msg);
-            lazy = _.filter(storeAllStaff, function (person) {
-              return typeof msg[person.username] === 'undefined';
+
+            lazy = storeAllStaff.filter(storeAllStaff, function (person) {
+              return typeof msg[person.username] === 'undefined');
+            }).filter(storeAllStaff, function (person) {
+              return !person.professional;
+            }).filter(storeAllStaff, function (person) {
+              return person.task.indexOf('events') > 0 || person.trainee;
             });
+
             var template = _.template( $(".template").html(), {'staff': msg, 'lazy': lazy});
             //console.log(template);
             $('#content').html(template);
@@ -342,9 +348,13 @@
       </table>
       <div class="well">
         <h5>Staff who did not sign up for any event in the given time period</h5>
-        <% _.each(rc.lazy, function(person) { %>
-          <%= person.name %> (<%= person.username %>), 
-        <% }) %>
+        <p style="-moz-column-width: 20em;-webkit-column-width: 20em;column-width: 20em;">
+          <ul>
+            <% _.each(rc.lazy, function(person) { %>
+              <li><%= person.name %> (<%= person.username %>)</li> 
+            <% }) %>
+          </ul>
+        </p>
       </div>
     </script>
 </html>
