@@ -209,6 +209,20 @@
             </h4></span>
             <h5>Event itself starts at {{= formatAMPM(event.eventStart) }} - {{= formatAMPM(event.eventEnd) }}</h5>
             
+            {{ if(event.inventory.length > 0) { }}
+              <ul class="inline">
+                <li>
+                  <strong>Inventory: </strong>
+                </li>
+                  {{ event.inventory.forEach(function(item) { }}
+                    <li>
+                      {{= Utility.inventoryName(item) }}, 
+                    </li>
+                  {{ }) }}
+                </li>
+              </ul>
+            {{ } }}
+
          <table class="table table-striped table-bordered">
               <tbody>
                {{ event.shifts.forEach(function(shift) { }}
@@ -225,15 +239,7 @@
                 {{ }) }}
               </tbody>
             </table>
-            <ul class="breadcrumb">
-              <li class="active">
-                <strong>Inventory: </strong> 
-                {{ event.inventory.forEach(function(item) { }}
-                  {{= Utility.inventoryName(item) }}, 
-                {{ }) }}
-              </li>
-            </ul>
-          </div>
+                      </div>
         </div>
          {{ }) }}
       </div>
