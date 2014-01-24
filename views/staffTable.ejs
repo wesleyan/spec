@@ -52,7 +52,7 @@
             msg = JSON.parse(msg);
 
             lazy = storeAllStaff.filter(storeAllStaff, function (person) {
-              return typeof msg[person.username] === 'undefined');
+              return typeof msg[person.username] === 'undefined';
             }).filter(storeAllStaff, function (person) {
               return !person.professional;
             }).filter(storeAllStaff, function (person) {
