@@ -1627,7 +1627,7 @@
 		try {
 			//Allows to set the starting time
 			if(req.query.start) {
-				var start = new Date(req.query.start * 1000),
+				var start = new Date(req.query.start * 1000);
 			} else {
 				//just now if not set
 				var start = new Date();
