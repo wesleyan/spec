@@ -51,11 +51,11 @@
             }
             msg = JSON.parse(msg);
 
-            lazy = storeAllStaff.filter(storeAllStaff, function (person) {
+            lazy = storeAllStaff.filter(function (person) {
               return typeof msg[person.username] === 'undefined';
-            }).filter(storeAllStaff, function (person) {
+            }).filter(function (person) {
               return !person.professional;
-            }).filter(storeAllStaff, function (person) {
+            }).filter(function (person) {
               return person.task.indexOf('events') > 0 || person.trainee;
             });
 
