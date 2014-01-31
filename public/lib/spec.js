@@ -861,6 +861,19 @@ $(document).ready(function() {
 	}).on('hide', function() {
 		$(this).css('overflow', 'hidden');
 	});
+
+	$(document).keydown(function(e) {
+      switch(e.keyCode) { 
+         // User pressed "right" arrow
+         case 39:
+            $('#calendar').fullCalendar('next');
+         break;
+         // User pressed "left" arrow
+         case 37:
+            $('#calendar').fullCalendar('prev');
+         break;
+      }
+   });
 });
 
 $(document).ajaxStart(function() {
