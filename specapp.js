@@ -504,6 +504,30 @@
 					}
 				});
 		});
+		app.post("/event/audio", cas.blocker, function(req, res) {
+			//req.url
+			res.writeHead(200, {
+				'Content-Type': 'application/json'
+			});
+			if(permission(req) != 10) {
+				res.write(JSON.stringify(false).toString("utf-8"));
+				res.end();
+				return false;
+			}
+			db.events.update(
+				{_id: new mongo.ObjectID(req.body.eventid)},
+				{ $set: {'audio': JSON.parse(req.body.make) } }, 
+				function(err, updated) {
+					if (err || !updated) {
+						console.log(req.url);
+						console.log("Event not audio toggled:" + err);
+					} else {
+						//console.log("Event audio toggled");
+						res.write(JSON.stringify(true).toString("utf-8"));
+						res.end();
+					}
+				});
+		});
 		app.post("/event/edit", cas.blocker, function(req, res) {
 			//req.url
 			res.writeHead(200, {
@@ -1356,6 +1380,7 @@
 								'eventEnd':   eventEnd,
 								'cancelled':  cancelled,
 								techMustStay: true,
+								'audio': false,
 								'video':  video,
 								customer: {
 									'name':  data['Customer'],
@@ -1699,3 +1724,8 @@
 	app.listen(Preferences.port, function() {
 		console.log("Express server listening on port " + Preferences.port);
 	});
+	/* //options should have SSL certificates
+	https.createServer(options, app).listen(Preferences.port, function() {
+		console.log("Express server listening on port " + Preferences.port);
+	});
+	*/

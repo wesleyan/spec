@@ -409,7 +409,9 @@ $(document).ready(function() {
 			if (calEvent.video == true) {
 				symbol += '<i class="icon-facetime-video"></i> ';
 			}
-			
+			if (calEvent.audio == true) {
+				symbol += '<i class="icon-volume-up"></i> ';
+			}
 			$('#eventButton').removeClass('disabled');
 			Spec.changePopupColor(calEvent);
 
@@ -469,6 +471,9 @@ $(document).ready(function() {
 				symbol = '';
 				if (event.video == true) {
 					symbol += '<i class="icon-facetime-video icon-white"></i> ';
+				}
+				if (event.audio == true) {
+					symbol += '<i class="icon-volume-up icon-white"></i> ';
 				}
 				element.find('.fc-event-title').html(symbol + event.title);
 				element.contextmenu({
@@ -628,6 +633,21 @@ $(document).ready(function() {
 			Spec.lastClickedEvent['video'] = !Spec.lastClickedEvent['video'];
 			$('#popup').modalPopover('hide');
 			console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' video toggled');
+		});
+	});
+	$('body').on('click','.toggleAudio',function(e) {
+		$.ajax({
+			type: "POST",
+			url: "event/audio",
+			data: {
+				eventid: Spec.lastClickedEvent['_id'],
+				make: !Spec.lastClickedEvent['audio']
+			}
+		}).done(function(msg) {
+			Spec.refetchEvents();
+			Spec.lastClickedEvent['audio'] = !Spec.lastClickedEvent['audio'];
+			$('#popup').modalPopover('hide');
+			console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' audio toggled');
 		});
 	});
 	$('body').on('click','.removeNote', function(e) {
