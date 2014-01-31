@@ -147,6 +147,7 @@ Spec = {
 				}
 			}).done(function(msg) {
 				console.log('pill with ID ' + id + ' added');
+				Spec.setInventoryNumber(1);
 			});
 			return pill; //has to return pill
 		}
