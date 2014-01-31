@@ -127,11 +127,13 @@ Spec = {
 				}
 			}).done(function(msg) {
 				console.log('pill with ID ' + id + ' removed');
+				Spec.setInventoryNumber(-1)
 			});
 		},
 		onBeforeAdd: function(pill) { //this also works for initial/on modal click loading.
 			//var id = pill.data('tag-id');
 			//console.log('initial pill with ID ' + id + ' added');
+			Spec.setInventoryNumber(1);
 			return pill; //has to return pill
 		},
 		onBeforeNewAdd: function(pill) { //this also works for initial/on modal click loading.
@@ -190,6 +192,20 @@ Spec = {
 	    	$('#technician').html('<b>duration of event</b>.');
 	    }
 	}, //end techTemplateUpdate
+	setNoteNumber: function (addition, int) {
+		if(typeof int == 'undefined') {
+			$('#noNote').text(parseInt($('#noNote').text()) + addition);
+		} else {
+			$('#noNote').text(int);
+		}
+	},
+	setInventoryNumber: function (addition, int) {
+		if(typeof int == 'undefined') {
+			$('#noInventory').text(parseInt($('#noInventory').text()) + addition);
+		} else {
+			$('#noInventory').text(int);
+		}
+	}
 };
 //User info must be imported for this part
 
@@ -275,10 +291,12 @@ Spec = {
 
 	Spec.View.Notes = Backbone.View.extend({
 	        initialize: function(options){
+	        	Spec.setNoteNumber(0, 0);
 	            this.render(options);
 	            options.notes.forEach(function(note) {
 	            	var each_note_view = new Spec.View.EachNote(note);
 	            });
+	       		
 	        },
 	        render: function(options){
 	            var variables = { eventid: Spec.lastClickedEvent['_id'], notes: options.notes };
@@ -289,6 +307,7 @@ Spec = {
 
 	Spec.View.EachNote = Backbone.View.extend({
 	        initialize: function(note){
+	        	Spec.setNoteNumber(1);
 	            this.render(note);
 	            var removedItem;
 	        },
@@ -438,6 +457,7 @@ $(document).ready(function() {
 				});
 			}
 			//Inventory update
+			Spec.setInventoryNumber(0, 0);
 			var inventoryOptions = {
 				values_url: 'inventory/existing/' + calEvent['_id'],
 			};
@@ -663,6 +683,7 @@ $(document).ready(function() {
 		}).done(function(msg) {
 			console.log('note removed from event ID ' + Spec.lastClickedEvent.id + ', ID: ' + noteid);
 			$(removedItem).parent().parent().remove();
+			Spec.setNoteNumber(-1);
 		});
 		return false;
 	});
