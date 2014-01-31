@@ -872,6 +872,10 @@ $(document).ready(function() {
          case 37:
             $('#calendar').fullCalendar('prev');
          break;
+         // User pressed "up" arrow
+         case 38:
+            $('#calendar').fullCalendar('today');
+         break;
       }
    });
 });
