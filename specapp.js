@@ -1239,7 +1239,11 @@
 						var result = {};
 						events.forEach(function(event) {
 							event.shifts.forEach(function(shift) {
-								if(shift.staff === "") { return; }
+								if (shift.staff === "") {
+									return;
+								} else {
+									shift.staff = shift.staff.toLowerCase();
+								}
 								result[shift.staff] = (typeof result[shift.staff] === 'undefined') ? {} : result[shift.staff];
 								result[shift.staff].hour = (typeof result[shift.staff].hour === 'undefined') ? 0 : result[shift.staff].hour;
 								result[shift.staff].event = (typeof result[shift.staff].event === 'undefined') ? 0 : result[shift.staff].event;
