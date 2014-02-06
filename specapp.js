@@ -572,14 +572,22 @@
 
 						//Send e-mails to the registered staff after update
 						var smtpTransport = Utility.smtpTransport();
-						
+
 						updated.shifts.forEach(function(shift) {
 							var staffMailOptions = {
 							    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
 							    to: shift.staff + "@wesleyan.edu",
 							    subject: "Updated Event for " + shift.staff + " (IMPORTANT)",
 							};
-							var items = {'update': [updated], remove: []};
+							var items = {
+								'update': [{
+									'event': updated,
+									'shift': _.findWhere(updated.shifts, {
+										staff: shift.staff
+									})
+								}],
+								remove: []
+							};
 							staffMailOptions.html = ejs.render(fs.readFileSync(__dirname + '/views/mail/normalUpdate.ejs', 'utf8'), {'app': app, 'items': items});
 
 							smtpTransport.sendMail(staffMailOptions, function(error, response) {
