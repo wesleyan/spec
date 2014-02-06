@@ -45,14 +45,17 @@
 
 // UTILITY FUNCTIONS
 	var Utility = {};
-	Utility.sendSingleMail = function(options, callback) {
-		var smtpTransport = nodemailer.createTransport("SMTP", {
+	Utility.smtpTransport = function () {
+		return nodemailer.createTransport("SMTP", {
 			service: Preferences.mail.service,
 			auth: {
 				user: Preferences.mail.user,
 				pass: Preferences.mail.pass
 			}
 		});
+	}
+	Utility.sendSingleMail = function(options, callback) {
+		var smtpTransport = Utility.smtpTransport();
 		var mailOptions = {
 			from: "Wesleyan Spec <wesleyanspec@gmail.com>",
 			subject: options.subject,
@@ -552,9 +555,12 @@
 			query.eventStart = new Date(Date.parse(reqDate + req.body.changedData.timepickerEventStart));
 			query.eventEnd = new Date(Date.parse(reqDate + req.body.changedData.timepickerEventEnd));
 			query.staffNeeded = parseInt(req.body.changedData.staffNeeded);
-			db.events.update(
-				{_id: new mongo.ObjectID(req.body.eventid)},
-				{ $set: query },  //this line consists of editing stuff
+			db.events.findAndModify(
+				{
+					query: {_id: new mongo.ObjectID(req.body.eventid)},
+					update: { $set: query }, 
+					new: true
+				},
 				function(err, updated) {
 					if (err || !updated) {
 						console.log(req.url);
@@ -563,6 +569,28 @@
 						//console.log("Event edited");
 						res.write(JSON.stringify(true).toString("utf-8"));
 						res.end();
+
+						//Send e-mails to the registered staff after update
+						var smtpTransport = Utility.smtpTransport();
+						
+						updated.shifts.forEach(function(shift) {
+							var staffMailOptions = {
+							    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
+							    to: shift.staff + "@wesleyan.edu",
+							    subject: "Updated Event for " + shift.staff + " (IMPORTANT)",
+							};
+							var items = {'update': [updated], remove: []};
+							staffMailOptions.html = ejs.render(fs.readFileSync(__dirname + '/views/mail/normalUpdate.ejs', 'utf8'), {'app': app, 'items': items});
+
+							smtpTransport.sendMail(staffMailOptions, function(error, response) {
+							    if (error) {
+							        console.log(error);
+							    } else {
+							        //console.log("Message sent: " + response.message);
+							    }
+							});
+						});
+						//e-mails sent
 					}
 				});
 		});
@@ -1514,13 +1542,7 @@
 		//not using a function for e-mail sending because we need to close the connection after all stuff
 
 		// create reusable transport method (opens pool of SMTP connections)
-		var smtpTransport = nodemailer.createTransport("SMTP", {
-		    service: Preferences.mail.service,
-		    auth: {
-		        user: Preferences.mail.user,
-		        pass: Preferences.mail.pass
-		    }
-		});
+		var smtpTransport = Utility.smtpTransport();
 		//we have an object {update:[], remove:[]}, and the update array has the these events
 		var whatToSend = {},
 			parallel = [];
@@ -1690,13 +1712,7 @@
 			} else {
 				var providers = ['vtext.com', 'txt.att.net', 'tomomail.net', 'messaging.sprintpcs.com', 'vmobl.com'];
 				//not using a function for e-mail sending because we need to close the connection after all stuff
-				var smtpTransport = nodemailer.createTransport("SMTP", {
-				    service: Preferences.mail.service,
-				    auth: {
-				        user: Preferences.mail.user,
-				        pass: Preferences.mail.pass
-				    }
-				});
+				var smtpTransport = Utility.smtpTransport();
 				events.forEach(function(event) {
 					event.shifts.forEach(function(shift) {
 						var phone = _.findWhere(app.locals.storeStaff, {'username': shift.staff});
