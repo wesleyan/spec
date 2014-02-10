@@ -179,7 +179,7 @@ $('#newStaff').click(function() {
       return 'Enter a valid phone number please!'
     }
   });
-  $('#permission').editable('option', 'validate', function(v) {
+  $('#level').editable('option', 'validate', function(v) {
     if (!v) return 'Required field!';
     if (!((/\d{1}/.test(v)) || (/\d{2}/.test(v))) || parseInt(v) > 10 || parseInt(v) < 0) {
       return 'Enter a valid permission level please!'

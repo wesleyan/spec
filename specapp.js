@@ -1325,7 +1325,48 @@
 				}
 				//console.log("Req for staff database");
 				  res.render('staffDatabase',{});
-				});
+			});
+			app.post('/staff/db/add', cas.blocker, function (req, res) {
+				if(permission(req) != 10) {
+					res.write(JSON.stringify(false).toString("utf-8"));
+					res.end();
+					return false;
+				}
+				//console.log("Req for staff adding to database");
+
+				//raw data from the front end is modified a bit to fit the format
+				var toAdd = req.body;
+				toAdd.class_year = parseInt(toAdd.class_year);
+				toAdd.level = parseInt(toAdd.level);
+				toAdd.phone = parseInt(toAdd.phone);
+				toAdd.professional = !!parseInt(toAdd.professional);
+				toAdd.trainee = !!parseInt(toAdd.trainee);
+				toAdd.task = toAdd.task.split(',').map(function(x) {return x.trim()});
+
+				//add toAdd to the database now
+			});
+			app.post('/staff/db/delete', cas.blocker, function (req, res) {
+				if(permission(req) != 10) {
+					res.write(JSON.stringify(false).toString("utf-8"));
+					res.end();
+					return false;
+				}
+				//console.log("Req for staff deleting from database");
+				
+				//req.body.id is the _id in the database
+			});
+			app.post('/staff/db/update', cas.blocker, function (req, res) {
+				if(permission(req) != 10) {
+					res.write(JSON.stringify(false).toString("utf-8"));
+					res.end();
+					return false;
+				}
+				//console.log("Req for staff updating in database");
+				
+				//req.body.id is the _id in the database
+				//req.body.what is the update query
+				  
+			});
 
 // FILE UPLOAD
 	app.get('/fileUpload', cas.blocker, function(req, res) {
