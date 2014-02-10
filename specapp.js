@@ -1317,6 +1317,15 @@
 						//users: app.locals.,
 					});
 				});
+			app.get('/staff/db', cas.blocker, function (req, res) {
+				if(permission(req) != 10) {
+					res.write(JSON.stringify(false).toString("utf-8"));
+					res.end();
+					return false;
+				}
+				//console.log("Req for staff database");
+				  res.render('staffDatabase',{});
+				});
 
 // FILE UPLOAD
 	app.get('/fileUpload', cas.blocker, function(req, res) {
