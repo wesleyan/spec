@@ -1366,7 +1366,7 @@
 				toAdd.task = toAdd.task.split(',').map(function(x) {return x.trim()});
 
 				//add toAdd to the database now
-				db.events.save(toAdd, function(err, saved) {
+				db.staff.save(toAdd, function(err, saved) {
 					if (err || !saved) {
 						console.log("Staff not added to database:" + err);
 					} else {
