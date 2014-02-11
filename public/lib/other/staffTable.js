@@ -60,14 +60,15 @@ $(document).ready(function() {
 
 var addTaskIcon = function (person) {
   var html = '';
-
-  if(person.task.indexOf('postpro') !== -1) {
-    //add post pro icon
-    html += ' <i class="icon-film" title="Post-Production"></i>';
-  }
-  if(person.task.indexOf('dataentry') !== -1) {
-    //add data entry icon
-    html += ' <i class="icon-file" title="Data Entry / Inventory"></i>';
+  if(person.task) {
+    if(person.task.indexOf('postpro') !== -1) {
+      //add post pro icon
+      html += ' <i class="icon-film" title="Post-Production"></i>';
+    }
+    if(person.task.indexOf('dataentry') !== -1) {
+      //add data entry icon
+      html += ' <i class="icon-file" title="Data Entry / Inventory"></i>';
+    }
   }
 
   return html;
