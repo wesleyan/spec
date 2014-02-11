@@ -1344,6 +1344,14 @@
 				toAdd.task = toAdd.task.split(',').map(function(x) {return x.trim()});
 
 				//add toAdd to the database now
+				db.events.save(toAdd, function(err, saved) {
+					if (err || !saved) {
+						console.log("Staff not added to database:" + err);
+					} else {
+						res.write(JSON.stringify(true).toString("utf-8"));
+						res.end();
+					}
+				});
 			});
 			app.post('/staff/db/delete', cas.blocker, function (req, res) {
 				if(permission(req) != 10) {
@@ -1354,6 +1362,17 @@
 				//console.log("Req for staff deleting from database");
 				
 				//req.body.id is the _id in the database
+				db.staff.remove(
+					{'_id': new mongo.ObjectID(req.body.id)},
+					function(err, removed) {
+						if (err || !removed) {
+							console.log("Staff could not be deleted:" + err);
+							console.log(event.title);
+						} else {
+							res.write(JSON.stringify(true).toString("utf-8"));
+							res.end()
+						}
+				});
 			});
 			app.post('/staff/db/update', cas.blocker, function (req, res) {
 				if(permission(req) != 10) {
@@ -1365,7 +1384,18 @@
 				
 				//req.body.id is the _id in the database
 				//req.body.what is the update query
-				  
+				db.staff.update( 
+					{'_id': new mongo.ObjectID(req.body.id)},
+					{ $set: req.body.what }, 
+					function(err, updated) {
+						if (err || !updated) {
+							console.log(req.url);
+							console.log("Staff not updated in database:" + err);
+						} else {
+							res.write(JSON.stringify(true).toString("utf-8"));
+							res.end();
+						}
+				});
 			});
 
 // FILE UPLOAD
