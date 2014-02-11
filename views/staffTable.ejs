@@ -61,7 +61,8 @@
          <% _.each(rc.staff, function(value, key) { %>
             <% if(key !== '') { %>
               <tr>
-                <td><%= _.findWhere(storeAllStaff, {'username': key}).name %> (<%= key %>)</td>
+                <td><%= _.findWhere(storeAllStaff, {'username': key}).name %> (<%= key %>)<%=addTaskIcon(_.findWhere(storeAllStaff, {'username': key})) %>
+                </td>
                 <td><%= value.event %></td>
                 <td><%= value.hour.toFixed(2) %></td>
               </tr>
@@ -73,7 +74,7 @@
         <h5>Staff who did not sign up for any event in the given time period</h5>
           <ul style="columns: 2; -webkit-columns: 2; -moz-columns: 2;">
             <% _.each(rc.lazy, function(person) { %>
-              <li><%= person.name %> (<%= person.username %>)</li> 
+              <li><%= person.name %> (<%= person.username %>)<%=addTaskIcon(person) %></li> 
             <% }) %>
           </ul>
       </div>
