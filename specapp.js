@@ -1365,14 +1365,27 @@
 				toAdd.trainee = !!parseInt(toAdd.trainee);
 				toAdd.task = toAdd.task.split(',').map(function(x) {return x.trim()});
 
-				//add toAdd to the database now
-				db.staff.save(toAdd, function(err, saved) {
-					if (err || !saved) {
+
+				db.staff.find({'username': toAdd.username}, function(err, data) {
+					if (err || !data) {
 						console.log("Staff not added to database:" + err);
 					} else {
-						Utility.updateCachedUsers();
-						res.write(JSON.stringify(true).toString("utf-8"));
-						res.end();
+						if(data.length < 1) {
+							//add toAdd to the database now
+							db.staff.save(toAdd, function(err, saved) {
+								if (err || !saved) {
+									console.log("Staff not added to database:" + err);
+								} else {
+									Utility.updateCachedUsers();
+									res.write(JSON.stringify(true).toString("utf-8"));
+									res.end();
+								}
+							});
+						} else {
+							//this staff exists in the database
+							res.write(JSON.stringify({errors:'A staff with this user name already exists in the database.'}).toString("utf-8"));
+							res.end();
+						}
 					}
 				});
 			});

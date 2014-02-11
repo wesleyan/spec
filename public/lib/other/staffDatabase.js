@@ -213,7 +213,10 @@ $('#newModal .btn-primary').click(function() {
       dataType: 'json'
     },
     success: function(data, config) {
-      if (data) {
+      if (data && data.errors) {
+        //server-side validation error, response like {"errors": {"username": "username already exist"} }
+        config.error.call(this, data.errors);
+      } else if (data) {
         pageableStaffList.fetch({
           reset: true
         })
@@ -222,9 +225,6 @@ $('#newModal .btn-primary').click(function() {
         $('#msg').addClass('alert-success').removeClass('alert-error').html(msg).show();
         //$('#save-btn').hide();
         $('#newModal').modal('hide');
-      } else if (data && data.errors) {
-        //server-side validation error, response like {"errors": {"username": "username already exist"} }
-        config.error.call(this, data.errors);
       }
     },
     error: function(errors) {
