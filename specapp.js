@@ -1417,6 +1417,12 @@
 				if(req.body.what.class_year) {
 					req.body.what.class_year = parseInt(req.body.what.class_year);
 				}
+				if(req.body.what.professional) {
+					req.body.what.professional = JSON.parse(req.body.what.professional);
+				}
+				if(req.body.what.trainee) {
+					req.body.what.trainee = JSON.parse(req.body.what.trainee);
+				}
 				db.staff.update( 
 					{'_id': new mongo.ObjectID(req.body.id)},
 					{ $set: req.body.what }, 
