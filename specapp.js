@@ -108,6 +108,21 @@
 				});
 			}
 		});
+	Utility.updateCachedUsers = function () {
+		db.staff.find({}, function(err, data) {
+				if (err || !data) {
+					console.log(req.url);
+					console.log(err);
+				} else {
+					var staffUsernameArrayNow = [];
+					app.locals.storeStaff = data;
+					app.locals.storeStaff.forEach(function(item) {
+						staffUsernameArrayNow.push(item.username);
+					});
+					staffUsernameArray = staffUsernameArrayNow;
+				}
+			});
+	};
 
 	//We are storing the inventory in the memory as well
 	var allInventory;
@@ -981,8 +996,15 @@
 			res.writeHead(200, {
 				'Content-Type': 'application/json'
 			});
-			res.write(JSON.stringify(app.locals.storeStaff).toString("utf-8"));
-			res.end();
+			db.staff.find({}, function(err, data) {
+				if (err || !data) {
+					console.log(req.url);
+					console.log(err);
+				} else {
+					res.write(JSON.stringify(data).toString("utf-8"));
+					res.end();
+				}
+			});
 		});
 		//Get the existing staff of an event
 		app.get("/staff/get/:id", cas.blocker, function(req, res) {
@@ -1348,6 +1370,7 @@
 					if (err || !saved) {
 						console.log("Staff not added to database:" + err);
 					} else {
+						Utility.updateCachedUsers();
 						res.write(JSON.stringify(true).toString("utf-8"));
 						res.end();
 					}
@@ -1369,6 +1392,7 @@
 							console.log("Staff could not be deleted:" + err);
 							console.log(event.title);
 						} else {
+							Utility.updateCachedUsers();
 							res.write(JSON.stringify(true).toString("utf-8"));
 							res.end()
 						}
@@ -1392,6 +1416,7 @@
 							console.log(req.url);
 							console.log("Staff not updated in database:" + err);
 						} else {
+							Utility.updateCachedUsers();
 							res.write(JSON.stringify(true).toString("utf-8"));
 							res.end();
 						}
