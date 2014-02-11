@@ -1408,6 +1408,15 @@
 				
 				//req.body.id is the _id in the database
 				//req.body.what is the update query
+				if(req.body.what.level) {
+					req.body.what.level = parseInt(req.body.what.level);
+				}
+				if(req.body.what.phone) {
+					req.body.what.phone = parseInt(req.body.what.phone);
+				}
+				if(req.body.what.class_year) {
+					req.body.what.class_year = parseInt(req.body.what.class_year);
+				}
 				db.staff.update( 
 					{'_id': new mongo.ObjectID(req.body.id)},
 					{ $set: req.body.what }, 
