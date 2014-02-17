@@ -863,21 +863,22 @@ $(document).ready(function() {
 	});
 
 	$(document).keydown(function(e) {
-      switch(e.keyCode) { 
-         // User pressed "right" arrow
-         case 39:
-            $('#calendar').fullCalendar('next');
-         break;
-         // User pressed "left" arrow
-         case 37:
-            $('#calendar').fullCalendar('prev');
-         break;
-         // User pressed "up" arrow
-         case 38:
-            $('#calendar').fullCalendar('today');
-         break;
-      }
-   });
+		if (!$(event.target).is(':not(input, textarea)')) { return; } //don't do anything if on input/textarea
+		switch (e.keyCode) {
+			// User pressed "right" arrow
+			case 39:
+				$('#calendar').fullCalendar('next');
+				break;
+				// User pressed "left" arrow
+			case 37:
+				$('#calendar').fullCalendar('prev');
+				break;
+				// User pressed "up" arrow
+			case 38:
+				$('#calendar').fullCalendar('today');
+				break;
+		}
+	});
 });
 
 $(document).ajaxStart(function() {
