@@ -25,6 +25,8 @@
 	app.configure(function() {
 		app.set('views', __dirname + '/views');
 		app.set('view engine', 'ejs');
+		// Template engine tags are changed to {{ }} because underscore uses <% %> as well in the front end
+		app.set('view options', {open: '{{', close: '}}'});
 		app.use(express.bodyParser({keepExtensions: true, uploadDir: __dirname + '/uploads'}));
 		app.use(express.methodOverride());
 		app.use(express.cookieParser('secret'));
@@ -38,10 +40,6 @@
 	  res.header("Access-Control-Allow-Headers", "X-Requested-With");
 	  next();
 	});
-		
-	// Template engine tags are changed to {{ }} because underscore uses <% %> as well in the front end
-	ejs.open = '{{';
-	ejs.close = '}}';
 
 // UTILITY FUNCTIONS
 	var Utility = {};
@@ -706,10 +704,7 @@
 				today = new Date();
 				dateString = (new Date()).toDateString();
 			}
-			today.setHours(0);
-			today.setMinutes(0);
-			today.setSeconds(0);
-			today.setMilliseconds(0);
+			today.setHours(0,0,0,0);
 		var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
 
 		db.events.find({start: {$gte: today, $lt: tomorrow}, cancelled:false}).sort({start: 1},
@@ -1320,11 +1315,7 @@
 					res.end();
 					return false;
 				}
-				//console.log("Req for staff check");
-				  res.render('staffCheck',
-					{
-						//users: app.locals.,
-					});
+				  res.render('staffCheck', {});
 				});
 
 			app.get('/staffTable', cas.blocker, function (req, res) {
@@ -1333,11 +1324,7 @@
 					res.end();
 					return false;
 				}
-				//console.log("Req for staff check");
-				  res.render('staffTable',
-					{
-						//users: app.locals.,
-					});
+				  res.render('staffTable', {});
 				});
 			app.get('/staff/db', cas.blocker, function (req, res) {
 				if(permission(req) != 10) {
@@ -1345,7 +1332,6 @@
 					res.end();
 					return false;
 				}
-				//console.log("Req for staff database");
 				  res.render('staffDatabase',{});
 			});
 			app.post('/staff/db/add', cas.blocker, function (req, res) {
@@ -1354,7 +1340,6 @@
 					res.end();
 					return false;
 				}
-				//console.log("Req for staff adding to database");
 
 				//raw data from the front end is modified a bit to fit the format
 				var toAdd = req.body;
@@ -1395,7 +1380,6 @@
 					res.end();
 					return false;
 				}
-				//console.log("Req for staff deleting from database");
 				
 				//req.body.id is the _id in the database
 				db.staff.remove(
@@ -1417,7 +1401,6 @@
 					res.end();
 					return false;
 				}
-				//console.log("Req for staff updating in database");
 				
 				//req.body.id is the _id in the database
 				//req.body.what is the update query
@@ -1777,10 +1760,7 @@
 	});
 	app.get('/m/:counter/', cas.blocker, function (req, res) {
 		var today = new Date();
-		today.setHours(0);
-		today.setMinutes(0);
-		today.setSeconds(0);
-		today.setMilliseconds(0);
+		today.setHours(0,0,0,0);
 		var start = new Date(today.getTime() + 24 * 60 * 60 * 1000 * req.params.counter),
 			end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
 		
