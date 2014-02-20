@@ -1,4 +1,6 @@
-var nodemailer = require("nodemailer");
+var nodemailer 	= require("nodemailer"),
+	cache 		= require('memory-cache');
+
 var Preferences = require('./../config/Preferences.js');
 
 var Utility = {
@@ -57,7 +59,24 @@ var Utility = {
 			}
 		}
 		return events;
+	},
+	updateCachedUsers : function () {
+		//We can store all staff in memory, since it is not a big array and it will be used VERY frequently, will save time.
+		db.staff.find({}, function(err, data) {
+				if (err || !data) {
+					console.log(req.url);
+					console.log(err);
+				} else {
+					var arr = [];
+					cache.put('storeStaff', data);
+					cache.get('storeStaff').forEach(function(item) {
+						arr.push(item.username);
+					});
+					cache.put('staffUsernameArray', arr);
+				}
+			});
 	}
 };
 
 module.exports = Utility;
+Utility.updateCachedUsers();

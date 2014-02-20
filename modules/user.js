@@ -1,13 +1,25 @@
+var cache = require('memory-cache');
+
+var _ = require('underscore');
+
 var User = {
 	getUser: function(req) {
 		return req.session.cas_user;
 	},
-	permission: function(req) { //returns the permission level of the user in session
-		var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == getUser(req); });
-		if(userObj.length < 1) {
+	permission: function(req) { 
+		//returns the permission level of the user in session
+		var userObj = _.findWhere(cache.get('storeStaff'), {username: User.getUser(req)});
+		if(_.isUndefined(userObj)) {
 			return false;
 		} else {
-			return userObj[0].level;
+			return userObj.level;
+		}
+	},
+	permissionControl: function(req, res, level) {
+		if (User.permission(req) < level) {
+			res.json(false);
+			res.end();
+			return false;
 		}
 	}
 }

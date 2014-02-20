@@ -10,18 +10,21 @@
 	require('ofe').call();
 
 	var Preferences = require('./config/Preferences.js'),
-		Utility = require('./modules/Utility.js').
-		db = require('./modules/db.js');
+		Utility 	= require('./modules/Utility.js'),
+		User 		= require('./modules/user.js'),
+		db 			= require('./modules/db.js'),
+		routes 		= require('./routes/index.js');
 
 	var express = require('express'),
-		app = express(),
-		$ = require('jquery'),
-		_ = require('underscore'),
-		mongo = require('mongodb-wrapper');
-		fs = require('fs');
-		cas = require('./modules/grand_master_cas.js'),
-		async = require('async'),
-		ejs = require('ejs');
+		app 	= express(),
+		$ 		= require('jquery'),
+		_ 		= require('underscore'),
+		mongo 	= require('mongodb-wrapper');
+		fs 		= require('fs');
+		cas 	= require('./modules/grand_master_cas.js'),
+		async 	= require('async'),
+		ejs 	= require('ejs'),
+		cache 	= require('memory-cache');
 	cas.configure(Preferences.casOptions);
 
 	app.configure(function() {
@@ -68,63 +71,23 @@
 	};
 
 // STUFF TO LOAD AT INITIATION
-	//We can store all staff in memory, since it is not a big array and it will be used VERY frequently, will save time.
-	var staffUsernameArray = [];
-	db.staff.find({}, function(err, data) {
-			if (err || !data) {
-				console.log(req.url);
-				console.log(err);
-			} else {
-				app.locals.storeStaff = data;
-				app.locals.storeStaff.forEach(function(item) {
-					staffUsernameArray.push(item.username);
-				});
-			}
-		});
-	Utility.updateCachedUsers = function () {
-		db.staff.find({}, function(err, data) {
-				if (err || !data) {
-					console.log(req.url);
-					console.log(err);
-				} else {
-					var staffUsernameArrayNow = [];
-					app.locals.storeStaff = data;
-					app.locals.storeStaff.forEach(function(item) {
-						staffUsernameArrayNow.push(item.username);
-					});
-					staffUsernameArray = staffUsernameArrayNow;
-				}
-			});
-	};
 
 	//We are storing the inventory in the memory as well
-	var allInventory;
 	db.inventory.find({}, function(err, data) {
 			if (err || !data) {
 				console.log(req.url);
 				console.log(err);
 			} else {
-				allInventory = data;
+				cache.put('allInventory', data);
 			}
 		});
+
 	Utility.inventoryName = function (id) {
 		var id = parseInt(id);
-		return _.findWhere(allInventory, {'id': id}).text;
+		return _.findWhere(cache.get('allInventory'), {'id': id}).text;
 	}
 
 // CAS SESSION MANAGEMENT
-	function getUser(req) {
-		return req.session.cas_user;
-	}
-
-	function permission(req) { //returns the permission level of the user in session
-		var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == getUser(req); });
-		if(userObj.length < 1) {
-			return false;
-		} else {
-			return userObj[0].level;
-		}
-	}
 
 	app.get('/login', cas.bouncer, function(req, res) {
 		res.redirect('/');
@@ -134,7 +97,7 @@
 
 	app.get("/user", cas.blocker, function(req, res) {
 		//req.session.cas_user
-		res.json({'username':getUser(req), 'permission':permission(req)});
+		res.json({'username':User.getUser(req), 'permission':User.permission(req)});
 		res.end();
 	});
 
@@ -145,7 +108,7 @@
 		oauth_cache = {};
 
 	try {
-	oauth_cache = JSON.parse(fs.readFileSync(__dirname + Preferences.path_client_secret, 'utf8'));
+		oauth_cache = JSON.parse(fs.readFileSync(__dirname + Preferences.path_client_secret, 'utf8'));
 	} catch (e) {
 		console.log("Could not read client secret file from the config directory\nError: " + e);
 	}
@@ -237,21 +200,21 @@
 								} else { //Now we have the calendar owner and readers, let's check it
 									//find owner, delete 'user:' from id, split to check the user name and domain
 									var user = (_.findWhere(names.items, {'role':'owner'}))['id'].substr(5).split('@'); 
-									if(user[1] === 'wesleyan.edu' && staffUsernameArray.indexOf(user[0]) !== -1 && getUser(req) === user[0]) {
+									if(user[1] === 'wesleyan.edu' && cache.get('staffUsernameArray').indexOf(user[0]) !== -1 && User.getUser(req) === user[0]) {
 										//console.log(user[0] + ' is in Wesleyan domain and in our staff list, and the logged in user');
 										req.session.credentials = tokens;
 										req.session.refresh_token = tokens.refresh_token;
 
 										//register the refresh token to the database, for that user
 										db.staff.update( 
-											{username: getUser(req)},
+											{username: User.getUser(req)},
 											{ $set: {'refresh_token': tokens.refresh_token } }, 
 											function(err, updated) {
 												if (err || !updated) {
 													console.log(req.url);
 													console.log("Refresh token not updated:" + err);
 												} else {
-													//console.log("Refresh token updated for " + getUser(req));
+													//console.log("Refresh token updated for " + User.getUser(req));
 													res.write(JSON.stringify(true).toString("utf-8"));
 													res.end();
 												}
@@ -261,7 +224,7 @@
 									} else {
 										// should explain the user that they have to use their valid wesleyan.edu accounts
 										// 		or they are not registered in the Spec system.
-										console.log('Something is wrong with this user ' + getUser(req));
+										console.log('Something is wrong with this user ' + User.getUser(req));
 										res.redirect('/authorize');
 									}
 								}
@@ -318,7 +281,7 @@
 	function overallGoogleCheck(req, res, callback) {
 		if (_.isUndefined(req.session.refresh_token)) {
 			//check the database for refresh token
-				db.staff.find({username:getUser(req)}, function(err, data) {
+				db.staff.find({username:User.getUser(req)}, function(err, data) {
 							if(err || !data || data.length < 1) {
 								console.log(req.url);
 								console.log(err);
@@ -362,58 +325,11 @@
 // EVENTS
 
 	//Event fetching should be filtered according to the time variables, still not done after MongoDB
-	app.get("/events", cas.blocker, function(req, res) {
-		//86400s = 1d
-		var start = new Date(req.query.start * 1000),
-			end = new Date(req.query.end * 1000),
-			query = {};
-		switch(req.query.filter) {
-			case 'all':
-				query = {};
-				break;
-			case 'hideCancelled':
-				query = {cancelled: false};
-				break;
-			case 'unstaffed':
-				query = {cancelled: false };
-				break;
-			case 'onlyMine':
-				query = {shifts: { $elemMatch: { staff: getUser(req) } }};
-				break;
-			case 'recentVideo':
-				query = {video: true};
-				break;
-			default:
-				query = {};
-		}
-		$.extend(query, {'start': {$gte: start, $lt: end}});
-		db.events.find(query, function(err, events) {
-			if (err || !events) {
-				console.log(req.url);
-				console.log("No events found:" + err);
-			} else {
-				if(req.query.filter === 'unstaffed') {
-					//filter them manually because empty shifts seem like real shifts
-					events = _.filter(events, function (event) {
-						return Utility.fullShiftNumber(event) < event.staffNeeded;
-					});
-				}
-				events = Utility.addBackgroundColor(events);
-				res.json(events);
-				res.end();
-			}
-		});
-
-		//req.url
-		//console.log("Req for events starting at " + start.toDateString() + " and ending before " + end.toDateString());	
-	});
+	app.get("/events", cas.blocker, routes.events.events);
 
 		app.post("/event/techMustStay", cas.blocker, function(req, res) {
-			if(permission(req) != 10) {
-				res.json(false);
-				res.end();
-				return false;
-			}
+			User.permissionControl(req, res, 10);
+
 			//req.url
 			//console.log("Req for techMustStay toggle Event ID " + req.body.eventid);
 			db.events.update(
@@ -432,11 +348,8 @@
 		});
 		app.post("/event/video", cas.blocker, function(req, res) {
 			//req.url
-			if(permission(req) != 10) {
-				res.json(false);
-				res.end();
-				return false;
-			}
+			User.permissionControl(req, res, 10);
+
 			//console.log("Req for techMustStay toggle Event ID " + req.body.eventid);
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
@@ -454,11 +367,8 @@
 		});
 		app.post("/event/audio", cas.blocker, function(req, res) {
 			//req.url
-			if(permission(req) != 10) {
-				res.json(false);
-				res.end();
-				return false;
-			}
+			User.permissionControl(req, res, 10);
+
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
 				{ $set: {'audio': JSON.parse(req.body.make) } }, 
@@ -475,11 +385,8 @@
 		});
 		app.post("/event/edit", cas.blocker, function(req, res) {
 			//req.url
-			if(permission(req) != 10) {
-				res.json(false);
-				res.end();
-				return false;
-			}
+			User.permissionControl(req, res, 10);
+
 			//console.log("Req for event edit Event ID " + req.body.eventid);
 			var query = {};
 			$.each(req.body.changedData, function(key, value) {
@@ -543,11 +450,8 @@
 		});
 		app.post("/event/spinner", cas.blocker, function(req, res) {
 			//req.url
-			if(permission(req) != 10) {
-				res.json(false);
-				res.end();
-				return false;
-			}
+			User.permissionControl(req, res, 10);
+
 			//console.log("Req for staffNeeded spinner for Event ID " + req.body.eventid);
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
@@ -565,11 +469,8 @@
 		});
 		app.post("/event/cancel", cas.blocker, function(req, res) {
 			//req.url
-			if(permission(req) != 10) {
-				res.json(false);
-				res.end();
-				return false;
-			}
+			User.permissionControl(req, res, 10);
+
 			//console.log("Req for cancel toggle Event ID " + req.body.eventid);
 			db.events.update(
 				{_id: new mongo.ObjectID(req.body.eventid)},
@@ -587,11 +488,8 @@
 		});
 		app.post("/event/remove", cas.blocker, function(req, res) {
 			//req.url
-			if(permission(req) != 10) {
-				res.json(false);
-				res.end();
-				return false;
-			}
+			User.permissionControl(req, res, 10);
+
 			//console.log("Req for remove Event ID " + req.body.eventid);
 			db.events.remove(
 				{_id: new mongo.ObjectID(req.body.eventid)},
@@ -711,7 +609,7 @@
 		app.get("/inventory/all", cas.blocker, function(req, res) {
 			//req.url
 			//console.log("Req for all inventory");
-			res.json(allInventory);
+			res.json(cache.get('allInventory'));
 			res.end();
 		});
 
@@ -730,7 +628,7 @@
 				} else {
 					var existingList = [];
 					data[0].inventory.forEach(function(id) {
-						existingList.push(allInventory.filter(function(tool) {
+						existingList.push(cache.get('allInventory').filter(function(tool) {
 							return tool.id == id;
 						})[0]);
 					});
@@ -743,7 +641,7 @@
 		//Inventory Update
 			//Add inventory to an event (POST)
 			app.post("/inventory/add", cas.blocker, function(req, res) {
-				if(permission(req) < 1) {
+				if(User.permission(req) < 1) {
 					res.json(false);
 					res.end();
 					return false;
@@ -751,7 +649,7 @@
 				//console.log("Req for adding inventory ID " + req.body.inventoryid + " to Event ID " + req.body.eventid);
 				//frontend checks for the same inventory adding, so no control needed for that
 				 //try to find the thing by its id and use the same data
-				var selectedInventory = allInventory.filter(function(thing) {
+				var selectedInventory = cache.get('allInventory').filter(function(thing) {
 					return thing.id == req.body.inventoryid;
 				})[0];
 				
@@ -772,7 +670,7 @@
 
 			//Remove inventory from an event (POST)
 			app.post("/inventory/remove", cas.blocker, function(req, res) {
-				if(permission(req) < 1) {
+				if(User.permission(req) < 1) {
 					res.json(false);
 					res.end();
 					return false;
@@ -818,14 +716,14 @@
 				var generatedID = new mongo.ObjectID();
 				db.events.update(
 					{_id: new mongo.ObjectID(req.body.eventid)},
-					{ $addToSet: {'notes': {'id': generatedID, 'text': req.body.note,'user': getUser(req), 'date': new Date()}} }, 
+					{ $addToSet: {'notes': {'id': generatedID, 'text': req.body.note,'user': User.getUser(req), 'date': new Date()}} }, 
 					function(err, updated) {
 						if (err || !updated) {
 							console.log(req.url);
 							console.log("Note not added:" + err);
 						} else {
 							//console.log("Note added");
-							res.json({'id':generatedID.toString(), 'user':getUser(req)});
+							res.json({'id':generatedID.toString(), 'user':User.getUser(req)});
 							res.end();
 						}
 					});
@@ -851,7 +749,7 @@
 							}
 						});
 				};
-				if(permission(req) == 10) { //remove the note if it's a manager
+				if(User.permission(req) == 10) { //remove the note if it's a manager
 					deleteNote();
 				} else {
 					db.events.find({_id: new mongo.ObjectID(req.body.eventid)}, function(err, events) {
@@ -862,7 +760,7 @@
 							console.log("No such note/event found");
 						} else {
 							var theNote = $.grep(events[0].notes, function(e){ return e['_id'] == req.body.id; });
-							if(theNote.user == getUser(req)) {
+							if(theNote.user == User.getUser(req)) {
 								deleteNote();
 							} else {
 								res.json(false);
@@ -911,13 +809,13 @@
 			app.post("/staff/add", cas.blocker, function(req, res) {
 				//req.url
 				var chosenStaff = req.body.staff;
-				if(staffUsernameArray.indexOf(getUser(req)) === -1) { //if user is not in staff list, don't allow
+				if(cache.get('staffUsernameArray').indexOf(User.getUser(req)) === -1) { //if user is not in staff list, don't allow
 					res.json(false);
 					res.end();
 					return false;
 				}
-				if(permission(req) != 10) {
-					chosenStaff = getUser(req); //this will only add 
+				if(User.permission(req) < 10) {
+					chosenStaff = User.getUser(req); //this will only add 
 				}
 				//console.log("Req for adding shift \"" + chosenStaff + "\" to Event ID " + req.body.eventid);
 				var eventStart = new Date(Date.parse(req.body.eventStart)),
@@ -951,8 +849,8 @@
 		//Remove staff/shift from an event (POST)
 			app.post("/staff/remove", cas.blocker, function(req, res) {
 				var query = {'shifts': {'id': new mongo.ObjectID(req.body.id)} };
-				if(permission(req) != 10) { //users other than the manager 
-					query['shifts']['staff'] = getUser(req);
+				if(User.permission(req) < 10) { //users other than the manager 
+					query['shifts']['staff'] = User.getUser(req);
 				}
 				//console.log("Req for removing shift ID " + req.body.id + " from Event ID " + req.body.eventid);
 				db.events.findAndModify({
@@ -1019,7 +917,7 @@
 							}
 							//it is safe to update now
 							db.events.update({_id: new mongo.ObjectID(req.body.eventid), 'shifts.id': new mongo.ObjectID(req.body.id)},
-											 {$set: {'shifts.$.staff': getUser(req)}},
+											 {$set: {'shifts.$.staff': User.getUser(req)}},
 											 function(err, ifUpdated) {
 												if (err || !ifUpdated) {
 													console.log(req.url);
@@ -1058,7 +956,7 @@
 								if(_.isUndefined(withdrawnShift)) {
 									console.log('the shift could not be found');
 									return false;
-								} else if(withdrawnShift.staff !== getUser(req)) {
+								} else if(withdrawnShift.staff !== User.getUser(req)) {
 									console.log('someone is trying to withdraw for a shift that is not theirs!');
 									return false;
 								}
@@ -1111,7 +1009,7 @@
 								busyStaff.push(shift.staff);
 							});
 						});
-						var availableStaff = $(staffUsernameArray).not(busyStaff).get();
+						var availableStaff = $(cache.get('staffUsernameArray')).not(busyStaff).get();
 						res.json(availableStaff);
 						res.end();
 					}	
@@ -1119,11 +1017,8 @@
 			});
 
 			app.get("/staff/check", cas.blocker, function(req, res) {
-				if(permission(req) != 10) {
-					res.json(false);
-					res.end();
-					return false;
-				}
+				User.permissionControl(req, res, 10);
+
 				var start = new Date(Date.parse(req.query.start)),
 					end = new Date(Date.parse(req.query.end));
 				end = new Date(end.getTime() + 24 * 60 * 60 * 1000);
@@ -1142,11 +1037,8 @@
 				});
 			});
 			app.get("/staff/table", cas.blocker, function(req, res) {
-				if(permission(req) != 10) {
-					res.json(false);
-					res.end();
-					return false;
-				}
+				User.permissionControl(req, res, 10);
+
 				var start = new Date(Date.parse(req.query.start)),
 					end = new Date(Date.parse(req.query.end));
 				end = new Date(end.getTime() + 24 * 60 * 60 * 1000);
@@ -1179,37 +1071,21 @@
 					}
 				});
 			});
-			app.get('/staffCheck', cas.blocker, function (req, res) {
-				if(permission(req) != 10) {
-					res.json(false);
-					res.end();
-					return false;
-				}
-				  res.render('staffCheck', {});
-				});
+			app.get('/staffCheck', cas.blocker, function(req, res) {
+				User.permissionControl(req, res, 10);
+				res.render('staffCheck', {});
+			});
 
-			app.get('/staffTable', cas.blocker, function (req, res) {
-				if(permission(req) != 10) {
-					res.json(false);
-					res.end();
-					return false;
-				}
-				  res.render('staffTable', {});
-				});
-			app.get('/staff/db', cas.blocker, function (req, res) {
-				if(permission(req) != 10) {
-					res.json(false);
-					res.end();
-					return false;
-				}
-				  res.render('staffDatabase',{});
+			app.get('/staffTable', cas.blocker, function(req, res) {
+				User.permissionControl(req, res, 10);
+				res.render('staffTable', {});
+			});
+			app.get('/staff/db', cas.blocker, function(req, res) {
+				User.permissionControl(req, res, 10);
+				res.render('staffDatabase', {});
 			});
 			app.post('/staff/db/add', cas.blocker, function (req, res) {
-				if(permission(req) != 10) {
-					res.json(false);
-					res.end();
-					return false;
-				}
+				User.permissionControl(req, res, 10);
 
 				//raw data from the front end is modified a bit to fit the format
 				var toAdd = req.body;
@@ -1245,11 +1121,7 @@
 				});
 			});
 			app.post('/staff/db/delete', cas.blocker, function (req, res) {
-				if(permission(req) != 10) {
-					res.json(false);
-					res.end();
-					return false;
-				}
+				User.permissionControl(req, res, 10);
 				
 				//req.body.id is the _id in the database
 				db.staff.remove(
@@ -1266,11 +1138,7 @@
 				});
 			});
 			app.post('/staff/db/update', cas.blocker, function (req, res) {
-				if(permission(req) != 10) {
-					res.json(false);
-					res.end();
-					return false;
-				}
+				User.permissionControl(req, res, 10);
 				
 				//req.body.id is the _id in the database
 				//req.body.what is the update query
@@ -1306,11 +1174,8 @@
 
 // FILE UPLOAD
 	app.get('/fileUpload', cas.blocker, function(req, res) {
-		if(permission(req) != 10) {
-			res.json(false);
-			res.end();
-			return false;
-		}
+		User.permissionControl(req, res, 10);
+
 		var lastInfo = ['',''];
 		try {
 			var readFile = fs.readFileSync(__dirname + Preferences.path_last_upload_info); //see the last upload time & user
@@ -1320,6 +1185,8 @@
 	});
 
 	app.post('/fileUpload', cas.blocker, function(req, res) {
+		User.permissionControl(req, res, 10);
+		
 		var today = new Date(); today.setHours(0,0,0,0),
 			twoWeeksLater = new Date((new Date).getTime() + 2 * 7 * 24 * 60 * 60 * 1000); twoWeeksLater.setHours(23,59,59,999);
 		db.events.find({'start': {$gte: today, $lt: twoWeeksLater}}, function(err, events) {
@@ -1330,11 +1197,6 @@
 				// events loaded. let's check for every event
 
 					var parser = require('xml2json');
-					if(permission(req) != 10) {
-						res.json(false);
-						res.end();
-						return false;
-					}
 					console.log('Upload and saving progress started');
 					//you should check if it's an xml file
 					try {
@@ -1501,7 +1363,7 @@
 								});
 							})(req.files.myFile.path);
 							reportUpdate(whatToReport); //send messages to the staff and managers
-							fs.writeFileSync(__dirname + Preferences.path_last_upload_info, (new Date() + '&' + getUser(req))); //store the last upload time & user
+							fs.writeFileSync(__dirname + Preferences.path_last_upload_info, (new Date() + '&' + User.getUser(req))); //store the last upload time & user
 						});
 					} catch (err) {
 						// delete the newly uploaded file because there is no need to store it
@@ -1583,7 +1445,7 @@
 
 		//now it's time to report all updates to the managers (all staff with level 10), with whatToReport
 			
-			//var managerList = _.where(app.locals.storeStaff, {level:10});
+			//var managerList = _.where(cache.get('storeStaff'), {level:10});
 			var managerList = Preferences.managerEmails;
 
 				managerMailOptions = {
@@ -1611,9 +1473,9 @@
 		if(req.query.ticket) {
 			res.redirect('/'); //redirect to the base if there is a ticket in the URL
 		}
-		var currentUser = _.findWhere(app.locals.storeStaff, { 'username': getUser(req) });
+		var currentUser = _.findWhere(cache.get('storeStaff'), { 'username': User.getUser(req) });
 		if(_.isUndefined(currentUser)) { //the user is not in the staff database
-			res.render('notStaff', {cas_user: getUser(req)});
+			res.render('notStaff', {cas_user: User.getUser(req)});
 		} else {
 			res.render('index', {
 				username: currentUser.username,
@@ -1653,8 +1515,8 @@
 			} else {
 				
 				res.render('mobile/index', {
-					username: getUser(req),
-					permission: permission(req),
+					username: User.getUser(req),
+					permission: User.permission(req),
 					events: events,
 					counter: req.params.counter,
 					title:title,
@@ -1671,8 +1533,8 @@
 				console.log("No events found" + err);
 			} else {
 				res.render('mobile/event', {
-					username: getUser(req),
-					permission: permission(req),
+					username: User.getUser(req),
+					permission: User.permission(req),
 					event: events[0],
 				});
 			}
@@ -1680,14 +1542,14 @@
 	});
 
 	app.get('/m/staff/:username', cas.blocker, function (req, res) {
-		var userObj = $.grep(app.locals.storeStaff, function(e){ return e.username == req.params.username; });
+		var userObj = $.grep(cache.get('storeStaff'), function(e){ return e.username == req.params.username; });
 		if(userObj.length != 1) {
 			res.end();
 			return false;
 		}
 		res.render('mobile/staff', {
-			username: getUser(req),
-			permission: permission(req),
+			username: User.getUser(req),
+			permission: User.permission(req),
 			staff: userObj[0],
 		});
 	});
@@ -1706,7 +1568,7 @@
 				var smtpTransport = Utility.smtpTransport();
 				events.forEach(function(event) {
 					event.shifts.forEach(function(shift) {
-						var phone = _.findWhere(app.locals.storeStaff, {'username': shift.staff});
+						var phone = _.findWhere(cache.get('storeStaff'), {'username': shift.staff});
 						if(_.isUndefined(phone) || phone == false || phone.toString().length !== 10) {
 							return false;
 						}

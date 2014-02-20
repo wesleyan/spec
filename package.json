@@ -17,6 +17,7 @@
     "async":"*",
     "request":"*",
     "googleapis":"*",
-    "xml2json":"*"
+    "xml2json":"*",
+    "memory-cache":"*"
   }
 }
