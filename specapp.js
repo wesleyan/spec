@@ -8,16 +8,18 @@
 */
 // CONFIGURATION AND MODULES
 	require('ofe').call();
-	var Preferences = require('./config/Preferences.js')
+
+	var Preferences = require('./config/Preferences.js'),
+		Utility = require('./modules/Utility.js').
+		db = require('./modules/db.js');
+
 	var express = require('express'),
 		app = express(),
 		$ = require('jquery'),
 		_ = require('underscore'),
-		db = require("mongojs").connect(Preferences.databaseUrl, Preferences.collections);
 		mongo = require('mongodb-wrapper');
 		fs = require('fs');
 		cas = require('./modules/grand_master_cas.js'),
-		nodemailer = require("nodemailer"),
 		async = require('async'),
 		ejs = require('ejs');
 	cas.configure(Preferences.casOptions);
@@ -42,34 +44,7 @@
 	});
 
 // UTILITY FUNCTIONS
-	var Utility = {};
-	Utility.smtpTransport = function () {
-		return nodemailer.createTransport("SMTP", {
-			service: Preferences.mail.service,
-			auth: {
-				user: Preferences.mail.user,
-				pass: Preferences.mail.pass
-			}
-		});
-	}
-	Utility.sendSingleMail = function(options, callback) {
-		var smtpTransport = Utility.smtpTransport();
-		var mailOptions = {
-			from: "Wesleyan Spec <wesleyanspec@gmail.com>",
-			subject: options.subject,
-			html: options.html,
-			to: options.to
-		};
 
-		smtpTransport.sendMail(mailOptions, function(error, response) {
-			if (error) {
-				console.log(error);
-			} else {
-				if(typeof callback === 'function') {callback(response);}
-			}
-		});
-		smtpTransport.close();
-	};
 	app.locals.formatAMPM = function(date) {
 		var hours = date.getHours();
 		var minutes = date.getMinutes();
@@ -158,11 +133,8 @@
 	app.get('/logout', cas.logout);
 
 	app.get("/user", cas.blocker, function(req, res) {
-		res.writeHead(200, {
-			'Content-Type': 'application/json'
-		});
 		//req.session.cas_user
-		res.write(JSON.stringify({'username':getUser(req), 'permission':permission(req)}).toString("utf-8"));
+		res.json({'username':getUser(req), 'permission':permission(req)});
 		res.end();
 	});
 
@@ -372,16 +344,13 @@
 			end = new Date(req.query.end * 1000);
 
 		var all = function() {
-			res.writeHead(200, {
-				'Content-Type': 'application/json'
-			});
 			read_models(req, {
 				timeMin: start.toISOString(),
 				timeMax: end.toISOString(),
 				//timeMin: (new Date).toISOString(), //today
 				//timeMax: new Date((new Date).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString(), //next week
 				success: function(items) {
-					res.write(JSON.stringify(gCalToFullCalendar(items)));
+					res.json(gCalToFullCalendar(items));
 					res.end();
 				}
 			});
@@ -391,33 +360,6 @@
 	});
 
 // EVENTS
-	Utility.fullShiftNumber = function (event) {
-		var fullShifts = 0;
-		for(var i = 0; i < event.shifts.length; i++) {
-			if(event.shifts[i].staff !== '') {
-				fullShifts++;
-			}
-		}
-		return fullShifts;
-	}
-	Utility.addBackgroundColor = function(events) { //changes the events object
-		for (index = 0; index < events.length; ++index) {
-			event = events[index];
-			if(event.techMustStay == false) {
-				events[index]['className'] = ['striped']; //handles the setup and breakdown events as well
-			}
-			if (event.cancelled == true) {
-				events[index]['backgroundColor'] = Preferences.backgroundColors.gray;
-			} else if (Utility.fullShiftNumber(event) == 0) {
-				events[index]['backgroundColor'] = Preferences.backgroundColors.red;
-			} else if (Utility.fullShiftNumber(event) < event.staffNeeded) {
-				events[index]['backgroundColor'] = Preferences.backgroundColors.yellow;
-			} else if (Utility.fullShiftNumber(event) == event.staffNeeded) {
-				events[index]['backgroundColor'] = Preferences.backgroundColors.green;
-			}
-		}
-		return events;
-	}
 
 	//Event fetching should be filtered according to the time variables, still not done after MongoDB
 	app.get("/events", cas.blocker, function(req, res) {
@@ -457,25 +399,18 @@
 					});
 				}
 				events = Utility.addBackgroundColor(events);
-				res.write(JSON.stringify(events).toString("utf-8"));
+				res.json(events);
 				res.end();
 			}
 		});
 
 		//req.url
-		//console.log("Req for events starting at " + start.toDateString() + " and ending before " + end.toDateString());
-		res.writeHead(200, {
-			'Content-Type': 'application/json'
-		});
-		
+		//console.log("Req for events starting at " + start.toDateString() + " and ending before " + end.toDateString());	
 	});
 
 		app.post("/event/techMustStay", cas.blocker, function(req, res) {
-			res.writeHead(200, {
-				'Content-Type': 'application/json'
-			});
 			if(permission(req) != 10) {
-				res.write(JSON.stringify(false).toString("utf-8"));
+				res.json(false);
 				res.end();
 				return false;
 			}
@@ -490,18 +425,15 @@
 						console.log("Event not techMustStay toggled:" + err);
 					} else {
 						//console.log("Event techMustStay toggled");
-						res.write(JSON.stringify(true).toString("utf-8"));
+						res.json(JSON.stringify(true).toString("utf-8"));
 						res.end();
 					}
 				});
 		});
 		app.post("/event/video", cas.blocker, function(req, res) {
 			//req.url
-			res.writeHead(200, {
-				'Content-Type': 'application/json'
-			});
 			if(permission(req) != 10) {
-				res.write(JSON.stringify(false).toString("utf-8"));
+				res.json(false);
 				res.end();
 				return false;
 			}
@@ -515,18 +447,15 @@
 						console.log("Event not video toggled:" + err);
 					} else {
 						//console.log("Event video toggled");
-						res.write(JSON.stringify(true).toString("utf-8"));
+						res.json(true);
 						res.end();
 					}
 				});
 		});
 		app.post("/event/audio", cas.blocker, function(req, res) {
 			//req.url
-			res.writeHead(200, {
-				'Content-Type': 'application/json'
-			});
 			if(permission(req) != 10) {
-				res.write(JSON.stringify(false).toString("utf-8"));
+				res.json(false);
 				res.end();
 				return false;
 			}
@@ -539,18 +468,15 @@
 						console.log("Event not audio toggled:" + err);
 					} else {
 						//console.log("Event audio toggled");
-						res.write(JSON.stringify(true).toString("utf-8"));
+						res.json(true);
 						res.end();
 					}
 				});
 		});
 		app.post("/event/edit", cas.blocker, function(req, res) {
 			//req.url
-			res.writeHead(200, {
-				'Content-Type': 'application/json'
-			});
 			if(permission(req) != 10) {
-				res.write(JSON.stringify(false).toString("utf-8"));
+				res.json(false);
 				res.end();
 				return false;
 			}
@@ -580,7 +506,7 @@
 						console.log("Event not edited:" + err);
 					} else {
 						//console.log("Event edited");
-						res.write(JSON.stringify(true).toString("utf-8"));
+						res.json(true);
 						res.end();
 
 						//Send e-mails to the registered staff after update
@@ -617,11 +543,8 @@
 		});
 		app.post("/event/spinner", cas.blocker, function(req, res) {
 			//req.url
-			res.writeHead(200, {
-				'Content-Type': 'application/json'
-			});
 			if(permission(req) != 10) {
-				res.write(JSON.stringify(false).toString("utf-8"));
+				res.json(false);
 				res.end();
 				return false;
 			}
@@ -635,18 +558,15 @@
 						console.log("Event staffNeeded not changed:" + err);
 					} else {
 						//console.log("Event staffNeeded changed");
-						res.write(JSON.stringify(true).toString("utf-8"));
+						res.json(true);
 						res.end();
 					}
 				});
 		});
 		app.post("/event/cancel", cas.blocker, function(req, res) {
 			//req.url
-			res.writeHead(200, {
-				'Content-Type': 'application/json'
-			});
 			if(permission(req) != 10) {
-				res.write(JSON.stringify(false).toString("utf-8"));
+				res.json(false);
 				res.end();
 				return false;
 			}
@@ -660,18 +580,15 @@
 						console.log("Event not cancel toggled:" + err);
 					} else {
 						//console.log("Event cancel toggled");
-						res.write(JSON.stringify(true).toString("utf-8"));
+						res.json(true);
 						res.end();
 					}
 				});
 		});
 		app.post("/event/remove", cas.blocker, function(req, res) {
 			//req.url
-			res.writeHead(200, {
-				'Content-Type': 'application/json'
-			});
 			if(permission(req) != 10) {
-				res.write(JSON.stringify(false).toString("utf-8"));
+				res.json(false);
 				res.end();
 				return false;
 			}
@@ -684,7 +601,7 @@
 						console.log("Event not removed:" + err);
 					} else {
 						//console.log("Event removed");
-						res.write(JSON.stringify(true).toString("utf-8"));
+						res.json(true);
 						res.end();
 					}
 				});
@@ -777,16 +694,13 @@
 						return Utility.fullShiftNumber(event) < event.staffNeeded;
 					});
 				}
-				res.write(JSON.stringify(events).toString("utf-8"));
+				res.json(events);
 				res.end();
 			}
 		});
 
 		//req.url
 		//console.log("Req for events starting at " + start.toDateString() + " and ending before " + end.toDateString());
-		res.writeHead(200, {
-			'Content-Type': 'application/json'
-		});
 	  return;
 	});
 
@@ -797,10 +711,7 @@
 		app.get("/inventory/all", cas.blocker, function(req, res) {
 			//req.url
 			//console.log("Req for all inventory");
-			res.writeHead(200, {
-				'Content-Type': 'application/json'
-			});
-			res.write(JSON.stringify(allInventory).toString("utf-8"));
+			res.json(allInventory);
 			res.end();
 		});
 
@@ -808,9 +719,6 @@
 		app.get("/inventory/existing/:id", cas.blocker, function(req, res) {
 			//req.url
 			//console.log("Req for inventory of Event ID " + req.params.id);
-			res.writeHead(200, {
-				'Content-Type': 'application/json'
-			});
 			//Event filtering and inventory
 			/*var selectedEvent = events.filter(function(event) {
 				return event.id == req.params.id;
@@ -826,7 +734,7 @@
 							return tool.id == id;
 						})[0]);
 					});
-					res.write(JSON.stringify(existingList).toString("utf-8"));
+					res.json(existingList);
 					res.end();
 				}
 			});
@@ -835,11 +743,8 @@
 		//Inventory Update
 			//Add inventory to an event (POST)
 			app.post("/inventory/add", cas.blocker, function(req, res) {
-				res.writeHead(200, {
-					'Content-Type': 'application/json'
-				});
 				if(permission(req) < 1) {
-					res.write(JSON.stringify(false).toString("utf-8"));
+					res.json(false);
 					res.end();
 					return false;
 				}
@@ -859,7 +764,7 @@
 							console.log("Inventory not added:" + err);
 						} else {
 							//console.log("Inventory added");
-							res.write(JSON.stringify(true).toString("utf-8"));
+							res.json(true);
 							res.end();
 						}
 					});
@@ -867,11 +772,8 @@
 
 			//Remove inventory from an event (POST)
 			app.post("/inventory/remove", cas.blocker, function(req, res) {
-				res.writeHead(200, {
-					'Content-Type': 'application/json'
-				});
 				if(permission(req) < 1) {
-					res.write(JSON.stringify(false).toString("utf-8"));
+					res.json(false);
 					res.end();
 					return false;
 				}
@@ -885,7 +787,7 @@
 							console.log("Inventory not removed:" + err);
 						} else {
 							//console.log("Inventory removed");
-							res.write(JSON.stringify(true).toString("utf-8"));
+							res.json(true);
 							res.end();
 						}
 					});
@@ -897,15 +799,12 @@
 			//req.url
 			//console.log("Req for fetching notes of Event ID " + req.params.id);
 			//Event filtering and inventory
-			res.writeHead(200, {
-				'Content-Type': 'application/json'
-			});
 			db.events.find({_id: new mongo.ObjectID(req.params.id)}, function(err, events) {
 				if (err || !events) {
 					console.log(req.url);
 					console.log("No events found: " + err);
 				} else {
-					res.write(JSON.stringify(events[0].notes).toString("utf-8"));
+					res.json(events[0].notes);
 					res.end();
 				}
 			});
@@ -915,9 +814,6 @@
 			//Add inventory to an event (POST) - not tested // username is required
 			app.post("/notes/add", cas.blocker, function(req, res) {
 				//req.url
-				res.writeHead(200, {
-					'Content-Type': 'application/json'
-				});
 				//console.log("Req for adding note \"" + req.body.note + "\" to Event ID " + req.body.eventid);
 				var generatedID = new mongo.ObjectID();
 				db.events.update(
@@ -929,7 +825,7 @@
 							console.log("Note not added:" + err);
 						} else {
 							//console.log("Note added");
-							res.write(JSON.stringify({'id':generatedID.toString(), 'user':getUser(req)}).toString("utf-8"));
+							res.json({'id':generatedID.toString(), 'user':getUser(req)});
 							res.end();
 						}
 					});
@@ -939,9 +835,6 @@
 				//managers should be able to delete any comment, others should only be able to delete their own
 			app.post("/notes/remove", cas.blocker, function(req, res) {
 				//req.url
-				res.writeHead(200, {
-					'Content-Type': 'application/json'
-				});
 				//console.log("Req for removing note ID " + req.body.id + " from Event ID " + req.body.eventid);
 				var deleteNote = function() {
 					db.events.update(
@@ -953,7 +846,7 @@
 								console.log("Note not removed:" + err);
 							} else {
 								//console.log("Note removed");
-								res.write(JSON.stringify(true).toString("utf-8"));
+								res.json(true);
 								res.end();
 							}
 						});
@@ -972,7 +865,7 @@
 							if(theNote.user == getUser(req)) {
 								deleteNote();
 							} else {
-								res.write(JSON.stringify(false).toString("utf-8"));
+								res.json(false);
 								res.end();
 								return false;
 							}
@@ -988,15 +881,12 @@
 			//req.url
 			//console.log("Req for all staff info");
 			// Filter the events/database and return the staff and shifts info (requires to decide on db structure)
-			res.writeHead(200, {
-				'Content-Type': 'application/json'
-			});
 			db.staff.find({}, function(err, data) {
 				if (err || !data) {
 					console.log(req.url);
 					console.log(err);
 				} else {
-					res.write(JSON.stringify(data).toString("utf-8"));
+					res.json(data);
 					res.end();
 				}
 			});
@@ -1007,15 +897,12 @@
 			//req.url
 			//console.log("Req for staff info of Event ID " + req.params.id);
 			// Filter the events/database and return the staff and shifts info (requires to decide on db structure)
-			res.writeHead(200, {
-				'Content-Type': 'application/json'
-			});
 			db.events.find({_id: new mongo.ObjectID(req.params.id)}, function(err, events) {
 				if (err || !events) {
 					console.log(req.url);
 					console.log("No events found");
 				} else {
-					res.write(JSON.stringify(events[0].shifts).toString("utf-8"));
+					res.json(events[0].shifts);
 					res.end();
 				}
 			});
@@ -1023,12 +910,9 @@
 		//Add staff/shift to an event (POST)
 			app.post("/staff/add", cas.blocker, function(req, res) {
 				//req.url
-				res.writeHead(200, {
-					'Content-Type': 'application/json'
-				});
 				var chosenStaff = req.body.staff;
 				if(staffUsernameArray.indexOf(getUser(req)) === -1) { //if user is not in staff list, don't allow
-					res.write(JSON.stringify(false).toString("utf-8"));
+					res.json(false);
 					res.end();
 					return false;
 				}
@@ -1053,7 +937,7 @@
 							console.log("Shift not added:" + err);
 						} else {
 							//console.log("Shift added");
-							res.write(JSON.stringify({'id':generatedID.toString(),'start':startDate, 'end':endDate}).toString("utf-8"));
+							res.json({'id':generatedID.toString(),'start':startDate, 'end':endDate});
 							res.end();
 							if(chosenStaff === '') { return; }
 							Utility.sendSingleMail({
@@ -1066,9 +950,6 @@
 			});
 		//Remove staff/shift from an event (POST)
 			app.post("/staff/remove", cas.blocker, function(req, res) {
-				res.writeHead(200, {
-					'Content-Type': 'application/json'
-				});
 				var query = {'shifts': {'id': new mongo.ObjectID(req.body.id)} };
 				if(permission(req) != 10) { //users other than the manager 
 					query['shifts']['staff'] = getUser(req);
@@ -1085,7 +966,7 @@
 							console.log("Shift not removed:" + err);
 						} else {
 							//console.log("Shift removed");
-							res.write(JSON.stringify(true).toString("utf-8"));
+							res.json(true);
 							res.end();
 							//below is needed because id's are ObjectID, so we convert them to string to compare with req.body.id
 							updated.shifts = updated.shifts.map(function(shift) {
@@ -1116,10 +997,6 @@
 			});
 		//Sign up for an empty shift for an event (POST)
 			app.post("/staff/shiftsignup", cas.blocker, function(req, res) {
-				res.writeHead(200, {
-					'Content-Type': 'application/json'
-				});
-
 				//find the data to be updated (before update!)
 				db.events.findOne({_id: new mongo.ObjectID(req.body.eventid)},
 					function(err, updated) {
@@ -1148,7 +1025,7 @@
 													console.log(req.url);
 													console.log("Shift not signed up:" + err);
 												} else {
-													res.write(JSON.stringify(true).toString("utf-8"));
+													res.json(true);
 													res.end();
 													
 													//now send e-mails
@@ -1165,10 +1042,6 @@
 			});
 		//Withdrawing from a shift for an event (POST)
 			app.post("/staff/withdraw", cas.blocker, function(req, res) {
-					res.writeHead(200, {
-						'Content-Type': 'application/json'
-					});
-
 					//find the data to be updated (before update!)
 					db.events.findOne({_id: new mongo.ObjectID(req.body.eventid)},
 						function(err, updated) {
@@ -1197,7 +1070,7 @@
 														console.log(req.url);
 														console.log("Shift not withdrawn:" + err);
 													} else {
-														res.write(JSON.stringify(true).toString("utf-8"));
+														res.json(true);
 														res.end();
 														
 														//now send e-mails
@@ -1226,9 +1099,6 @@
 				var start = new Date(req.query.start * 1000),
 					end = new Date(req.query.end * 1000);
 				//console.log("Req for staff available starting at " + start.toDateString() + " and ending before " + end.toDateString());
-				res.writeHead(200, {
-					'Content-Type': 'application/json'
-				});
 				var query = {};
 				$.extend(query, {'start': {$gte: start, $lt: end}});
 				db.events.find(query, function(err, events) {
@@ -1242,7 +1112,7 @@
 							});
 						});
 						var availableStaff = $(staffUsernameArray).not(busyStaff).get();
-						res.write(JSON.stringify(availableStaff).toString("utf-8"));
+						res.json(availableStaff);
 						res.end();
 					}	
 				});
@@ -1250,7 +1120,7 @@
 
 			app.get("/staff/check", cas.blocker, function(req, res) {
 				if(permission(req) != 10) {
-					res.write(JSON.stringify(false).toString("utf-8"));
+					res.json(false);
 					res.end();
 					return false;
 				}
@@ -1263,17 +1133,17 @@
 					if (err || !events) {
 						console.log(req.url);
 						console.log("No events found" + err);
-						res.write(JSON.stringify(false).toString("utf-8"));
+						res.json(false);
 						res.end();
 					} else {
-						res.write(JSON.stringify(events).toString("utf-8"));
+						res.json(events);
 						res.end();
 					}
 				});
 			});
 			app.get("/staff/table", cas.blocker, function(req, res) {
 				if(permission(req) != 10) {
-					res.write(JSON.stringify(false).toString("utf-8"));
+					res.json(false);
 					res.end();
 					return false;
 				}
@@ -1286,7 +1156,7 @@
 					if (err || !events) {
 						console.log(req.url);
 						console.log("No events found" + err);
-						res.write(JSON.stringify(false).toString("utf-8"));
+						res.json(false);
 						res.end();
 					} else {
 						var result = {};
@@ -1304,14 +1174,14 @@
 								result[shift.staff].hour += ((Date.parse(shift.end) - Date.parse(shift.start)) / 3600000);
 							})
 						});
-						res.write(JSON.stringify(result).toString("utf-8"));
+						res.json(result);
 						res.end();
 					}
 				});
 			});
 			app.get('/staffCheck', cas.blocker, function (req, res) {
 				if(permission(req) != 10) {
-					res.write(JSON.stringify(false).toString("utf-8"));
+					res.json(false);
 					res.end();
 					return false;
 				}
@@ -1320,7 +1190,7 @@
 
 			app.get('/staffTable', cas.blocker, function (req, res) {
 				if(permission(req) != 10) {
-					res.write(JSON.stringify(false).toString("utf-8"));
+					res.json(false);
 					res.end();
 					return false;
 				}
@@ -1328,7 +1198,7 @@
 				});
 			app.get('/staff/db', cas.blocker, function (req, res) {
 				if(permission(req) != 10) {
-					res.write(JSON.stringify(false).toString("utf-8"));
+					res.json(false);
 					res.end();
 					return false;
 				}
@@ -1336,7 +1206,7 @@
 			});
 			app.post('/staff/db/add', cas.blocker, function (req, res) {
 				if(permission(req) != 10) {
-					res.write(JSON.stringify(false).toString("utf-8"));
+					res.json(false);
 					res.end();
 					return false;
 				}
@@ -1368,7 +1238,7 @@
 							});
 						} else {
 							//this staff exists in the database
-							res.write(JSON.stringify({errors:'A staff with this user name already exists in the database.'}).toString("utf-8"));
+							res.json({errors:'A staff with this user name already exists in the database.'});
 							res.end();
 						}
 					}
@@ -1376,7 +1246,7 @@
 			});
 			app.post('/staff/db/delete', cas.blocker, function (req, res) {
 				if(permission(req) != 10) {
-					res.write(JSON.stringify(false).toString("utf-8"));
+					res.json(false);
 					res.end();
 					return false;
 				}
@@ -1390,14 +1260,14 @@
 							console.log(event.title);
 						} else {
 							Utility.updateCachedUsers();
-							res.write(JSON.stringify(true).toString("utf-8"));
+							res.json(true);
 							res.end()
 						}
 				});
 			});
 			app.post('/staff/db/update', cas.blocker, function (req, res) {
 				if(permission(req) != 10) {
-					res.write(JSON.stringify(false).toString("utf-8"));
+					res.json(false);
 					res.end();
 					return false;
 				}
@@ -1428,7 +1298,7 @@
 							console.log("Staff not updated in database:" + err);
 						} else {
 							Utility.updateCachedUsers();
-							res.write(JSON.stringify(true).toString("utf-8"));
+							res.json(true);
 							res.end();
 						}
 				});
@@ -1437,7 +1307,7 @@
 // FILE UPLOAD
 	app.get('/fileUpload', cas.blocker, function(req, res) {
 		if(permission(req) != 10) {
-			res.write(JSON.stringify(false).toString("utf-8"));
+			res.json(false);
 			res.end();
 			return false;
 		}
@@ -1461,7 +1331,7 @@
 
 					var parser = require('xml2json');
 					if(permission(req) != 10) {
-						res.write(JSON.stringify(false).toString("utf-8"));
+						res.json(false);
 						res.end();
 						return false;
 					}
