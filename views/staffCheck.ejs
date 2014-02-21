@@ -30,7 +30,7 @@
         <div class="form-inline">
         <select class="combobox" placeholder="Choose a staff">
           <option></option>
-          {{ storeStaff.forEach(function(staff) { }}
+          {{ cache.get('storeStaff').forEach(function(staff) { }}
             <option value="{{=staff.username}}">{{=staff.name}} ({{=staff.username}})</option>
           {{ }); }}
         </select>

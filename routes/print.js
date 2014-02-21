@@ -1,5 +1,7 @@
 var db = require('./../modules/db.js');
 
+var cache = require('memory-cache');
+
 module.exports = function(req, res) {
 	//console.log('Req for seeing today\'s events list');
 		var today;

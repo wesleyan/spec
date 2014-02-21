@@ -89,7 +89,7 @@
                  {{ if(shift.staff != '') { }}
                     <tr>
                       <td>
-                        {{=storeStaff.filter(function(staff) {return staff.username == shift.staff;})[0].name }} 
+                        {{=cache.get('storeStaff').filter(function(staff) {return staff.username == shift.staff;})[0].name }} 
                         ({{= shift.staff }})
                       </td>
                       <td>{{= formatAMPM(shift.start) }}</td>

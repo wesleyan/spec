@@ -4,7 +4,8 @@ var Utility  = require('./../modules/Utility.js'),
 	
 var _	 	 = require('underscore'),
 	$	 	 = require('jquery'),
-	mongo 	 = require('mongodb-wrapper');
+	mongo 	 = require('mongodb-wrapper'),
+	cache 	 = require('memory-cache');
 
 module.exports = {
 	availableToday: function(req, res) {

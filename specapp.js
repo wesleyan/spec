@@ -128,9 +128,11 @@
 	//this is determined by staff time checking, not shift time checking, therefore if 
 	app.get("/staff/available/today", cas.blocker, routes.staff.info.availableToday);
 
+	// Staff info routes
 	app.get("/staff/check", cas.blocker, routes.staff.info.check);
-	app.get("/staff/table", cas.blocker, routes.staff.info.table);
 	app.get('/staffCheck', cas.blocker, routes.staff.info.staffCheck);
+
+	app.get("/staff/table", cas.blocker, routes.staff.info.table);
 	app.get('/staffTable', cas.blocker, routes.staff.info.staffTable);
 
 	app.get('/staff/db', cas.blocker, routes.staff.db.db);
@@ -140,7 +142,6 @@
 
 // FILE UPLOAD
 	app.get('/fileUpload', cas.blocker, routes.fileUpload.get);
-
 	app.post('/fileUpload', cas.blocker, routes.fileUpload.post);
 
 // MAIN PAGE RENDERING
