@@ -1,3 +1,9 @@
+var Utility = require('./Utility.js'),
+	db 	 	= require('./db.js');
+	
+var _	= require('underscore'),
+	ejs = require('ejs');
+
 module.exports = function() {
 	//check if there is an event starting in 5 min
 	var fiveMinCheck = {'start': {$gte: new Date((new Date()).getTime() + 55*60*1000), $lt: new Date((new Date()).getTime() + 60*6*10000)}};
