@@ -7,161 +7,167 @@
         |_|                
 */
 // CONFIGURATION AND MODULES
-	require('ofe').call();
+    require('ofe').call();
 
-	var express = require('express'),
-		app 	= express(),
-		$ 		= require('jquery'),
-		_ 		= require('underscore'),
-		mongo 	= require('mongodb-wrapper'),
-		fs 		= require('fs'),
-		cas 	= require('./modules/grand_master_cas.js'),
-		async 	= require('async'),
-		ejs 	= require('ejs'),
-		cache 	= require('memory-cache');
+    var express = require('express'),
+        app     = express(),
+        _       = require('underscore'),
+        cas     = require('./modules/grand_master_cas.js'),
+        cache   = require('memory-cache');
 
-	var Preferences   = require('./config/Preferences.js'),
-		Utility 	  = require('./modules/Utility.js'),
-		User 		  = require('./modules/user.js'),
-		db 			  = require('./modules/db.js'),
-		routes 		  = require('./routes/index.js'),
-		textReminders = require('./modules/textReminders.js');
+    var Preferences   = require('./config/Preferences.js'),
+        Utility       = require('./modules/Utility.js'),
+        db            = require('./modules/db.js'),
+        routes        = require('./routes/index.js'),
+        textReminders = require('./modules/textReminders.js');
 
-	app.locals 		= _.extend(app.locals, require('./modules/app.locals.js'));
+    app.locals        = _.extend(app.locals, require('./modules/app.locals.js'));
 
-	cas.configure(Preferences.casOptions);
+    cas.configure(Preferences.casOptions);
 
-	app.configure(function() {
-		app.set('views', __dirname + '/views');
-		app.set('view engine', 'ejs');
-		// Template engine tags are changed to {{ }} because underscore uses <% %> as well in the front end
-		app.set('view options', {open: '{{', close: '}}'});
-		app.use(express.bodyParser({keepExtensions: true, uploadDir: __dirname + '/uploads'}));
-		app.use(express.methodOverride());
-		app.use(express.cookieParser('secret'));
-		app.use(express.session());
-		app.use(app.router);
-		app.use(express.static(__dirname + '/public'));
-	});
+    app.configure(function() {
+        app.set('views', __dirname + '/views');
+        app.set('view engine', 'ejs');
+        // Template engine tags are changed to {{ }} because underscore uses <% %> as well in the front end
+        app.set('view options', {open: '{{', close: '}}'});
+        app.use(express.bodyParser({keepExtensions: true, uploadDir: __dirname + '/uploads'}));
+        app.use(express.methodOverride());
+        app.use(express.cookieParser('secret'));
+        app.use(express.session());
+        app.use(app.router);
+        app.use(express.static(__dirname + '/public'));
+    });
 
-	app.all('/api/*', function(req, res, next) {
-	  res.header("Access-Control-Allow-Origin", "*"); //or just allowed domains if wanted
-	  res.header("Access-Control-Allow-Headers", "X-Requested-With");
-	  next();
-	});
+    app.all('/api/*', function(req, res, next) {
+      res.header("Access-Control-Allow-Origin", "*"); //or just allowed domains if wanted
+      res.header("Access-Control-Allow-Headers", "X-Requested-With");
+      next();
+    });
 
 // CAS SESSION MANAGEMENT
-
-	app.get('/login', cas.bouncer, routes.general.login);
-
-	app.get('/logout', cas.logout);
-
-	app.get("/user", cas.blocker, routes.general.user);
+    // CAS route to redirect to Wesleyan SSO system (GET)
+    app.get('/login', cas.bouncer, routes.general.login);
+    // Log out route, deletes session info (GET)
+    app.get('/logout', cas.logout);
+    // Returns username and permission for the user info saved in session (GET)
+    app.get("/user", cas.blocker, routes.general.user);
 
 // GOOGLE CALENDAR INTEGRATION
-
-	// TODO: Replace with or add a button on frontend
-	app.get('/authorize', cas.blocker, routes.googleCalendar.authorize);
-	app.get('/oauth2callback', cas.blocker, routes.googleCalendar.oauth2callback);
-	app.get('/gCalEvents/', cas.blocker, routes.googleCalendar.events);
+    // Route to redirect to appropriate Google authorization page (GET)
+    app.get('/authorize', cas.blocker, routes.googleCalendar.authorize);
+    // Route to handle the data coming from Google OAuth (GET)
+    app.get('/oauth2callback', cas.blocker, routes.googleCalendar.oauth2callback);
+    // Returns the events in the main calendar of the Wesleyan user, in FullCalendar format. (GET)
+    app.get('/gCalEvents/', cas.blocker, routes.googleCalendar.events);
 
 // EVENTS
-
-	//Event fetching should be filtered according to the time variables, still not done after MongoDB
-	app.get("/events", cas.blocker, routes.events.events);
-
-	app.post("/event/techMustStay", cas.blocker, routes.events.techMustStay);
-	app.post("/event/video", cas.blocker, routes.events.video);
-	app.post("/event/audio", cas.blocker, routes.events.audio);
-	app.post("/event/edit", cas.blocker, routes.events.edit);
-	app.post("/event/spinner", cas.blocker, routes.events.spinner);
-	app.post("/event/cancel", cas.blocker, routes.events.cancel);
-	app.post("/event/remove", cas.blocker, routes.events.remove);
-
-	app.get('/print', cas.blocker, routes.print);
+    // Returns the events in the given time period (GET)
+    app.get("/events", cas.blocker, routes.events.events);
+    // Toggle techMustStay to change if staff stays at the duration of the event (POST)
+    app.post("/event/techMustStay", cas.blocker, routes.events.techMustStay);
+    // Toggle if it's a video event (POST)
+    app.post("/event/video", cas.blocker, routes.events.video);
+    // Toggle if it's a audio event (POST)
+    app.post("/event/audio", cas.blocker, routes.events.audio);
+    // Edit event (POST)
+    app.post("/event/edit", cas.blocker, routes.events.edit);
+    // Change needed staff number (POST)
+    app.post("/event/spinner", cas.blocker, routes.events.spinner);
+    // Toggle event cancel (POST)
+    app.post("/event/cancel", cas.blocker, routes.events.cancel);
+    // Remove event (POST)
+    app.post("/event/remove", cas.blocker, routes.events.remove);
 
 // API
-	app.get('/api/events', routes.api.events);
+    // To be used by other IMS applications like PullEffect. (GET)
+    // More info can be found in public/doc/index.html
+    app.get('/api/events', routes.api.events);
 
 // TRIVIAL STUFF
 
-	// INVENTORY
-	// All inventory
-	app.get("/inventory/all", cas.blocker, routes.inventory.all);
+    // INVENTORY
+    // All inventory (GET)
+    app.get("/inventory/all", cas.blocker, routes.inventory.all);
+    // Existing inventory for each event (GET)
+    app.get("/inventory/existing/:id", cas.blocker, routes.inventory.existing);
+    // Add inventory to an event (POST)
+    app.post("/inventory/add", cas.blocker, routes.inventory.add);
+    // Remove inventory from an event (POST)
+    app.post("/inventory/remove", cas.blocker, routes.inventory.remove);
 
-	//Existing inventory for each event
-	app.get("/inventory/existing/:id", cas.blocker, routes.inventory.existing);
+    // NOTES
+    // Existing notes for each event (GET)
+    app.get("/notes/existing/:id", cas.blocker, routes.notes.existing);
+    // Add inventory to an event (POST)
+    app.post("/notes/add", cas.blocker, routes.notes.add);
+    // Remove inventory from an event (POST)
+    app.post("/notes/remove", cas.blocker, routes.notes.remove);
 
-	//Inventory Update
-	//Add inventory to an event (POST)
-	app.post("/inventory/add", cas.blocker, routes.inventory.add);
+    // STAFF
+    // All event staff in IMS
+    app.get("/staff/all", cas.blocker, routes.staff.all);
+    // Get the existing staff of an event
+    app.get("/staff/get/:id", cas.blocker, routes.staff.get);
+    // Add staff/shift to an event (POST)
+    app.post("/staff/add", cas.blocker, routes.staff.add);
+    // Remove staff/shift from an event (POST)
+    app.post("/staff/remove", cas.blocker, routes.staff.remove);
+    // Sign up for an empty shift for an event (POST)
+    app.post("/staff/shiftsignup", cas.blocker, routes.staff.shiftsignup);
+    // Withdrawing from a shift for an event (POST)
+    app.post("/staff/withdraw", cas.blocker, routes.staff.withdraw);
+    // Staff available today (GET)
+    app.get("/staff/available/today", cas.blocker, routes.staff.info.availableToday);
 
-	//Remove inventory from an event (POST)
-	app.post("/inventory/remove", cas.blocker, routes.inventory.remove);
+    // Returns the events the given staff has worked in - used in /staffCheck (GET)
+    app.get("/staff/check", cas.blocker, routes.staff.info.check);
+    // Static page for single staff check (GET)
+    app.get('/staffCheck', cas.blocker, routes.staff.info.staffCheck);
+    // Returns staff table with their work hours in the given time period (GET)
+    app.get("/staff/table", cas.blocker, routes.staff.info.table);
+    // Static page for staff table (GET)
+    app.get('/staffTable', cas.blocker, routes.staff.info.staffTable);
 
-	// NOTES
-	//Existing notes for each event
-	app.get("/notes/existing/:id", cas.blocker, routes.notes.existing);
-
-	//Notes Update
-	//Add inventory to an event (POST) - not tested // username is required
-	app.post("/notes/add", cas.blocker, routes.notes.add);
-
-	//Remove inventory from an event (POST) - username is required for verification
-		//managers should be able to delete any comment, others should only be able to delete their own
-	app.post("/notes/remove", cas.blocker, routes.notes.remove);
-
-	// STAFF
-	//All event staff in IMS
-	app.get("/staff/all", cas.blocker, routes.staff.all);
-	//Get the existing staff of an event
-	app.get("/staff/get/:id", cas.blocker, routes.staff.get);
-	//Add staff/shift to an event (POST)
-	app.post("/staff/add", cas.blocker, routes.staff.add);
-	//Remove staff/shift from an event (POST)
-	app.post("/staff/remove", cas.blocker, routes.staff.remove);
-	//Sign up for an empty shift for an event (POST)
-	app.post("/staff/shiftsignup", cas.blocker, routes.staff.shiftsignup);
-	//Withdrawing from a shift for an event (POST)
-	app.post("/staff/withdraw", cas.blocker, routes.staff.withdraw);
-
-	//this is determined by staff time checking, not shift time checking, therefore if 
-	app.get("/staff/available/today", cas.blocker, routes.staff.info.availableToday);
-
-	// Staff info routes
-	app.get("/staff/check", cas.blocker, routes.staff.info.check);
-	app.get('/staffCheck', cas.blocker, routes.staff.info.staffCheck);
-
-	app.get("/staff/table", cas.blocker, routes.staff.info.table);
-	app.get('/staffTable', cas.blocker, routes.staff.info.staffTable);
-
-	app.get('/staff/db', cas.blocker, routes.staff.db.db);
-	app.post('/staff/db/add', cas.blocker, routes.staff.db.add);
-	app.post('/staff/db/delete', cas.blocker, routes.staff.db.delete);
-	app.post('/staff/db/update', cas.blocker, routes.staff.db.update);
+    // Static page for staff database (GET)
+    app.get('/staff/db', cas.blocker, routes.staff.db.db);
+    // Adds staff to database (POST)
+    app.post('/staff/db/add', cas.blocker, routes.staff.db.add);
+    // Deletes staff from database (POST)
+    app.post('/staff/db/delete', cas.blocker, routes.staff.db.delete);
+    // Updates staff in database (POST)
+    app.post('/staff/db/update', cas.blocker, routes.staff.db.update);
 
 // FILE UPLOAD
-	app.get('/fileUpload', cas.blocker, routes.fileUpload.get);
-	app.post('/fileUpload', cas.blocker, routes.fileUpload.post);
+    // Static page for EMS XML file upload (GET)
+    app.get('/fileUpload', cas.blocker, routes.fileUpload.get);
+    // Route that handles the whole upload process and database update (POST)
+    app.post('/fileUpload', cas.blocker, routes.fileUpload.post);
 
-// MAIN PAGE RENDERING
-	app.get('/', cas.blocker, routes.general.main);
+// GENERAL
+    // Main Spec route (GET)
+    app.get('/', cas.blocker, routes.general.main);
+    // Show events of a date in a printer friendly way (GET)
+    app.get('/print', cas.blocker, routes.print);
 
 // MOBILE
-	app.get('/m', cas.blocker, routes.mobile.m);
-	app.get('/m/:counter/', cas.blocker, routes.mobile.mWithCounter);
-	app.get('/m/event/:id', cas.blocker, routes.mobile.event);
-	app.get('/m/staff/:username', cas.blocker, routes.mobile.staff);
+    // Route for the mobile site (GET)
+    app.get('/m', cas.blocker, routes.mobile.m);
+    // Route for the mobile site, counter indicates the requested date. (GET)
+    app.get('/m/:counter/', cas.blocker, routes.mobile.mWithCounter);
+    // Mobile route for showing single event info. (GET)
+    app.get('/m/event/:id', cas.blocker, routes.mobile.event);
+    // Mobile route for showing single staff info. (GET)
+    app.get('/m/staff/:username', cas.blocker, routes.mobile.staff);
 
 // TEXT REMINDERS
-	setInterval(textReminders, 1000 * 60 * 5); //every 5 minutes
+    setInterval(textReminders, 1000 * 60 * 5); //every 5 minutes
 
 // STARTING THE SERVER
-	app.listen(Preferences.port, function() {
-		console.log("Express server listening on port " + Preferences.port);
-	});
-	/* //options should have SSL certificates
-	https.createServer(options, app).listen(Preferences.port, function() {
-		console.log("Express server listening on port " + Preferences.port);
-	});
-	*/
+    app.listen(Preferences.port, function() {
+        console.log("Express server listening on port " + Preferences.port);
+    });
+    /* //options should have SSL certificates
+    https.createServer(options, app).listen(Preferences.port, function() {
+        console.log("Express server listening on port " + Preferences.port);
+    });
+    */
