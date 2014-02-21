@@ -2,7 +2,8 @@ var Utility	 = require('./../modules/Utility.js'),
 	User 	 = require('./../modules/User.js'),
 	db 	 	 = require('./../modules/db.js');
 	
-var _	 	 = require('underscore');
+var _	 	 = require('underscore'),
+	mongo 	 = require('mongodb-wrapper');
 
 module.exports = {
 	events: function(req, res) {
@@ -47,5 +48,182 @@ module.exports = {
 			}
 		});
 		//console.log("Req for events starting at " + start.toDateString() + " and ending before " + end.toDateString());	
+	},
+	techMustStay: function(req, res) { //post
+		User.permissionControl(req, res, 10);
+
+		//req.url
+		//console.log("Req for techMustStay toggle Event ID " + req.body.eventid);
+		db.events.update(
+			{_id: new mongo.ObjectID(req.body.eventid)},
+			{ $set: {'techMustStay': JSON.parse(req.body.make) } }, 
+			function(err, updated) {
+				if (err || !updated) {
+					console.log(req.url);
+					console.log("Event not techMustStay toggled:" + err);
+				} else {
+					//console.log("Event techMustStay toggled");
+					res.json(JSON.stringify(true).toString("utf-8"));
+					res.end();
+				}
+			});
+	},
+	video: function(req, res) { //post
+		//req.url
+		User.permissionControl(req, res, 10);
+
+		//console.log("Req for techMustStay toggle Event ID " + req.body.eventid);
+		db.events.update(
+			{_id: new mongo.ObjectID(req.body.eventid)},
+			{ $set: {'video': JSON.parse(req.body.make) } }, 
+			function(err, updated) {
+				if (err || !updated) {
+					console.log(req.url);
+					console.log("Event not video toggled:" + err);
+				} else {
+					//console.log("Event video toggled");
+					res.json(true);
+					res.end();
+				}
+			});
+	},
+	audio: function(req, res) { //post
+		//req.url
+		User.permissionControl(req, res, 10);
+
+		db.events.update(
+			{_id: new mongo.ObjectID(req.body.eventid)},
+			{ $set: {'audio': JSON.parse(req.body.make) } }, 
+			function(err, updated) {
+				if (err || !updated) {
+					console.log(req.url);
+					console.log("Event not audio toggled:" + err);
+				} else {
+					//console.log("Event audio toggled");
+					res.json(true);
+					res.end();
+				}
+			});
+	},
+	edit: function(req, res) { //post
+		//req.url
+		User.permissionControl(req, res, 10);
+
+		//console.log("Req for event edit Event ID " + req.body.eventid);
+		var query = {};
+		$.each(req.body.changedData, function(key, value) {
+			if(key == 'title' || key == 'desc' || key == 'loc') {
+				query[key] = value;
+			}
+		});
+		var reqDate = new Date(Date.parse(req.body.changedData.date));
+		reqDate = (reqDate.getMonth() + 1) + '/' + reqDate.getDate() + '/' +  reqDate.getFullYear() + ' ';
+		query.start = new Date(Date.parse(reqDate + req.body.changedData.timepickerResStart));
+		query.end = new Date(Date.parse(reqDate + req.body.changedData.timepickerResEnd));
+		query.eventStart = new Date(Date.parse(reqDate + req.body.changedData.timepickerEventStart));
+		query.eventEnd = new Date(Date.parse(reqDate + req.body.changedData.timepickerEventEnd));
+		query.staffNeeded = parseInt(req.body.changedData.staffNeeded);
+		db.events.findAndModify(
+			{
+				query: {_id: new mongo.ObjectID(req.body.eventid)},
+				update: { $set: query }, 
+				new: true
+			},
+			function(err, updated) {
+				if (err || !updated) {
+					console.log(req.url);
+					console.log("Event not edited:" + err);
+				} else {
+					//console.log("Event edited");
+					res.json(true);
+					res.end();
+
+					//Send e-mails to the registered staff after update
+					var smtpTransport = Utility.smtpTransport();
+
+					updated.shifts.forEach(function(shift) {
+						var staffMailOptions = {
+						    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
+						    to: shift.staff + "@wesleyan.edu",
+						    subject: "Updated Event for " + shift.staff + " (IMPORTANT)",
+						};
+						var items = {
+							'update': [{
+								'event': updated,
+								'shift': _.findWhere(updated.shifts, {
+									staff: shift.staff
+								})
+							}],
+							remove: []
+						};
+						staffMailOptions.html = ejs.render(fs.readFileSync(__dirname + '/views/mail/normalUpdate.ejs', 'utf8'), {'app': app, 'items': items});
+
+						smtpTransport.sendMail(staffMailOptions, function(error, response) {
+						    if (error) {
+						        console.log(error);
+						    } else {
+						        //console.log("Message sent: " + response.message);
+						    }
+						});
+					});
+					//e-mails sent
+				}
+			});
+	},
+	spinner: function(req, res) { //post
+		//req.url
+		User.permissionControl(req, res, 10);
+
+		//console.log("Req for staffNeeded spinner for Event ID " + req.body.eventid);
+		db.events.update(
+			{_id: new mongo.ObjectID(req.body.eventid)},
+			{ $set: {'staffNeeded': parseInt(req.body.make) } }, 
+			function(err, updated) {
+				if (err || !updated) {
+					console.log(req.url);
+					console.log("Event staffNeeded not changed:" + err);
+				} else {
+					//console.log("Event staffNeeded changed");
+					res.json(true);
+					res.end();
+				}
+			});
+	},
+	cancel: function(req, res) { //post
+		//req.url
+		User.permissionControl(req, res, 10);
+
+		//console.log("Req for cancel toggle Event ID " + req.body.eventid);
+		db.events.update(
+			{_id: new mongo.ObjectID(req.body.eventid)},
+			{ $set: {'cancelled': JSON.parse(req.body.make) } }, 
+			function(err, updated) {
+				if (err || !updated) {
+					console.log(req.url);
+					console.log("Event not cancel toggled:" + err);
+				} else {
+					//console.log("Event cancel toggled");
+					res.json(true);
+					res.end();
+				}
+			});
+	},
+	remove: function(req, res) { //post
+		//req.url
+		User.permissionControl(req, res, 10);
+
+		//console.log("Req for remove Event ID " + req.body.eventid);
+		db.events.remove(
+			{_id: new mongo.ObjectID(req.body.eventid)},
+			function(err, removed) {
+				if (err || !removed) {
+					console.log(req.url);
+					console.log("Event not removed:" + err);
+				} else {
+					//console.log("Event removed");
+					res.json(true);
+					res.end();
+				}
+			});
 	}
 };

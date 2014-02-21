@@ -7,13 +7,8 @@
         |_|                
 */
 // CONFIGURATION AND MODULES
-	require('ofe').call();
 
-	var Preferences = require('./config/Preferences.js'),
-		Utility 	= require('./modules/Utility.js'),
-		User 		= require('./modules/user.js'),
-		db 			= require('./modules/db.js'),
-		routes 		= require('./routes/index.js');
+	require('ofe').call();
 
 	var express = require('express'),
 		app 	= express(),
@@ -25,6 +20,15 @@
 		async 	= require('async'),
 		ejs 	= require('ejs'),
 		cache 	= require('memory-cache');
+
+	var Preferences = require('./config/Preferences.js'),
+		Utility 	= require('./modules/Utility.js'),
+		User 		= require('./modules/user.js'),
+		db 			= require('./modules/db.js'),
+		routes 		= require('./routes/index.js');
+
+	app.locals 		= _.extend(app.locals, require('./modules/app.locals.js'));
+
 	cas.configure(Preferences.casOptions);
 
 	app.configure(function() {
@@ -45,47 +49,6 @@
 	  res.header("Access-Control-Allow-Headers", "X-Requested-With");
 	  next();
 	});
-
-// UTILITY FUNCTIONS
-
-	app.locals.formatAMPM = function(date) {
-		var hours = date.getHours();
-		var minutes = date.getMinutes();
-		var ampm = hours >= 12 ? 'PM' : 'AM';
-		hours = hours % 12;
-		hours = hours ? hours : 12; // the hour '0' should be '12'
-		minutes = minutes < 10 ? '0' + minutes : minutes;
-		var strTime = hours + ':' + minutes + ' ' + ampm;
-		return strTime;
-	};
-	app.locals.getFormattedDate = function(date) {
-		var year = date.getFullYear();
-		var month = (1 + date.getMonth()).toString();
-		month = month.length > 1 ? month : '0' + month;
-		var day = date.getDate().toString();
-		day = day.length > 1 ? day : '0' + day;
-		return month + '/' + day + '/' + year;
-	};
-	app.locals.fixParantheses = function(s) {
-		return s.replace("&#35;","#").replace("&#41;",")").replace("&amp;#40;","(");
-	};
-
-// STUFF TO LOAD AT INITIATION
-
-	//We are storing the inventory in the memory as well
-	db.inventory.find({}, function(err, data) {
-			if (err || !data) {
-				console.log(req.url);
-				console.log(err);
-			} else {
-				cache.put('allInventory', data);
-			}
-		});
-
-	Utility.inventoryName = function (id) {
-		var id = parseInt(id);
-		return _.findWhere(cache.get('allInventory'), {'id': id}).text;
-	}
 
 // CAS SESSION MANAGEMENT
 
@@ -327,183 +290,13 @@
 	//Event fetching should be filtered according to the time variables, still not done after MongoDB
 	app.get("/events", cas.blocker, routes.events.events);
 
-		app.post("/event/techMustStay", cas.blocker, function(req, res) {
-			User.permissionControl(req, res, 10);
-
-			//req.url
-			//console.log("Req for techMustStay toggle Event ID " + req.body.eventid);
-			db.events.update(
-				{_id: new mongo.ObjectID(req.body.eventid)},
-				{ $set: {'techMustStay': JSON.parse(req.body.make) } }, 
-				function(err, updated) {
-					if (err || !updated) {
-						console.log(req.url);
-						console.log("Event not techMustStay toggled:" + err);
-					} else {
-						//console.log("Event techMustStay toggled");
-						res.json(JSON.stringify(true).toString("utf-8"));
-						res.end();
-					}
-				});
-		});
-		app.post("/event/video", cas.blocker, function(req, res) {
-			//req.url
-			User.permissionControl(req, res, 10);
-
-			//console.log("Req for techMustStay toggle Event ID " + req.body.eventid);
-			db.events.update(
-				{_id: new mongo.ObjectID(req.body.eventid)},
-				{ $set: {'video': JSON.parse(req.body.make) } }, 
-				function(err, updated) {
-					if (err || !updated) {
-						console.log(req.url);
-						console.log("Event not video toggled:" + err);
-					} else {
-						//console.log("Event video toggled");
-						res.json(true);
-						res.end();
-					}
-				});
-		});
-		app.post("/event/audio", cas.blocker, function(req, res) {
-			//req.url
-			User.permissionControl(req, res, 10);
-
-			db.events.update(
-				{_id: new mongo.ObjectID(req.body.eventid)},
-				{ $set: {'audio': JSON.parse(req.body.make) } }, 
-				function(err, updated) {
-					if (err || !updated) {
-						console.log(req.url);
-						console.log("Event not audio toggled:" + err);
-					} else {
-						//console.log("Event audio toggled");
-						res.json(true);
-						res.end();
-					}
-				});
-		});
-		app.post("/event/edit", cas.blocker, function(req, res) {
-			//req.url
-			User.permissionControl(req, res, 10);
-
-			//console.log("Req for event edit Event ID " + req.body.eventid);
-			var query = {};
-			$.each(req.body.changedData, function(key, value) {
-				if(key == 'title' || key == 'desc' || key == 'loc') {
-					query[key] = value;
-				}
-			});
-			var reqDate = new Date(Date.parse(req.body.changedData.date));
-			reqDate = (reqDate.getMonth() + 1) + '/' + reqDate.getDate() + '/' +  reqDate.getFullYear() + ' ';
-			query.start = new Date(Date.parse(reqDate + req.body.changedData.timepickerResStart));
-			query.end = new Date(Date.parse(reqDate + req.body.changedData.timepickerResEnd));
-			query.eventStart = new Date(Date.parse(reqDate + req.body.changedData.timepickerEventStart));
-			query.eventEnd = new Date(Date.parse(reqDate + req.body.changedData.timepickerEventEnd));
-			query.staffNeeded = parseInt(req.body.changedData.staffNeeded);
-			db.events.findAndModify(
-				{
-					query: {_id: new mongo.ObjectID(req.body.eventid)},
-					update: { $set: query }, 
-					new: true
-				},
-				function(err, updated) {
-					if (err || !updated) {
-						console.log(req.url);
-						console.log("Event not edited:" + err);
-					} else {
-						//console.log("Event edited");
-						res.json(true);
-						res.end();
-
-						//Send e-mails to the registered staff after update
-						var smtpTransport = Utility.smtpTransport();
-
-						updated.shifts.forEach(function(shift) {
-							var staffMailOptions = {
-							    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
-							    to: shift.staff + "@wesleyan.edu",
-							    subject: "Updated Event for " + shift.staff + " (IMPORTANT)",
-							};
-							var items = {
-								'update': [{
-									'event': updated,
-									'shift': _.findWhere(updated.shifts, {
-										staff: shift.staff
-									})
-								}],
-								remove: []
-							};
-							staffMailOptions.html = ejs.render(fs.readFileSync(__dirname + '/views/mail/normalUpdate.ejs', 'utf8'), {'app': app, 'items': items});
-
-							smtpTransport.sendMail(staffMailOptions, function(error, response) {
-							    if (error) {
-							        console.log(error);
-							    } else {
-							        //console.log("Message sent: " + response.message);
-							    }
-							});
-						});
-						//e-mails sent
-					}
-				});
-		});
-		app.post("/event/spinner", cas.blocker, function(req, res) {
-			//req.url
-			User.permissionControl(req, res, 10);
-
-			//console.log("Req for staffNeeded spinner for Event ID " + req.body.eventid);
-			db.events.update(
-				{_id: new mongo.ObjectID(req.body.eventid)},
-				{ $set: {'staffNeeded': parseInt(req.body.make) } }, 
-				function(err, updated) {
-					if (err || !updated) {
-						console.log(req.url);
-						console.log("Event staffNeeded not changed:" + err);
-					} else {
-						//console.log("Event staffNeeded changed");
-						res.json(true);
-						res.end();
-					}
-				});
-		});
-		app.post("/event/cancel", cas.blocker, function(req, res) {
-			//req.url
-			User.permissionControl(req, res, 10);
-
-			//console.log("Req for cancel toggle Event ID " + req.body.eventid);
-			db.events.update(
-				{_id: new mongo.ObjectID(req.body.eventid)},
-				{ $set: {'cancelled': JSON.parse(req.body.make) } }, 
-				function(err, updated) {
-					if (err || !updated) {
-						console.log(req.url);
-						console.log("Event not cancel toggled:" + err);
-					} else {
-						//console.log("Event cancel toggled");
-						res.json(true);
-						res.end();
-					}
-				});
-		});
-		app.post("/event/remove", cas.blocker, function(req, res) {
-			//req.url
-			User.permissionControl(req, res, 10);
-
-			//console.log("Req for remove Event ID " + req.body.eventid);
-			db.events.remove(
-				{_id: new mongo.ObjectID(req.body.eventid)},
-				function(err, removed) {
-					if (err || !removed) {
-						console.log(req.url);
-						console.log("Event not removed:" + err);
-					} else {
-						//console.log("Event removed");
-						res.json(true);
-						res.end();
-					}
-				});
-		});
+	app.post("/event/techMustStay", cas.blocker, routes.events.techMustStay);
+	app.post("/event/video", cas.blocker, routes.events.video);
+	app.post("/event/audio", cas.blocker, routes.events.audio);
+	app.post("/event/edit", cas.blocker, routes.events.edit);
+	app.post("/event/spinner", cas.blocker, routes.events.spinner);
+	app.post("/event/cancel", cas.blocker, routes.events.cancel);
+	app.post("/event/remove", cas.blocker, routes.events.remove);
 
 	app.get('/print', cas.blocker, function(req, res) {
 		//console.log('Req for seeing today\'s events list');
@@ -1186,7 +979,7 @@
 
 	app.post('/fileUpload', cas.blocker, function(req, res) {
 		User.permissionControl(req, res, 10);
-		
+
 		var today = new Date(); today.setHours(0,0,0,0),
 			twoWeeksLater = new Date((new Date).getTime() + 2 * 7 * 24 * 60 * 60 * 1000); twoWeeksLater.setHours(23,59,59,999);
 		db.events.find({'start': {$gte: today, $lt: twoWeeksLater}}, function(err, events) {

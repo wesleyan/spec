@@ -1,7 +1,8 @@
 var nodemailer 	= require("nodemailer"),
 	cache 		= require('memory-cache');
 
-var Preferences = require('./../config/Preferences.js');
+var Preferences = require('./../config/Preferences.js'),
+	db 			= require('./db.js');
 
 var Utility = {
 	smtpTransport: function() {
@@ -60,7 +61,7 @@ var Utility = {
 		}
 		return events;
 	},
-	updateCachedUsers : function () {
+	updateCachedUsers: function () {
 		//We can store all staff in memory, since it is not a big array and it will be used VERY frequently, will save time.
 		db.staff.find({}, function(err, data) {
 				if (err || !data) {
@@ -75,8 +76,24 @@ var Utility = {
 					cache.put('staffUsernameArray', arr);
 				}
 			});
+	},
+	updateCachedInventory: function () {
+		//We are storing the inventory in the memory as well
+		db.inventory.find({}, function(err, data) {
+				if (err || !data) {
+					console.log(req.url);
+					console.log(err);
+				} else {
+					cache.put('allInventory', data);
+				}
+			});
+	},
+	inventoryName: function (id) {
+		var id = parseInt(id);
+		return _.findWhere(cache.get('allInventory'), {'id': id}).text;
 	}
 };
 
 module.exports = Utility;
 Utility.updateCachedUsers();
+Utility.updateCachedInventory();
