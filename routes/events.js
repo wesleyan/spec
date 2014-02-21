@@ -52,7 +52,7 @@ module.exports = {
     techMustStay: function(req, res) { //post
         User.permissionControl(req, res, 10);
 
-        //req.url
+        
         //console.log("Req for techMustStay toggle Event ID " + req.body.eventid);
         db.events.update(
             {_id: new mongo.ObjectID(req.body.eventid)},
@@ -69,7 +69,7 @@ module.exports = {
             });
     },
     video: function(req, res) { //post
-        //req.url
+        
         User.permissionControl(req, res, 10);
 
         //console.log("Req for techMustStay toggle Event ID " + req.body.eventid);
@@ -88,7 +88,7 @@ module.exports = {
             });
     },
     audio: function(req, res) { //post
-        //req.url
+        
         User.permissionControl(req, res, 10);
 
         db.events.update(
@@ -106,7 +106,7 @@ module.exports = {
             });
     },
     edit: function(req, res) { //post
-        //req.url
+        
         User.permissionControl(req, res, 10);
 
         //console.log("Req for event edit Event ID " + req.body.eventid);
@@ -171,7 +171,7 @@ module.exports = {
             });
     },
     spinner: function(req, res) { //post
-        //req.url
+        
         User.permissionControl(req, res, 10);
 
         //console.log("Req for staffNeeded spinner for Event ID " + req.body.eventid);
@@ -190,7 +190,7 @@ module.exports = {
             });
     },
     cancel: function(req, res) { //post
-        //req.url
+        
         User.permissionControl(req, res, 10);
 
         //console.log("Req for cancel toggle Event ID " + req.body.eventid);
@@ -209,7 +209,7 @@ module.exports = {
             });
     },
     remove: function(req, res) { //post
-        //req.url
+        
         User.permissionControl(req, res, 10);
 
         //console.log("Req for remove Event ID " + req.body.eventid);

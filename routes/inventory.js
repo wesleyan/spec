@@ -6,13 +6,13 @@ var mongo     = require('mongodb-wrapper'),
 
 module.exports = {
     all: function(req, res) {
-        //req.url
+        
         //console.log("Req for all inventory");
         res.json(cache.get('allInventory'));
         res.end();
     },
     existing: function(req, res) {
-        //req.url
+        
         //console.log("Req for inventory of Event ID " + req.params.id);
         //Event filtering and inventory
         /*var selectedEvent = events.filter(function(event) {

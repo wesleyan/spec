@@ -6,7 +6,7 @@ var _         = require('underscore'),
 
 module.exports = {
     existing: function(req, res) {
-        //req.url
+        
         //console.log("Req for fetching notes of Event ID " + req.params.id);
         //Event filtering and inventory
         db.events.find({_id: new mongo.ObjectID(req.params.id)}, function(err, events) {
@@ -20,7 +20,7 @@ module.exports = {
         });
     },
     add: function(req, res) { //post
-        //req.url
+        
         //console.log("Req for adding note \"" + req.body.note + "\" to Event ID " + req.body.eventid);
         var generatedID = new mongo.ObjectID();
         db.events.update(
@@ -39,7 +39,7 @@ module.exports = {
     },
     remove: function(req, res) {
         //managers should be able to delete any comment, others should only be able to delete their own
-        //req.url
+        
         //console.log("Req for removing note ID " + req.body.id + " from Event ID " + req.body.eventid);
         var deleteNote = function() {
             db.events.update(

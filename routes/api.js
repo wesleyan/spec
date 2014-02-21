@@ -68,7 +68,7 @@ module.exports = {
             }
         });
 
-        //req.url
+        
         //console.log("Req for events starting at " + start.toDateString() + " and ending before " + end.toDateString());
       return;
     }

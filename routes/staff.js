@@ -33,7 +33,7 @@ module.exports = {
         });
     },
     add: function(req, res) { //post
-        //req.url
+        
         var chosenStaff = req.body.staff;
         if(cache.get('staffUsernameArray').indexOf(User.getUser(req)) === -1) { //if user is not in staff list, don't allow
             res.json(false);
