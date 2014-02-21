@@ -1,7 +1,8 @@
 var User 	 = require('./../modules/User.js'),
 	db 	 	 = require('./../modules/db.js');
 	
-var mongo 	 = require('mongodb-wrapper');
+var mongo 	 = require('mongodb-wrapper'),
+	cache 	 = require('memory-cache');
 
 module.exports = {
 	all: function(req, res) {

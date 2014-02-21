@@ -21,11 +21,12 @@
 		ejs 	= require('ejs'),
 		cache 	= require('memory-cache');
 
-	var Preferences = require('./config/Preferences.js'),
-		Utility 	= require('./modules/Utility.js'),
-		User 		= require('./modules/user.js'),
-		db 			= require('./modules/db.js'),
-		routes 		= require('./routes/index.js');
+	var Preferences   = require('./config/Preferences.js'),
+		Utility 	  = require('./modules/Utility.js'),
+		User 		  = require('./modules/user.js'),
+		db 			  = require('./modules/db.js'),
+		routes 		  = require('./routes/index.js'),
+		textReminders = require('./modules/textReminders.js');
 
 	app.locals 		= _.extend(app.locals, require('./modules/app.locals.js'));
 
@@ -298,530 +299,65 @@
 	app.post("/event/cancel", cas.blocker, routes.events.cancel);
 	app.post("/event/remove", cas.blocker, routes.events.remove);
 
-	app.get('/print', cas.blocker, function(req, res) {
-		//console.log('Req for seeing today\'s events list');
-			var today;
-			if(req.query.date) {
-				try {
-					today = new Date(req.query.date);
-				} catch(e) {
-					res.send(false);
-					return false;
-				}
-			} else {
-				today = new Date();
-				dateString = (new Date()).toDateString();
-			}
-			today.setHours(0,0,0,0);
-		var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
-
-		db.events.find({start: {$gte: today, $lt: tomorrow}, cancelled:false}).sort({start: 1},
-			function(err, data) {
-					res.render('printtoday', {
-						'events': data,
-						'dateString': today.toDateString(),
-						'Utility': Utility
-					});
-			});
-	});
+	app.get('/print', cas.blocker, routes.print);
 
 // API
-	app.get('/api/events', function (req, res) {
-		try {
-			//Allows to set the starting time
-			if(req.query.start) {
-				var start = new Date(req.query.start * 1000);
-			} else {
-				//just now if not set
-				var start = new Date();
-			}
-
-			//Allows to set the ending time
-			if(req.query.end) {
-				var end = new Date(req.query.end * 1000);
-			} else {
-				var end = new Date();
-				end.setTime(start.getTime() + (30 * 60 * 1000));
-			}
-
-			//Shows the events starting in next given number of minutes
-			if(req.query.minutes) {
-				var start = new Date();
-				var end = new Date();
-				end.setTime(start.getTime() + (parseInt(req.query.minutes) * 60 * 1000));
-			}
-		} catch(e) {
-			return false;
-		}
-		if(typeof req.query.filter == 'undefined') {
-			req.query.filter = 'hideCancelled';
-		}
-		query = {};
-		switch(req.query.filter) {
-			case 'all':
-				query = {};
-				break;
-			case 'hideCancelled':
-				query = {cancelled: false};
-				break;
-			case 'unstaffed':
-				query = {cancelled: false };
-				break;
-			case 'video':
-				query = {video: true};
-				break;
-			default:
-				query = {};
-		}
-		$.extend(query, {'start': {$gte: start, $lt: end}});
-		db.events.find(query, function(err, events) {
-			if (err || !events) {
-				console.log(req.url);
-				console.log("No events found:" + err);
-			} else {
-				if(req.query.filter === 'unstaffed') {
-					//filter them manually because empty shifts seem like real shifts
-					events = _.filter(events, function (event) {
-						return Utility.fullShiftNumber(event) < event.staffNeeded;
-					});
-				}
-				res.json(events);
-				res.end();
-			}
-		});
-
-		//req.url
-		//console.log("Req for events starting at " + start.toDateString() + " and ending before " + end.toDateString());
-	  return;
-	});
+	app.get('/api/events', routes.api.events);
 
 // TRIVIAL STUFF
 
 	// INVENTORY
-		// All inventory
-		app.get("/inventory/all", cas.blocker, routes.inventory.all);
+	// All inventory
+	app.get("/inventory/all", cas.blocker, routes.inventory.all);
 
-		//Existing inventory for each event
-		app.get("/inventory/existing/:id", cas.blocker, routes.inventory.existing);
+	//Existing inventory for each event
+	app.get("/inventory/existing/:id", cas.blocker, routes.inventory.existing);
 
-		//Inventory Update
-		//Add inventory to an event (POST)
-		app.post("/inventory/add", cas.blocker, routes.inventory.add);
+	//Inventory Update
+	//Add inventory to an event (POST)
+	app.post("/inventory/add", cas.blocker, routes.inventory.add);
 
-		//Remove inventory from an event (POST)
-		app.post("/inventory/remove", cas.blocker, routes.inventory.remove);
+	//Remove inventory from an event (POST)
+	app.post("/inventory/remove", cas.blocker, routes.inventory.remove);
 
 	// NOTES
-		//Existing notes for each event
-		app.get("/notes/existing/:id", cas.blocker, routes.notes.existing);
+	//Existing notes for each event
+	app.get("/notes/existing/:id", cas.blocker, routes.notes.existing);
 
-		//Notes Update
-		//Add inventory to an event (POST) - not tested // username is required
-		app.post("/notes/add", cas.blocker, routes.notes.add);
+	//Notes Update
+	//Add inventory to an event (POST) - not tested // username is required
+	app.post("/notes/add", cas.blocker, routes.notes.add);
 
-		//Remove inventory from an event (POST) - username is required for verification
-			//managers should be able to delete any comment, others should only be able to delete their own
-		app.post("/notes/remove", cas.blocker, routes.notes.remove);
+	//Remove inventory from an event (POST) - username is required for verification
+		//managers should be able to delete any comment, others should only be able to delete their own
+	app.post("/notes/remove", cas.blocker, routes.notes.remove);
 
 	// STAFF
-		//All event staff in IMS
-		app.get("/staff/all", cas.blocker, function(req, res) {
-			
-			//req.url
-			//console.log("Req for all staff info");
-			// Filter the events/database and return the staff and shifts info (requires to decide on db structure)
-			db.staff.find({}, function(err, data) {
-				if (err || !data) {
-					console.log(req.url);
-					console.log(err);
-				} else {
-					res.json(data);
-					res.end();
-				}
-			});
-		});
-		//Get the existing staff of an event
-		app.get("/staff/get/:id", cas.blocker, function(req, res) {
-			
-			//req.url
-			//console.log("Req for staff info of Event ID " + req.params.id);
-			// Filter the events/database and return the staff and shifts info (requires to decide on db structure)
-			db.events.find({_id: new mongo.ObjectID(req.params.id)}, function(err, events) {
-				if (err || !events) {
-					console.log(req.url);
-					console.log("No events found");
-				} else {
-					res.json(events[0].shifts);
-					res.end();
-				}
-			});
-		});
-		//Add staff/shift to an event (POST)
-			app.post("/staff/add", cas.blocker, function(req, res) {
-				//req.url
-				var chosenStaff = req.body.staff;
-				if(cache.get('staffUsernameArray').indexOf(User.getUser(req)) === -1) { //if user is not in staff list, don't allow
-					res.json(false);
-					res.end();
-					return false;
-				}
-				if(User.permission(req) < 10) {
-					chosenStaff = User.getUser(req); //this will only add 
-				}
-				//console.log("Req for adding shift \"" + chosenStaff + "\" to Event ID " + req.body.eventid);
-				var eventStart = new Date(Date.parse(req.body.eventStart)),
-					eventEnd = new Date(Date.parse(req.body.eventEnd)),
-					generatedID = new mongo.ObjectID(),
-					startDate = new Date(Date.parse(eventStart.getFullYear() + "-" + (eventStart.getMonth()+1) + "-" + eventStart.getDate() + " " +req.body.start)),
-					endDate = new Date(Date.parse(eventEnd.getFullYear() + "-" + (eventStart.getMonth()+1) + "-" + eventEnd.getDate() + " " +req.body.end)),
-					newShift = {'id': generatedID, 'start': startDate,'end': endDate, 'staff': chosenStaff};
-				db.events.findAndModify({
-									query: {_id: new mongo.ObjectID(req.body.eventid)},
-									update: { $addToSet: {'shifts': newShift} }, 
-									new: true
-								},
-					function(err, updated) {
-						if (err || !updated) {
-							console.log(req.url);
-							console.log("Shift not added:" + err);
-						} else {
-							//console.log("Shift added");
-							res.json({'id':generatedID.toString(),'start':startDate, 'end':endDate});
-							res.end();
-							if(chosenStaff === '') { return; }
-							Utility.sendSingleMail({
-								to: chosenStaff + '@wesleyan.edu',
-								subject:'You have a new shift! : ' + updated.title,
-								html: ejs.render(fs.readFileSync(__dirname + '/views/mail/newShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': newShift})
-							});
-						}
-					});
-			});
-		//Remove staff/shift from an event (POST)
-			app.post("/staff/remove", cas.blocker, function(req, res) {
-				var query = {'shifts': {'id': new mongo.ObjectID(req.body.id)} };
-				if(User.permission(req) < 10) { //users other than the manager 
-					query['shifts']['staff'] = User.getUser(req);
-				}
-				//console.log("Req for removing shift ID " + req.body.id + " from Event ID " + req.body.eventid);
-				db.events.findAndModify({
-									query: {_id: new mongo.ObjectID(req.body.eventid)},
-									update: { $pull: query }, 
-									new: false //return the data before the update
-								},
-					function(err, updated) {
-						if (err || !updated) {
-							console.log(req.url);
-							console.log("Shift not removed:" + err);
-						} else {
-							//console.log("Shift removed");
-							res.json(true);
-							res.end();
-							//below is needed because id's are ObjectID, so we convert them to string to compare with req.body.id
-							updated.shifts = updated.shifts.map(function(shift) {
-								shift.id = shift.id + '';
-								return shift;
-							});
-							var oldShift = _.findWhere(updated.shifts, {'id': req.body.id});
-							if(_.isUndefined(oldShift)) {
-								console.log('old shift could not be found');
-								return false;
-							}
+	//All event staff in IMS
+	app.get("/staff/all", cas.blocker, routes.staff.all);
+	//Get the existing staff of an event
+	app.get("/staff/get/:id", cas.blocker, routes.staff.get);
+	//Add staff/shift to an event (POST)
+	app.post("/staff/add", cas.blocker, routes.staff.add);
+	//Remove staff/shift from an event (POST)
+	app.post("/staff/remove", cas.blocker, routes.staff.remove);
+	//Sign up for an empty shift for an event (POST)
+	app.post("/staff/shiftsignup", cas.blocker, routes.staff.shiftsignup);
+	//Withdrawing from a shift for an event (POST)
+	app.post("/staff/withdraw", cas.blocker, routes.staff.withdraw);
 
-							//store the removed shift somewhere, just in case someone deletes their shift just before the event or something
-							db.removedShifts.save(oldShift, function(err, saved) {
-														if (err || !saved) {
-															console.log("Removed shift could not be added");
-														}
-													});
+	//this is determined by staff time checking, not shift time checking, therefore if 
+	app.get("/staff/available/today", cas.blocker, routes.staff.info.availableToday);
 
-							if(oldShift.staff === '') { return; }
-							Utility.sendSingleMail({
-								to: oldShift.staff + '@wesleyan.edu',
-								subject:'You have a removed shift! : ' + updated.title,
-								html: ejs.render(fs.readFileSync(__dirname + '/views/mail/removeShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': oldShift})
-							});
-						}
-					});
-			});
-		//Sign up for an empty shift for an event (POST)
-			app.post("/staff/shiftsignup", cas.blocker, function(req, res) {
-				//find the data to be updated (before update!)
-				db.events.findOne({_id: new mongo.ObjectID(req.body.eventid)},
-					function(err, updated) {
-						if (err || !updated) {
-							console.log(req.url);
-							console.log("Could not find after update:" + err);
-						} else {
-							//below is needed because id's are ObjectID, so we convert them to string to compare with req.body.id
-							updated.shifts = updated.shifts.map(function(shift) {
-														shift.id = shift.id + '';
-														return shift;
-													});
-							var signedUpShift = _.findWhere(updated.shifts, {'id': req.body.id});
-							if(_.isUndefined(signedUpShift)) {
-								console.log('the shift could not be found');
-								return false;
-							} else if(signedUpShift.staff !== '') {
-								console.log('someone is trying to sign up for a shift that already has a staff!');
-								return false;
-							}
-							//it is safe to update now
-							db.events.update({_id: new mongo.ObjectID(req.body.eventid), 'shifts.id': new mongo.ObjectID(req.body.id)},
-											 {$set: {'shifts.$.staff': User.getUser(req)}},
-											 function(err, ifUpdated) {
-												if (err || !ifUpdated) {
-													console.log(req.url);
-													console.log("Shift not signed up:" + err);
-												} else {
-													res.json(true);
-													res.end();
-													
-													//now send e-mails
-													Utility.sendSingleMail({
-														to: signedUpShift.staff + '@wesleyan.edu',
-														subject:'You have a new shift! : ' + updated.title,
-														html: ejs.render(fs.readFileSync(__dirname + '/views/mail/newShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': signedUpShift})
-													});
-												}
-											}); //end of update
-						}
-					});				
-				//console.log("Req for signing up shift ID " + req.body.id + " from Event ID " + req.body.eventid);
-			});
-		//Withdrawing from a shift for an event (POST)
-			app.post("/staff/withdraw", cas.blocker, function(req, res) {
-					//find the data to be updated (before update!)
-					db.events.findOne({_id: new mongo.ObjectID(req.body.eventid)},
-						function(err, updated) {
-							if (err || !updated) {
-								console.log(req.url);
-								console.log("Could not find after update:" + err);
-							} else {
-								//below is needed because id's are ObjectID, so we convert them to string to compare with req.body.id
-								updated.shifts = updated.shifts.map(function(shift) {
-															shift.id = shift.id + '';
-															return shift;
-														});
-								var withdrawnShift = _.findWhere(updated.shifts, {'id': req.body.id});
-								if(_.isUndefined(withdrawnShift)) {
-									console.log('the shift could not be found');
-									return false;
-								} else if(withdrawnShift.staff !== User.getUser(req)) {
-									console.log('someone is trying to withdraw for a shift that is not theirs!');
-									return false;
-								}
-								//it is safe to update now
-								db.events.update({_id: new mongo.ObjectID(req.body.eventid), 'shifts.id': new mongo.ObjectID(req.body.id)},
-												 {$set: {'shifts.$.staff': ''}},
-												 function(err, ifUpdated) {
-													if (err || !ifUpdated) {
-														console.log(req.url);
-														console.log("Shift not withdrawn:" + err);
-													} else {
-														res.json(true);
-														res.end();
-														
-														//now send e-mails
-														Utility.sendSingleMail({
-															to: withdrawnShift.staff + '@wesleyan.edu',
-															subject:'You have a removed shift! : ' + updated.title,
-															html: ejs.render(fs.readFileSync(__dirname + '/views/mail/removeShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': withdrawnShift})
-														});
-														//store the removed shift somewhere, just in case someone deletes their shift just before the event or something
-															db.removedShifts.save(withdrawnShift, function(err, saved) {
-																	if (err || !saved) {
-																		console.log("Removed shift could not be added");
-																	}
-																});
-													}
-												}); //end of update
-							}
-						});				
-					//console.log("Req for withdrawing shift ID " + req.body.id + " from Event ID " + req.body.eventid);
-				});
+	app.get("/staff/check", cas.blocker, routes.staff.info.check);
+	app.get("/staff/table", cas.blocker, routes.staff.info.table);
+	app.get('/staffCheck', cas.blocker, routes.staff.info.staffCheck);
+	app.get('/staffTable', cas.blocker, routes.staff.info.staffTable);
 
-			//this is determined by staff time checking, not shift time checking, therefore if 
-			app.get("/staff/available/today", cas.blocker, function(req, res) {
-				var busyStaff = [];
-				//86400s = 1d
-				var start = new Date(req.query.start * 1000),
-					end = new Date(req.query.end * 1000);
-				//console.log("Req for staff available starting at " + start.toDateString() + " and ending before " + end.toDateString());
-				var query = {};
-				$.extend(query, {'start': {$gte: start, $lt: end}});
-				db.events.find(query, function(err, events) {
-					if (err || !events) {
-						console.log(req.url);
-						console.log("No events found");
-					} else {
-						events.forEach(function(event) {
-							event.shifts.forEach(function(shift) {
-								busyStaff.push(shift.staff);
-							});
-						});
-						var availableStaff = $(cache.get('staffUsernameArray')).not(busyStaff).get();
-						res.json(availableStaff);
-						res.end();
-					}	
-				});
-			});
-
-			app.get("/staff/check", cas.blocker, function(req, res) {
-				User.permissionControl(req, res, 10);
-
-				var start = new Date(Date.parse(req.query.start)),
-					end = new Date(Date.parse(req.query.end));
-				end = new Date(end.getTime() + 24 * 60 * 60 * 1000);
-				//console.log(start);
-				//console.log("Req for staff check for " + req.query.user);
-				db.events.find({'start': {$gte: start, $lt: end}, 'shifts':{$elemMatch: {'staff': req.query.user}},}, function(err, events) {
-					if (err || !events) {
-						console.log(req.url);
-						console.log("No events found" + err);
-						res.json(false);
-						res.end();
-					} else {
-						res.json(events);
-						res.end();
-					}
-				});
-			});
-			app.get("/staff/table", cas.blocker, function(req, res) {
-				User.permissionControl(req, res, 10);
-
-				var start = new Date(Date.parse(req.query.start)),
-					end = new Date(Date.parse(req.query.end));
-				end = new Date(end.getTime() + 24 * 60 * 60 * 1000);
-				//console.log(start);
-				//console.log("Req for staff table for " + req.query.user);
-				db.events.find({'start': {$gte: start, $lt: end},}, function(err, events) {
-					if (err || !events) {
-						console.log(req.url);
-						console.log("No events found" + err);
-						res.json(false);
-						res.end();
-					} else {
-						var result = {};
-						events.forEach(function(event) {
-							event.shifts.forEach(function(shift) {
-								if (shift.staff === "") {
-									return;
-								} else {
-									shift.staff = shift.staff.toLowerCase();
-								}
-								result[shift.staff] = (typeof result[shift.staff] === 'undefined') ? {} : result[shift.staff];
-								result[shift.staff].hour = (typeof result[shift.staff].hour === 'undefined') ? 0 : result[shift.staff].hour;
-								result[shift.staff].event = (typeof result[shift.staff].event === 'undefined') ? 0 : result[shift.staff].event;
-								result[shift.staff].event += 1;
-								result[shift.staff].hour += ((Date.parse(shift.end) - Date.parse(shift.start)) / 3600000);
-							})
-						});
-						res.json(result);
-						res.end();
-					}
-				});
-			});
-			app.get('/staffCheck', cas.blocker, function(req, res) {
-				User.permissionControl(req, res, 10);
-				res.render('staffCheck', {});
-			});
-
-			app.get('/staffTable', cas.blocker, function(req, res) {
-				User.permissionControl(req, res, 10);
-				res.render('staffTable', {});
-			});
-			app.get('/staff/db', cas.blocker, function(req, res) {
-				User.permissionControl(req, res, 10);
-				res.render('staffDatabase', {});
-			});
-			app.post('/staff/db/add', cas.blocker, function (req, res) {
-				User.permissionControl(req, res, 10);
-
-				//raw data from the front end is modified a bit to fit the format
-				var toAdd = req.body;
-				toAdd.class_year = parseInt(toAdd.class_year);
-				toAdd.level = parseInt(toAdd.level);
-				toAdd.phone = parseInt(toAdd.phone);
-				toAdd.professional = !!parseInt(toAdd.professional);
-				toAdd.trainee = !!parseInt(toAdd.trainee);
-				toAdd.task = toAdd.task.split(',').map(function(x) {return x.trim()});
-
-
-				db.staff.find({'username': toAdd.username}, function(err, data) {
-					if (err || !data) {
-						console.log("Staff not added to database:" + err);
-					} else {
-						if(data.length < 1) {
-							//add toAdd to the database now
-							db.staff.save(toAdd, function(err, saved) {
-								if (err || !saved) {
-									console.log("Staff not added to database:" + err);
-								} else {
-									Utility.updateCachedUsers();
-									res.write(JSON.stringify(true).toString("utf-8"));
-									res.end();
-								}
-							});
-						} else {
-							//this staff exists in the database
-							res.json({errors:'A staff with this user name already exists in the database.'});
-							res.end();
-						}
-					}
-				});
-			});
-			app.post('/staff/db/delete', cas.blocker, function (req, res) {
-				User.permissionControl(req, res, 10);
-				
-				//req.body.id is the _id in the database
-				db.staff.remove(
-					{'_id': new mongo.ObjectID(req.body.id)},
-					function(err, removed) {
-						if (err || !removed) {
-							console.log("Staff could not be deleted:" + err);
-							console.log(event.title);
-						} else {
-							Utility.updateCachedUsers();
-							res.json(true);
-							res.end()
-						}
-				});
-			});
-			app.post('/staff/db/update', cas.blocker, function (req, res) {
-				User.permissionControl(req, res, 10);
-				
-				//req.body.id is the _id in the database
-				//req.body.what is the update query
-				if(req.body.what.level) {
-					req.body.what.level = parseInt(req.body.what.level);
-				}
-				if(req.body.what.phone) {
-					req.body.what.phone = parseInt(req.body.what.phone);
-				}
-				if(req.body.what.class_year) {
-					req.body.what.class_year = parseInt(req.body.what.class_year);
-				}
-				if(req.body.what.professional) {
-					req.body.what.professional = JSON.parse(req.body.what.professional);
-				}
-				if(req.body.what.trainee) {
-					req.body.what.trainee = JSON.parse(req.body.what.trainee);
-				}
-				db.staff.update( 
-					{'_id': new mongo.ObjectID(req.body.id)},
-					{ $set: req.body.what }, 
-					function(err, updated) {
-						if (err || !updated) {
-							console.log(req.url);
-							console.log("Staff not updated in database:" + err);
-						} else {
-							Utility.updateCachedUsers();
-							res.json(true);
-							res.end();
-						}
-				});
-			});
+	app.get('/staff/db', cas.blocker, routes.staff.db.db);
+	app.post('/staff/db/add', cas.blocker, routes.staff.db.add);
+	app.post('/staff/db/delete', cas.blocker, routes.staff.db.delete);
+	app.post('/staff/db/update', cas.blocker, routes.staff.db.update);
 
 // FILE UPLOAD
 	app.get('/fileUpload', cas.blocker, function(req, res) {
@@ -1137,113 +673,13 @@
 	});
 
 // MOBILE
-	app.get('/m', cas.blocker, function (req, res) {
-		if(req.query.ticket) {res.redirect('/m/');} //redirect to the base if there is a ticket in the URL
-		res.redirect('/m/0/');
-	});
-	app.get('/m/:counter/', cas.blocker, function (req, res) {
-		var today = new Date();
-		today.setHours(0,0,0,0);
-		var start = new Date(today.getTime() + 24 * 60 * 60 * 1000 * req.params.counter),
-			end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
-		
-		var title = '';
-		if (req.params.counter == 0) {
-			title = 'Today';
-		} else if (req.params.counter == -1) {
-			title = 'Yesterday';
-		} else if(req.params.counter == 1) {
-			title = 'Tomorrow';
-		} else {
-			title = app.locals.getFormattedDate(start);
-		}
-		query = {};
-		$.extend(query, {'start': {$gte: start, $lt: end}});
-		db.events.find(query, function(err, events) {
-			if (err || !events) {
-				console.log(req.url);
-				console.log("No events found" + err);
-			} else {
-				
-				res.render('mobile/index', {
-					username: User.getUser(req),
-					permission: User.permission(req),
-					events: events,
-					counter: req.params.counter,
-					title:title,
-				});
-			}
-		});	
-	});
-	app.get('/m/event/:id', cas.blocker, function (req, res) {
-		query = {};
-		$.extend(query, {'_id': new mongo.ObjectID(req.params.id)});
-		db.events.find(query, function(err, events) {
-			if (err || !events) {
-				console.log(req.url);
-				console.log("No events found" + err);
-			} else {
-				res.render('mobile/event', {
-					username: User.getUser(req),
-					permission: User.permission(req),
-					event: events[0],
-				});
-			}
-		});	
-	});
-
-	app.get('/m/staff/:username', cas.blocker, function (req, res) {
-		var userObj = $.grep(cache.get('storeStaff'), function(e){ return e.username == req.params.username; });
-		if(userObj.length != 1) {
-			res.end();
-			return false;
-		}
-		res.render('mobile/staff', {
-			username: User.getUser(req),
-			permission: User.permission(req),
-			staff: userObj[0],
-		});
-	});
+	app.get('/m', cas.blocker, routes.mobile.m);
+	app.get('/m/:counter/', cas.blocker, routes.mobile.mWithCounter);
+	app.get('/m/event/:id', cas.blocker, routes.mobile.event);
+	app.get('/m/staff/:username', cas.blocker, routes.mobile.staff);
 
 // TEXT REMINDERS
-	setInterval(function() {
-		//check if there is an event starting in 5 min
-		var fiveMinCheck = {'start': {$gte: new Date((new Date()).getTime() + 55*60*1000), $lt: new Date((new Date()).getTime() + 60*6*10000)}};
-		db.events.find(fiveMinCheck, function(err, events) {
-			if (err || !events) {
-				console.log(req.url);
-				console.log(err);
-			} else {
-				var providers = ['vtext.com', 'txt.att.net', 'tomomail.net', 'messaging.sprintpcs.com', 'vmobl.com'];
-				//not using a function for e-mail sending because we need to close the connection after all stuff
-				var smtpTransport = Utility.smtpTransport();
-				events.forEach(function(event) {
-					event.shifts.forEach(function(shift) {
-						var phone = _.findWhere(cache.get('storeStaff'), {'username': shift.staff});
-						if(_.isUndefined(phone) || phone == false || phone.toString().length !== 10) {
-							return false;
-						}
-						var mailOptions = {
-						    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
-						    subject: "Text reminder for " + user,
-						};
-						mailOptions.html = ejs.render(fs.readFileSync(__dirname + '/views/mail/textReminder.ejs', 'utf8'), {'app': app, 'event':event,'shift':shift});
-						providers.each(function(provider) {
-							mailOptions.to = phone + "@" + provider; //we need to fetch the phone actually
-							smtpTransport.sendMail(mailOptions, function(error, response) {
-							    if (error) {
-							        console.log(error);
-							    } else {
-							        //console.log("Message sent: " + response.message);
-							    }
-							});
-						});
-					}); //event.shifts.forEach ends
-				}); //events.forEach ends
-				smtpTransport.close();
-			}
-		});
-	}, 1000 * 60 * 5); //every 5 minutes
+	setInterval(textReminders, 1000 * 60 * 5); //every 5 minutes
 
 // STARTING THE SERVER
 	app.listen(Preferences.port, function() {
