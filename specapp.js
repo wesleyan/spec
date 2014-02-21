@@ -399,171 +399,29 @@
 
 	// INVENTORY
 		// All inventory
-		app.get("/inventory/all", cas.blocker, function(req, res) {
-			//req.url
-			//console.log("Req for all inventory");
-			res.json(cache.get('allInventory'));
-			res.end();
-		});
+		app.get("/inventory/all", cas.blocker, routes.inventory.all);
 
 		//Existing inventory for each event
-		app.get("/inventory/existing/:id", cas.blocker, function(req, res) {
-			//req.url
-			//console.log("Req for inventory of Event ID " + req.params.id);
-			//Event filtering and inventory
-			/*var selectedEvent = events.filter(function(event) {
-				return event.id == req.params.id;
-			})[0];*/
-			db.events.find({_id: new mongo.ObjectID(req.params.id)}, function(err, data) {
-				if (err || !data) {
-					console.log(req.url);
-					console.log("No events found: " + err);
-				} else {
-					var existingList = [];
-					data[0].inventory.forEach(function(id) {
-						existingList.push(cache.get('allInventory').filter(function(tool) {
-							return tool.id == id;
-						})[0]);
-					});
-					res.json(existingList);
-					res.end();
-				}
-			});
-		});
+		app.get("/inventory/existing/:id", cas.blocker, routes.inventory.existing);
 
 		//Inventory Update
-			//Add inventory to an event (POST)
-			app.post("/inventory/add", cas.blocker, function(req, res) {
-				if(User.permission(req) < 1) {
-					res.json(false);
-					res.end();
-					return false;
-				}
-				//console.log("Req for adding inventory ID " + req.body.inventoryid + " to Event ID " + req.body.eventid);
-				//frontend checks for the same inventory adding, so no control needed for that
-				 //try to find the thing by its id and use the same data
-				var selectedInventory = cache.get('allInventory').filter(function(thing) {
-					return thing.id == req.body.inventoryid;
-				})[0];
-				
-				db.events.update(
-					{_id: new mongo.ObjectID(req.body.eventid)},
-					{ $addToSet: {'inventory': req.body.inventoryid} }, 
-					function(err, updated) {
-						if (err || !updated) {
-							console.log(req.url);
-							console.log("Inventory not added:" + err);
-						} else {
-							//console.log("Inventory added");
-							res.json(true);
-							res.end();
-						}
-					});
-			});
+		//Add inventory to an event (POST)
+		app.post("/inventory/add", cas.blocker, routes.inventory.add);
 
-			//Remove inventory from an event (POST)
-			app.post("/inventory/remove", cas.blocker, function(req, res) {
-				if(User.permission(req) < 1) {
-					res.json(false);
-					res.end();
-					return false;
-				}
-				//console.log("Req for removing inventory ID " + req.body.inventoryid + " from Event ID " + req.body.eventid);
-				db.events.update(
-					{_id: new mongo.ObjectID(req.body.eventid)},
-					{ $pull: {'inventory': req.body.inventoryid } }, 
-					function(err, updated) {
-						if (err || !updated) {
-							console.log(req.url);
-							console.log("Inventory not removed:" + err);
-						} else {
-							//console.log("Inventory removed");
-							res.json(true);
-							res.end();
-						}
-					});
-			});
+		//Remove inventory from an event (POST)
+		app.post("/inventory/remove", cas.blocker, routes.inventory.remove);
 
 	// NOTES
 		//Existing notes for each event
-		app.get("/notes/existing/:id", cas.blocker, function(req, res) {
-			//req.url
-			//console.log("Req for fetching notes of Event ID " + req.params.id);
-			//Event filtering and inventory
-			db.events.find({_id: new mongo.ObjectID(req.params.id)}, function(err, events) {
-				if (err || !events) {
-					console.log(req.url);
-					console.log("No events found: " + err);
-				} else {
-					res.json(events[0].notes);
-					res.end();
-				}
-			});
-		});
+		app.get("/notes/existing/:id", cas.blocker, routes.notes.existing);
 
 		//Notes Update
-			//Add inventory to an event (POST) - not tested // username is required
-			app.post("/notes/add", cas.blocker, function(req, res) {
-				//req.url
-				//console.log("Req for adding note \"" + req.body.note + "\" to Event ID " + req.body.eventid);
-				var generatedID = new mongo.ObjectID();
-				db.events.update(
-					{_id: new mongo.ObjectID(req.body.eventid)},
-					{ $addToSet: {'notes': {'id': generatedID, 'text': req.body.note,'user': User.getUser(req), 'date': new Date()}} }, 
-					function(err, updated) {
-						if (err || !updated) {
-							console.log(req.url);
-							console.log("Note not added:" + err);
-						} else {
-							//console.log("Note added");
-							res.json({'id':generatedID.toString(), 'user':User.getUser(req)});
-							res.end();
-						}
-					});
-			});
+		//Add inventory to an event (POST) - not tested // username is required
+		app.post("/notes/add", cas.blocker, routes.notes.add);
 
-			//Remove inventory from an event (POST) - username is required for verification
-				//managers should be able to delete any comment, others should only be able to delete their own
-			app.post("/notes/remove", cas.blocker, function(req, res) {
-				//req.url
-				//console.log("Req for removing note ID " + req.body.id + " from Event ID " + req.body.eventid);
-				var deleteNote = function() {
-					db.events.update(
-						{_id: new mongo.ObjectID(req.body.eventid)},
-						{ $pull: {'notes': {'id': new mongo.ObjectID(req.body.id)} } }, 
-						function(err, updated) {
-							if (err || !updated) {
-								console.log(req.url);
-								console.log("Note not removed:" + err);
-							} else {
-								//console.log("Note removed");
-								res.json(true);
-								res.end();
-							}
-						});
-				};
-				if(User.permission(req) == 10) { //remove the note if it's a manager
-					deleteNote();
-				} else {
-					db.events.find({_id: new mongo.ObjectID(req.body.eventid)}, function(err, events) {
-						if (err || !events) {
-							console.log(req.url);
-							console.log(err);
-						} else if(events.length < 1) {
-							console.log("No such note/event found");
-						} else {
-							var theNote = $.grep(events[0].notes, function(e){ return e['_id'] == req.body.id; });
-							if(theNote.user == User.getUser(req)) {
-								deleteNote();
-							} else {
-								res.json(false);
-								res.end();
-								return false;
-							}
-						}
-					});
-				}
-			});
+		//Remove inventory from an event (POST) - username is required for verification
+			//managers should be able to delete any comment, others should only be able to delete their own
+		app.post("/notes/remove", cas.blocker, routes.notes.remove);
 
 	// STAFF
 		//All event staff in IMS
