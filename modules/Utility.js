@@ -1,4 +1,5 @@
-var nodemailer    = require("nodemailer"),
+var _             = require("underscore"),
+    nodemailer    = require("nodemailer"),
     cache         = require('memory-cache');
 
 var Preferences = require('./../config/Preferences.js'),

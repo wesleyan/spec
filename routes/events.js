@@ -2,7 +2,8 @@ var Utility   = require('./../modules/Utility.js'),
     User      = require('./../modules/user.js'),
     db        = require('./../modules/db.js');
     
-var _          = require('underscore'),
+var fs         = require('fs'),
+    _          = require('underscore'),
     $          = require('jquery'),
     mongo      = require('mongodb-wrapper');
 
@@ -152,7 +153,7 @@ module.exports = {
                             }],
                             remove: []
                         };
-                        staffMailOptions.html = ejs.render(fs.readFileSync(__dirname + '/views/mail/normalUpdate.ejs', 'utf8'), {'app': app, 'items': items});
+                        staffMailOptions.html = ejs.render(fs.readFileSync(__dirname + '/../views/mail/normalUpdate.ejs', 'utf8'), {'app': app, 'items': items});
 
                         smtpTransport.sendMail(staffMailOptions, function(error, response) {
                             if (error) {
