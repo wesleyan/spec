@@ -34,14 +34,12 @@ module.exports = {
                             console.log("Staff not added to database:" + err);
                         } else {
                             Utility.updateCachedUsers();
-                            res.write(JSON.stringify(true).toString("utf-8"));
-                            res.end();
+                            res.json(true);
                         }
                     });
                 } else {
                     //this staff exists in the database
                     res.json({errors:'A staff with this user name already exists in the database.'});
-                    res.end();
                 }
             }
         });
@@ -59,7 +57,6 @@ module.exports = {
                 } else {
                     Utility.updateCachedUsers();
                     res.json(true);
-                    res.end()
                 }
         });
     },
@@ -93,7 +90,6 @@ module.exports = {
                 } else {
                     Utility.updateCachedUsers();
                     res.json(true);
-                    res.end();
                 }
         });
     }

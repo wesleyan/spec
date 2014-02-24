@@ -25,6 +25,5 @@ module.exports = {
     user: function(req, res) {
         //req.session.cas_user
         res.json({'username':User.getUser(req), 'permission':User.permission(req)});
-        res.end();
     }
 }

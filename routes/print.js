@@ -1,4 +1,5 @@
-var db = require('./../modules/db.js');
+var Utility  = require('./../modules/Utility.js'),
+    db       = require('./../modules/db.js');
 
 var cache = require('memory-cache');
 

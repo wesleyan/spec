@@ -16,7 +16,6 @@ module.exports = {
                 console.log(err);
             } else {
                 res.json(data);
-                res.end();
             }
         });
     },
@@ -28,7 +27,6 @@ module.exports = {
                 console.log("No events found");
             } else {
                 res.json(events[0].shifts);
-                res.end();
             }
         });
     },
@@ -37,7 +35,6 @@ module.exports = {
         var chosenStaff = req.body.staff;
         if(cache.get('staffUsernameArray').indexOf(User.getUser(req)) === -1) { //if user is not in staff list, don't allow
             res.json(false);
-            res.end();
             return false;
         }
         if(User.permission(req) < 10) {
@@ -62,7 +59,6 @@ module.exports = {
                 } else {
                     //console.log("Shift added");
                     res.json({'id':generatedID.toString(),'start':startDate, 'end':endDate});
-                    res.end();
                     if(chosenStaff === '') { return; }
                     Utility.sendSingleMail({
                         to: chosenStaff + '@wesleyan.edu',
@@ -90,7 +86,6 @@ module.exports = {
                 } else {
                     //console.log("Shift removed");
                     res.json(true);
-                    res.end();
                     //below is needed because id's are ObjectID, so we convert them to string to compare with req.body.id
                     updated.shifts = updated.shifts.map(function(shift) {
                         shift.id = shift.id + '';
@@ -148,7 +143,6 @@ module.exports = {
                                             console.log("Shift not signed up:" + err);
                                         } else {
                                             res.json(true);
-                                            res.end();
                                             
                                             //now send e-mails
                                             Utility.sendSingleMail({
@@ -192,7 +186,6 @@ module.exports = {
                                             console.log("Shift not withdrawn:" + err);
                                         } else {
                                             res.json(true);
-                                            res.end();
                                             
                                             //now send e-mails
                                             Utility.sendSingleMail({

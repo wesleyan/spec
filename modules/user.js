@@ -18,7 +18,6 @@ var User = {
     permissionControl: function(req, res, level) {
         if (User.permission(req) < level) {
             res.json(false);
-            res.end();
             return false;
         }
     }

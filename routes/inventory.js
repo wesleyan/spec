@@ -6,10 +6,7 @@ var mongo     = require('mongodb-wrapper'),
 
 module.exports = {
     all: function(req, res) {
-        
-        //console.log("Req for all inventory");
         res.json(cache.get('allInventory'));
-        res.end();
     },
     existing: function(req, res) {
         
@@ -30,14 +27,12 @@ module.exports = {
                     })[0]);
                 });
                 res.json(existingList);
-                res.end();
             }
         });
     },
     add: function(req, res) {
         if(User.permission(req) < 1) {
             res.json(false);
-            res.end();
             return false;
         }
         //console.log("Req for adding inventory ID " + req.body.inventoryid + " to Event ID " + req.body.eventid);
@@ -57,14 +52,12 @@ module.exports = {
                 } else {
                     //console.log("Inventory added");
                     res.json(true);
-                    res.end();
                 }
             });
     },
     remove: function(req, res) {
         if(User.permission(req) < 1) {
             res.json(false);
-            res.end();
             return false;
         }
         //console.log("Req for removing inventory ID " + req.body.inventoryid + " from Event ID " + req.body.eventid);
@@ -78,7 +71,6 @@ module.exports = {
                 } else {
                     //console.log("Inventory removed");
                     res.json(true);
-                    res.end();
                 }
             });
     }

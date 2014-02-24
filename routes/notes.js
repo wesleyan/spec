@@ -15,7 +15,6 @@ module.exports = {
                 console.log("No events found: " + err);
             } else {
                 res.json(events[0].notes);
-                res.end();
             }
         });
     },
@@ -33,7 +32,6 @@ module.exports = {
                 } else {
                     //console.log("Note added");
                     res.json({'id':generatedID.toString(), 'user':User.getUser(req)});
-                    res.end();
                 }
             });
     },
@@ -52,7 +50,6 @@ module.exports = {
                     } else {
                         //console.log("Note removed");
                         res.json(true);
-                        res.end();
                     }
                 });
         };
@@ -71,7 +68,6 @@ module.exports = {
                         deleteNote();
                     } else {
                         res.json(false);
-                        res.end();
                         return false;
                     }
                 }

@@ -29,7 +29,6 @@ module.exports = {
                 });
                 var availableStaff = $(cache.get('staffUsernameArray')).not(busyStaff).get();
                 res.json(availableStaff);
-                res.end();
             }    
         });
     },
@@ -46,10 +45,8 @@ module.exports = {
                 console.log(req.url);
                 console.log("No events found" + err);
                 res.json(false);
-                res.end();
             } else {
                 res.json(events);
-                res.end();
             }
         });
     },
@@ -66,7 +63,6 @@ module.exports = {
                 console.log(req.url);
                 console.log("No events found" + err);
                 res.json(false);
-                res.end();
             } else {
                 var result = {};
                 events.forEach(function(event) {
@@ -84,7 +80,6 @@ module.exports = {
                     })
                 });
                 res.json(result);
-                res.end();
             }
         });
     },

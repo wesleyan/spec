@@ -1,7 +1,8 @@
 var Utility    = require('./../modules/Utility.js'),
     db         = require('./../modules/db.js');
     
-var _          = require('underscore');
+var _          = require('underscore'),
+    $          = require('jquery');
 
 module.exports = {
     events: function (req, res) {
@@ -64,7 +65,6 @@ module.exports = {
                     });
                 }
                 res.json(events);
-                res.end();
             }
         });
 

@@ -44,7 +44,6 @@ module.exports = {
                 }
                 events = Utility.addBackgroundColor(events);
                 res.json(events);
-                res.end();
             }
         });
         //console.log("Req for events starting at " + start.toDateString() + " and ending before " + end.toDateString());    
@@ -63,8 +62,7 @@ module.exports = {
                     console.log("Event not techMustStay toggled:" + err);
                 } else {
                     //console.log("Event techMustStay toggled");
-                    res.json(JSON.stringify(true).toString("utf-8"));
-                    res.end();
+                    res.json(true);
                 }
             });
     },
@@ -83,7 +81,6 @@ module.exports = {
                 } else {
                     //console.log("Event video toggled");
                     res.json(true);
-                    res.end();
                 }
             });
     },
@@ -101,7 +98,6 @@ module.exports = {
                 } else {
                     //console.log("Event audio toggled");
                     res.json(true);
-                    res.end();
                 }
             });
     },
@@ -136,7 +132,6 @@ module.exports = {
                 } else {
                     //console.log("Event edited");
                     res.json(true);
-                    res.end();
 
                     //Send e-mails to the registered staff after update
                     var smtpTransport = Utility.smtpTransport();
@@ -185,7 +180,6 @@ module.exports = {
                 } else {
                     //console.log("Event staffNeeded changed");
                     res.json(true);
-                    res.end();
                 }
             });
     },
@@ -204,7 +198,6 @@ module.exports = {
                 } else {
                     //console.log("Event cancel toggled");
                     res.json(true);
-                    res.end();
                 }
             });
     },
@@ -222,7 +215,6 @@ module.exports = {
                 } else {
                     //console.log("Event removed");
                     res.json(true);
-                    res.end();
                 }
             });
     }
