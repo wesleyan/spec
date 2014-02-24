@@ -5,6 +5,7 @@ var Preferences   = require('./../config/Preferences.js'),
 var fs            = require('fs'),
     _             = require('underscore'),
     request       = require('request'),
+    cache         = require('memory-cache')
     googleapis    = require('googleapis');
 
 var OAuth2Client = googleapis.OAuth2Client,
@@ -55,7 +56,7 @@ var getCalendar = function(client, authClient, userId, options, req) {
 // Fetch access & refresh token
     /* this function is only for the first time to fetch access & refresh tokens
     if there is a refresh token registered for that user but no valid access token, you need to use refreshAccessToken function*/
-var getFirstToken = function(oauth2Client, app, req, res) {
+var getFirstToken = function(oauth2Client, req, res) {
     // OAuth options
     var oauthOptions = {access_type: 'offline', scope: 'https://www.googleapis.com/auth/calendar'};
 
@@ -140,11 +141,13 @@ var overallGoogleCheck = function(req, res, callback) {
     }
 }
 
+var oauth2Client;
+
 module.exports = {
     authorize: function(req, res) {
         //if we have the refresh token for the user, then we just need to refreshAccessToken, otherwise take permission
-        var oauth2Client = new OAuth2Client(oauth_cache.web.client_id, oauth_cache.web.client_secret, Preferences.googleRedirectUrl);
-        getFirstToken(oauth2Client, app, req, res);
+        oauth2Client = new OAuth2Client(oauth_cache.web.client_id, oauth_cache.web.client_secret, Preferences.googleRedirectUrl);
+        getFirstToken(oauth2Client, req, res);
     },
     oauth2callback: function(req, res) {
         oauth2Client.getToken(req.query.code, function(err, tokens) {

@@ -3,6 +3,7 @@ var Utility   = require('./../modules/Utility.js'),
     db        = require('./../modules/db.js');
     
 var _          = require('underscore'),
+    $          = require('jquery'),
     mongo      = require('mongodb-wrapper');
 
 module.exports = {
