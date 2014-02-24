@@ -1,9 +1,9 @@
 module.exports = {
     
     //general preferences
-    path_last_xml: '/uploads/lastfile.xml',
-    path_last_upload_info: '/logs/lastUpload.txt',
-    path_client_secret: '/config/client_secret.json',
+    path_last_xml: '/../uploads/lastfile.xml',
+    path_last_upload_info: '/../logs/lastUpload.txt',
+    path_client_secret: '/../config/client_secret.json',
     
     //the one below must match with the one you have saved in https://code.google.com/apis/console
     googleRedirectUrl: 'http://ims-dev.wesleyan.edu:8080/oauth2callback',

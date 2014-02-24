@@ -2,7 +2,8 @@ var Preferences   = require('./../config/Preferences.js'),
     User          = require('./../modules/user.js'),
     db            = require('./../modules/db.js');
 
-var _             = require('underscore');
+var fs            = require('fs'),
+    _             = require('underscore'),
     request       = require('request'),
     googleapis    = require('googleapis');
 

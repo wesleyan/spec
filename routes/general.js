@@ -1,4 +1,4 @@
-var User      = require('./../modules/User.js');
+var User      = require('./../modules/user.js');
     
 var _         = require('underscore'),
     cache     = require('memory-cache');

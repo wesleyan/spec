@@ -1,6 +1,6 @@
-var Utility  = require('./../modules/Utility.js'),
-    User     = require('./../modules/User.js'),
-    db       = require('./../modules/db.js');
+var Utility  = require('./../../modules/Utility.js'),
+    User     = require('./../../modules/user.js'),
+    db       = require('./../../modules/db.js');
     
 var _        = require('underscore'),
     $        = require('jquery'),

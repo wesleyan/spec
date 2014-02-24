@@ -1,4 +1,4 @@
-var User      = require('./../modules/User.js'),
+var User      = require('./../modules/user.js'),
     db        = require('./../modules/db.js');
     
 var mongo     = require('mongodb-wrapper'),
