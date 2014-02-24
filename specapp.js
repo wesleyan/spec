@@ -8,6 +8,11 @@
 */
 // CONFIGURATION AND MODULES
     require('ofe').call();
+    
+    // Template engine tags are changed to {{ }} because underscore uses <% %> as well in the front end
+    var ejs = require('ejs');
+    ejs.open = '{{';
+    ejs.close = '}}';
 
     var express = require('express'),
         app     = express(),
@@ -28,8 +33,7 @@
     app.configure(function() {
         app.set('views', __dirname + '/views');
         app.set('view engine', 'ejs');
-        // Template engine tags are changed to {{ }} because underscore uses <% %> as well in the front end
-        app.set('view options', {open: '{{', close: '}}'});
+        
         app.use(express.bodyParser({keepExtensions: true, uploadDir: __dirname + '/uploads'}));
         app.use(express.methodOverride());
         app.use(express.cookieParser('secret'));
