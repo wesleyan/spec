@@ -3,7 +3,9 @@ var Utility  = require('./../modules/Utility.js'),
     db       = require('./../modules/db.js');
     
 var _        = require('underscore'),
-    mongo    = require('mongodb-wrapper');
+    fs       = require('fs'),
+    mongo    = require('mongodb-wrapper'),
+    cache    = require('memory-cache');;
 
 module.exports = {
     db: require('./staff/db.js'),
@@ -63,7 +65,7 @@ module.exports = {
                     Utility.sendSingleMail({
                         to: chosenStaff + '@wesleyan.edu',
                         subject:'You have a new shift! : ' + updated.title,
-                        html: ejs.render(fs.readFileSync(__dirname + '/views/mail/newShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': newShift})
+                        html: ejs.render(fs.readFileSync(__dirname + '/../views/mail/newShift.ejs', 'utf8'), {'app': req.app, 'event': updated, 'shift': newShift})
                     });
                 }
             });
@@ -108,7 +110,7 @@ module.exports = {
                     Utility.sendSingleMail({
                         to: oldShift.staff + '@wesleyan.edu',
                         subject:'You have a removed shift! : ' + updated.title,
-                        html: ejs.render(fs.readFileSync(__dirname + '/views/mail/removeShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': oldShift})
+                        html: ejs.render(fs.readFileSync(__dirname + '/../views/mail/removeShift.ejs', 'utf8'), {'app': req.app, 'event': updated, 'shift': oldShift})
                     });
                 }
             });
@@ -148,7 +150,7 @@ module.exports = {
                                             Utility.sendSingleMail({
                                                 to: signedUpShift.staff + '@wesleyan.edu',
                                                 subject:'You have a new shift! : ' + updated.title,
-                                                html: ejs.render(fs.readFileSync(__dirname + '/views/mail/newShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': signedUpShift})
+                                                html: ejs.render(fs.readFileSync(__dirname + '/../views/mail/newShift.ejs', 'utf8'), {'app': req.app, 'event': updated, 'shift': signedUpShift})
                                             });
                                         }
                                     }); //end of update
@@ -191,7 +193,7 @@ module.exports = {
                                             Utility.sendSingleMail({
                                                 to: withdrawnShift.staff + '@wesleyan.edu',
                                                 subject:'You have a removed shift! : ' + updated.title,
-                                                html: ejs.render(fs.readFileSync(__dirname + '/views/mail/removeShift.ejs', 'utf8'), {'app': app, 'event': updated, 'shift': withdrawnShift})
+                                                html: ejs.render(fs.readFileSync(__dirname + '/../views/mail/removeShift.ejs', 'utf8'), {'app': req.app, 'event': updated, 'shift': withdrawnShift})
                                             });
                                             //store the removed shift somewhere, just in case someone deletes their shift just before the event or something
                                                 db.removedShifts.save(withdrawnShift, function(err, saved) {

@@ -29,11 +29,11 @@ $(document).ready(function() {
         'end': $('#d2').data('datepicker').date,
       }
     }).done(function(msg) {
-      if (msg == 'false') {
+      if (msg === false) {
         return false;
       }
       var template = _.template($(".template").html(), {
-        'events': JSON.parse(msg)
+        'events': msg
       });
       //console.log(template);
       $('#content').html(template);

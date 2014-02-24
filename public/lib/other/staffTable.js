@@ -29,10 +29,9 @@ $(document).ready(function() {
         'end': $('#d2').data('datepicker').date,
       }
     }).done(function(msg) {
-      if (msg == 'false') {
+      if (msg === false) {
         return false;
       }
-      msg = JSON.parse(msg);
 
       lazy = storeAllStaff.filter(function(person) {
         return typeof msg[person.username] === 'undefined';
