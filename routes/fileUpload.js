@@ -97,9 +97,9 @@ module.exports = {
                             });
                             return {
                                 XMLid: data['Service_x0020_Order_x0020_Detail_x0020_ID'],
-                                title: data['Event_x0020_Name'],
-                                desc:  desc,
-                                loc:   data['Room_x0020_Description'],
+                                title: req.app.locals.fixParantheses(data['Event_x0020_Name']),
+                                desc:  req.app.locals.fixParantheses(desc),
+                                loc:   req.app.locals.fixParantheses(data['Room_x0020_Description']),
                                 start: reservedStart,
                                 end:   reservedEnd,
                                 'eventStart': eventStart,
@@ -109,7 +109,7 @@ module.exports = {
                                 'audio': false,
                                 'video':  video,
                                 customer: {
-                                    'name':  data['Customer'],
+                                    'name':  req.app.locals.fixParantheses(data['Customer']),
                                     'phone': data['Customer_x0020_Phone_x0020_1'],
                                 }
                             };
