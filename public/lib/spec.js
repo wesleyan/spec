@@ -29,29 +29,24 @@ Spec = {
 		$('a[href="#' + Backbone.history.fragment + '"]').addClass('drop-active');
 	},
 	fullShiftNumber: function (event) {
-		var fullShifts = 0;
-		for(var i = 0; i < event.shifts.length; i++) {
-			if(event.shifts[i].staff !== '') {
-				fullShifts++;
-			}
-		}
-		return fullShifts;
+		return event.shifts.map(function(s){return s.staff}).filter(function(n){return n}).length;
 	},
 	changePopupColor: function (event) {
 		$("#popupTitleButton").removeClass("btn-success btn-inverse btn-warning btn-danger btn-info");
+		var shiftNumber = Spec.fullShiftNumber(event);
 		if (event.cancelled == true) {
 			$("#popupTitleButton").addClass("btn-inverse");
-		} else if (Spec.fullShiftNumber(event) == 0) {
+		} else if (shiftNumber == 0) {
 			$("#popupTitleButton").addClass("btn-danger");
-		} else if (Spec.fullShiftNumber(event) < event.staffNeeded) {
+		} else if (shiftNumber < event.staffNeeded) {
 			$("#popupTitleButton").addClass("btn-warning");
-		} else if (Spec.fullShiftNumber(event) == event.staffNeeded) {
+		} else if (shiftNumber == event.staffNeeded) {
 			$("#popupTitleButton").addClass("btn-success");
-		} else if (Spec.fullShiftNumber(event) > event.staffNeeded) {
+		} else if (shiftNumber > event.staffNeeded) {
 			$("#popupTitleButton").addClass("btn-info");
 		}
 
-		$('#popupStaffInfo').html(Spec.fullShiftNumber(event) + '/' + event.staffNeeded);
+		$('#popupStaffInfo').html(shiftNumber + '/' + event.staffNeeded);
 	},
 	resizeMap: function() {
 		var height = $(window).height() - 40;
@@ -500,13 +495,11 @@ $(document).ready(function() {
 				element.contextmenu({
 					'target': '#context-menu'
 				});
-				if (Spec.fullShiftNumber(event) > 0) {
-					var list = 'Staff: ';
-					event.shifts.forEach(function(shift) {
-						list += shift.staff + ', ';
+				var shiftList = event.shifts.map(function(s){return s.staff}).filter(function(n){return n});
+				if (shiftList.length > 0) {
+					element.tooltip({
+						'title': 'Staff: ' + shiftList.join(', ')
 					});
-					list = list.substring(0, list.length - 2);
-					element.tooltip({'title': list});
 				}
 			}
 		},
