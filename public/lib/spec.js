@@ -454,12 +454,10 @@ $(document).ready(function() {
 			}
 			//Inventory update
 			Spec.setInventoryNumber(0, 0);
-			var inventoryOptions = {
-				values_url: 'inventory/existing/' + calEvent['_id'],
-			};
-			$.extend(inventoryOptions,Spec._inventoryProto);
 			$('#inventory').html('');
-			$('#inventory').tags(inventoryOptions);
+			$('#inventory').tags(_.extend(Spec._inventoryProto, {
+				values_url: 'inventory/existing/' + calEvent['_id']
+			}));
 
 			//Notes update
 			$.ajax({
