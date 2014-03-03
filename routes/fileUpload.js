@@ -82,7 +82,14 @@ module.exports = {
                                 reservedEnd = new Date(Date.parse(bookingDate + ' ' + data['Reserved_x0020_End'])),
                                 eventStart = new Date(Date.parse(bookingDate + ' ' + data['Event_x0020_Start'])),
                                 eventEnd = new Date(Date.parse(bookingDate + ' ' + data['Event_x0020_End'])),
+                                desc;
+                                
+                            if(data['Category'] === 'A/V Services') {
+                                desc = data['Resource'];
+                            } else {
                                 desc = data['Notes'];
+                            }
+                            
                             if(_.isObject(desc)) { desc = '' }; //if it's an object rather than a string, make it a blank string
 
                             var cancelled = false;
