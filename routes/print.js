@@ -25,7 +25,8 @@ module.exports = function(req, res) {
                 res.render('printtoday', {
                     'events': data,
                     'dateString': today.toDateString(),
-                    'Utility': Utility
+                    'Utility': Utility,
+                    'cache': cache
                 });
         });
 }
