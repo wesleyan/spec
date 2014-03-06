@@ -277,7 +277,7 @@ function reportUpdate(whatToReport) {
                 subject: "Updated Event for " + user + " (IMPORTANT)",
             };
 
-            staffMailOptions.html = ejs.render(fs.readFileSync(__dirname + '/../views/mail/normalUpdate.ejs', 'utf8'), {'app': app, 'items': items});
+            staffMailOptions.html = ejs.render(fs.readFileSync(__dirname + '/../views/mail/normalUpdate.ejs', 'utf8'), {'app': req.app, 'items': items});
 
             smtpTransport.sendMail(staffMailOptions, function(error, response) {
                 if (error) {
@@ -300,7 +300,7 @@ function reportUpdate(whatToReport) {
                     subject: "General Event Update Report (IMPORTANT)",
                 };
 
-        managerMailOptions.html = ejs.render(fs.readFileSync(__dirname + '/../views/mail/managerUpdate.ejs', 'utf8'), {'app': app, 'items': whatToReport});
+        managerMailOptions.html = ejs.render(fs.readFileSync(__dirname + '/../views/mail/managerUpdate.ejs', 'utf8'), {'app': req.app, 'items': whatToReport});
         managerList.forEach(function (manager) {
             managerMailOptions.to = manager.username + "@wesleyan.edu"
             smtpTransport.sendMail(managerMailOptions, function(error, response) {

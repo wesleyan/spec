@@ -153,7 +153,7 @@ module.exports = {
                             }],
                             remove: []
                         };
-                        staffMailOptions.html = ejs.render(fs.readFileSync(__dirname + '/../views/mail/normalUpdate.ejs', 'utf8'), {'app': app, 'items': items});
+                        staffMailOptions.html = ejs.render(fs.readFileSync(__dirname + '/../views/mail/normalUpdate.ejs', 'utf8'), {'app': req.app, 'items': items});
 
                         smtpTransport.sendMail(staffMailOptions, function(error, response) {
                             if (error) {

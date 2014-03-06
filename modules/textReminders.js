@@ -25,7 +25,7 @@ module.exports = function() {
                         from: "Wesleyan Spec <wesleyanspec@gmail.com>",
                         subject: "Text reminder for " + user,
                     };
-                    mailOptions.html = ejs.render(fs.readFileSync(__dirname + '/../views/mail/textReminder.ejs', 'utf8'), {'app': app, 'event':event,'shift':shift});
+                    mailOptions.html = ejs.render(fs.readFileSync(__dirname + '/../views/mail/textReminder.ejs', 'utf8'), {'app': req.app, 'event':event,'shift':shift});
                     providers.each(function(provider) {
                         mailOptions.to = phone + "@" + provider; //we need to fetch the phone actually
                         smtpTransport.sendMail(mailOptions, function(error, response) {
