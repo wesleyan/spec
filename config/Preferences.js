@@ -26,6 +26,9 @@ module.exports = {
         pass:'#thisiswhy'
     },
     managerEmails: ['specialeventsmanagers@gmail.com'],
+    //E-mail addresses to send notifications if an event is unstaffed until 1 hour before the event starts
+    notificationEmails: ['specialeventsmanagers@gmail.com', 'imsofficemanagers@gmail.com', 
+                         'bmorgan@wesleyan.edu', 'rchristensen@wesleyan.edu', 'hflores@wesleyan.edu'],
 
     backgroundColors: {
         'green': '#097054',

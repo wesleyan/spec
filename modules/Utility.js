@@ -36,13 +36,7 @@ var Utility = {
         smtpTransport.close();
     },
     fullShiftNumber: function(event) {
-        var fullShifts = 0;
-        for (var i = 0; i < event.shifts.length; i++) {
-            if (event.shifts[i].staff !== '') {
-                fullShifts++;
-            }
-        }
-        return fullShifts;
+        return event.shifts.map(function(s){return s.staff}).filter(function(n){return n}).length;
     },
     addBackgroundColor: function(events) { //changes the events object
         for (index = 0; index < events.length; ++index) {

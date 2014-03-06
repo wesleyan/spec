@@ -29,6 +29,7 @@
     "request":"*",
     "googleapis":"*",
     "xml2json":"*",
-    "memory-cache":"*"
+    "memory-cache":"*",
+    "moment":"*"
   }
 }

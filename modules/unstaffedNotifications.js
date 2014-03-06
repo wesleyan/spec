@@ -1,38 +1,35 @@
+var Preferences = require('./../config/Preferences.js'),
+
 var Utility = require('./Utility.js'),
     db      = require('./db.js');
     
 var _       = require('underscore'),
     ejs     = require('ejs'),
-    moment  = require('moment');   
+    moment  = require('moment');
 
 module.exports = function() {
-    //check if there is an event starting in 5 min
+    //check if there is an event starting in an hour
     var fiveMinCheck = {'start': {$gte: moment().add('m',60).toDate(), $lt: moment().add('m',65).toDate()}};
     db.events.find(fiveMinCheck, function(err, events) {
         if (err || !events) {
             console.log(req.url);
             console.log(err);
         } else {
-            var providers = ['vtext.com', 'txt.att.net', 'tomomail.net', 'messaging.sprintpcs.com', 'vmobl.com'];
             //not using a function for e-mail sending because we need to close the connection after all stuff
             var smtpTransport = Utility.smtpTransport();
             events.forEach(function(event) {
-                event.shifts.forEach(function(shift) {
-                    var phone = _.findWhere(cache.get('storeStaff'), {'username': shift.staff});
-                    if(_.isUndefined(phone) || phone == false || phone.toString().length !== 10) {
-                        return false;
-                    }
+
+                if(Utility.fullShiftNumber(event) < 1) {
                     var mailOptions = {
                         from: "Wesleyan Spec <wesleyanspec@gmail.com>",
-                        subject: "Text reminder for " + user,
+                        subject: "Unstaffed event in an hour!",
                     };
-                    mailOptions.html = ejs.render(fs.readFileSync(__dirname + '/../views/mail/textReminder.ejs', 'utf8'), {
+                    mailOptions.html = ejs.render(fs.readFileSync(__dirname + '/../views/mail/unstaffedNotification.ejs', 'utf8'), {
                         'app': req.app,
-                        'event': event,
-                        'shift': shift
+                        'event': event
                     });
-                    providers.each(function(provider) {
-                        mailOptions.to = phone + "@" + provider; //we need to fetch the phone actually
+                    Preferences.notificationEmails.each(function(address) {
+                        mailOptions.to = address; //we need to fetch the phone actually
                         smtpTransport.sendMail(mailOptions, function(error, response) {
                             if (error) {
                                 console.log(error);
@@ -41,7 +38,7 @@ module.exports = function() {
                             }
                         });
                     });
-                }); //event.shifts.forEach ends
+                }
             }); //events.forEach ends
             smtpTransport.close();
         }
