@@ -20,11 +20,12 @@
         cas     = require('./modules/grand_master_cas.js'),
         cache   = require('memory-cache');
 
-    var Preferences   = require('./config/Preferences.js'),
-        Utility       = require('./modules/Utility.js'),
-        db            = require('./modules/db.js'),
-        routes        = require('./routes/index.js'),
-        textReminders = require('./modules/textReminders.js');
+    var Preferences            = require('./config/Preferences.js'),
+        Utility                = require('./modules/Utility.js'),
+        db                     = require('./modules/db.js'),
+        routes                 = require('./routes/index.js'),
+        textReminders          = require('./modules/textReminders.js'),
+        unstaffedNotifications = require('./modules/unstaffedNotifications.js');
 
     app.locals        = _.extend(app.locals, require('./modules/app.locals.js'));
 
@@ -165,6 +166,8 @@
 
 // TEXT REMINDERS
     setInterval(textReminders, 1000 * 60 * 5); //every 5 minutes
+// UNSTAFFED NOTIFICATIONS
+    setInterval(unstaffedNotifications, 1000 * 60 * 5); //every 5 minutes
 
 // STARTING THE SERVER
     app.listen(Preferences.port, function() {
