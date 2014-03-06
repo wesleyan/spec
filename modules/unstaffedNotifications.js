@@ -1,4 +1,4 @@
-var Preferences = require('./../config/Preferences.js'),
+var Preferences = require('./../config/Preferences.js');
 
 var Utility = require('./Utility.js'),
     db      = require('./db.js');
