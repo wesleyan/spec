@@ -8,7 +8,8 @@ var _          = require('underscore'),
 var Preferences = require('./../config/Preferences.js'),
     Utility     = require('./../modules/Utility.js'),
     User        = require('./../modules/user.js'),
-    db          = require('./../modules/db.js');
+    db          = require('./../modules/db.js'),
+    autoAssign  = require('./../modules/autoAssign.js');
 
 module.exports = {
     get: function(req, res) {
@@ -131,7 +132,7 @@ module.exports = {
                         }
 
                         whatToChange.update = whatToChange.update.map(process);
-                        whatToChange.add = whatToChange.add.map(process).map(cleanSheet);
+                        whatToChange.add = whatToChange.add.map(process).map(cleanSheet).map(autoAssign);
 
                         var changeNumbers = {add:0, update:0, remove: 0},
                             parallel = [],
