@@ -1,64 +1,66 @@
 html {
   height: 100%;
 }
+
 body {
-	margin-top: 10px;
-	margin-bottom: 20px;
-	line-height: 15px;
-	font-size: 14px;
-	height: 100%;
-	overflow: hidden;
-	}
+  margin-top: 10px;
+  margin-bottom: 20px;
+  line-height: 15px;
+  font-size: 14px;
+  height: 100%;
+  overflow: hidden;
+}
 
 #calendar {
-	margin-top: 0px;
-	width: 90%;
-	margin: 0 auto;
-	}
+  margin-top: 0px;
+  width: 90%;
+  margin: 0 auto;
+}
 
 #newHeader {
-	width: 90%;
-	margin: 0 auto;
-	margin-bottom: 10px;
-
-	}
+  width: 90%;
+  margin: 0 auto;
+  margin-bottom: 10px;
+}
 
 #newHeader .fc-button {
-	margin-left: 2px;
+  margin-left: 2px;
 }
+
 .timeline {
-    position: absolute;
-    left: 59px;
-    border: none;
-    border-top: 2px solid red;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    z-index: 999;
+  position: absolute;
+  left: 59px;
+  border: none;
+  border-top: 2px solid red;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  z-index: 999;
 }
 
 .front {
-	z-index: 1051;
+  z-index: 1051;
 }
 
 #popupContentInside {
-	overflow-y: auto;
-	max-height: 100px;
+  overflow-y: auto;
+  max-height: 100px;
 }
 
 .popover {
-   max-width: 400px !important;
-   width: 400px !important;
+  max-width: 400px !important;
+  width: 400px !important;
 }
+
 .popover-title {
-	line-height: 20px;
+  line-height: 20px;
 }
 
 .striped {
-	background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.3) 35px, rgba(255,255,255,.3) 70px);
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.3) 35px, rgba(255,255,255,.3) 70px);
 }
 
-.drop-active {  
+.drop-active {
   background-color: hsl(360, 5%, 81%) !important;
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#eeecec", endColorstr="#d0cccc");
@@ -76,98 +78,103 @@ body {
 }
 
 .collapse {
-	margin-top:7px;
-	
+  margin-top: 7px;
 }
 
-.modal { overflow: visible; }
-.modal-body { overflow-y: visible; }
+.modal {
+  overflow: visible;
+}
+
+.modal-body {
+  overflow-y: visible;
+}
 
 #editEvent > .modal-body {
-	
-	overflow-y: scroll;
-
+  overflow-y: scroll;
 }
-
 
 #inventory .tag-badge {
-	margin-right: 5px;
-	margin-bottom: 5px;
-	font-weight: 100;
-	font-size: 14px;
-	line-height: 20px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  font-weight: 100;
+  font-size: 14px;
+  line-height: 20px;
 }
+
 #inventory .tag-icon {
-	margin-left: 5px;
-	margin-right: -3px;
+  margin-left: 5px;
+  margin-right: -3px;
 }
+
 #inventory .tag-badge a.tag-link {
-	color: #ffffff;
-	text-decoration: underline;
+  color: #ffffff;
+  text-decoration: underline;
 }
+
 #inventory .tag-input {
-	border: 0 solid;
-	margin: 0;
-	padding: 0;
-	font-weight: 100;
-	border: 0 solid;
-	background-color: transparent;
-	height: 18px;
-	margin-top: -5px;
-	color: #ffffff;
-	outline: none;
+  border: 0 solid;
+  margin: 0;
+  padding: 0;
+  font-weight: 100;
+  border: 0 solid;
+  background-color: transparent;
+  height: 18px;
+  margin-top: -5px;
+  color: #ffffff;
+  outline: none;
 }
 
 #popoverAccordion {
-	margin-top: 10px;
-	margin-bottom: -5px;
+  margin-top: 10px;
+  margin-bottom: -5px;
 }
 
 #popoverAccordion .accordion-group {
-    margin-bottom: 0px;
-    border:0px;
-    -webkit-border-radius: 0px;
-    -moz-border-radius: 0px;
-    border-radius: 0px;
-}   
+  margin-bottom: 0px;
+  border: 0px;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+}
+
 #notes {
-    margin-bottom: -15px !important;
-}  
+  margin-bottom: -15px !important;
+}
+
 #popoverAccordion .accordion-inner {
-    border: 0px !important;
-    padding-top: 0px !important;
-    padding-bottom: 0px !important;
-}   
+  border: 0px !important;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
 
 #popoverAccordion .accordion-heading {
-    height: 34px;
-  	margin: 0;
-	-webkit-border-radius: 5px 5px 0 0;
-	 -moz-border-radius: 5px 5px 0 0;
-	      border-radius: 5px 5px 0 0;
-}  
+  height: 34px;
+  margin: 0;
+  -webkit-border-radius: 5px 5px 0 0;
+  -moz-border-radius: 5px 5px 0 0;
+  border-radius: 5px 5px 0 0;
+}
 
-#popoverAccordion .accordion-heading  a{  
-    color: #333; /* text color */
-    text-decoration:none;
+#popoverAccordion .accordion-heading  a {
+  color: #333;
+ /* text color */
+  text-decoration: none;
 }
 
 .notesTable {
-	border-top: 1px dashed #ccc !important;
-	font-size: 13px;
+  border-top: 1px dashed #ccc !important;
+  font-size: 13px;
 }
 
-textarea{ 
-	width: 97%; 
-	height:50px; 
-	resize:vertical;
+textarea {
+  width: 97%;
+  height: 50px;
+  resize: vertical;
 }
 
 .removeNote {
-	font-size: 10px;
+  font-size: 10px;
 }
-
-
 
 .spinner input {
   float: left;
@@ -199,6 +206,7 @@ textarea{
   top: 2px;
   padding: 0 0 4px 1px;
 }
+
 .spinner .spinner-up i {
   position: relative;
   top: -4px;
@@ -216,13 +224,13 @@ textarea{
 }
 
 .event-bg-section {
-	opacity: 0.3;
-	background-color: black;
+  opacity: 0.3;
+  background-color: black;
 }
 
 .fc-view-month {
-    width: 100%; 
-    max-height: 100%;
-    bottom:0;
-    overflow-y: scroll;
+  width: 100%;
+  max-height: 100%;
+  bottom: 0;
+  overflow-y: scroll;
 }
