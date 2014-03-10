@@ -22,7 +22,7 @@ module.exports = function(grunt) {
 		uglify: {
 			options: {
 				banner: '/*! <%= pkg.name %> <%= pkg.version %> <%= grunt.template.today("dd-mm-yyyy") %> */\n',
-				mangle: false
+				mangle: true
 			},
 			dist: {
 				files: {
