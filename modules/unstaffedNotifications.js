@@ -4,6 +4,7 @@ var Utility = require('./Utility.js'),
     db      = require('./db.js');
     
 var _       = require('underscore'),
+    fs      = require('fs'),
     ejs     = require('ejs'),
     moment  = require('moment');
 

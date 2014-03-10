@@ -26,7 +26,7 @@ module.exports = {
         } else if(req.params.counter == 1) {
             title = 'Tomorrow';
         } else {
-            title = app.locals.getFormattedDate(start);
+            title = req.app.locals.getFormattedDate(start);
         }
         query = {};
         $.extend(query, {'start': {$gte: start, $lt: end}});
