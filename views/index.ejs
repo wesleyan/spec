@@ -14,6 +14,8 @@
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
   	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min.js"></script>
+  	<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.4.6/bootstrap-editable/js/bootstrap-editable.min.js"></script>
     <script src="dist/js/plugins.min.js"></script>
     <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
     <link href="dist/css/spec.min.css" rel="stylesheet">
@@ -178,8 +180,6 @@
 			</div>         
 	    </div>
 	</div>
-	<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.4.6/bootstrap-editable/js/bootstrap-editable.min.js"></script>
     <script src="dist/js/spec.min.js"></script>
     </script>
     {{ if(permission == 10) { }}
@@ -387,9 +387,6 @@
 			</tr>
 	</script>
 	<script>
-	//this is just for convenience, back end will validate these for every single request
-	Spec.username = '{{=username}}';
-	Spec.permission = '{{=permission}}';
 	{{ if(permission != 10) { }}
 		//These are jQuery plugins that managers need, however other users get JS error because they are lacked.
 		$.fn.spinner = function() {};

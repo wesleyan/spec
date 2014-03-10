@@ -56,7 +56,7 @@
 			$('#modifyCSSRule').html('.fc-view-month { height:' + (height - 70) + 'px !important; }');
 		}, //end resizeMap
 		setTimeline: function(view) { //this is borrowed from stackoverflow
-			var parentDiv = jQuery(".fc-agenda-slots:visible").parent();
+			var parentDiv = $(".fc-agenda-slots:visible").parent();
 			var timeline = parentDiv.children(".timeline");
 			if (timeline.length == 0) { //if timeline isn't there, add it
 				timeline = jQuery("<hr>").addClass("timeline");
