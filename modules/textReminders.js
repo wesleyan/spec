@@ -2,7 +2,7 @@ var Utility = require('./Utility.js'),
     db      = require('./db.js');
     
 var _       = require('underscore'),
-    cache   = require('cache'),
+    cache   = require('memory-cache'),
     ejs     = require('ejs'),
     moment  = require('moment');   
 
