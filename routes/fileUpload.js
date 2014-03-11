@@ -207,7 +207,7 @@ module.exports = {
                                     });
                                 });
                             })(req.files.myFile.path);
-                            reportUpdate(whatToReport); //send messages to the staff and managers
+                            reportUpdate(whatToReport, req); //send messages to the staff and managers
                             fs.writeFileSync(__dirname + Preferences.path_last_upload_info, (new Date() + '&' + User.getUser(req))); //store the last upload time & user
                         });
                     } catch (err) {
@@ -241,7 +241,7 @@ module.exports = {
 
 //this will send messages to the managers and the people who are registered in those events
 //gonna be hoisted
-function reportUpdate(whatToReport) {
+function reportUpdate(whatToReport, req) {
     if(whatToReport.update.length < 1 && whatToReport.remove.length < 1) {return false;} //don't send any mail if there is no change
     //not using a function for e-mail sending because we need to close the connection after all stuff
 
