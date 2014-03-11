@@ -21,7 +21,7 @@ module.exports = function(grunt) {
         },
         uglify: {
             options: {
-                banner: '/*! <%= pkg.name %> <%= pkg.version %> <%= grunt.template.today("dd-mm-yyyy") %> */\n',
+                banner: '/*! <%= pkg.name %> <%= pkg.version %> */\n',
                 mangle: true
             },
             dist: {
@@ -55,7 +55,7 @@ module.exports = function(grunt) {
         },
         cssmin: {
             options: {
-                banner: '/*! <%= pkg.name %> <%= pkg.version %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
+                banner: '/*! <%= pkg.name %> <%= pkg.version %> */\n'
             },
             combine: {
                 files: {

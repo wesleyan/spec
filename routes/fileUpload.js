@@ -273,7 +273,7 @@ function reportUpdate(whatToReport, req) {
 
         _.each(whatToSend, function(items, user) {
             var staffMailOptions = {
-                from: "Wesleyan Spec <wesleyanspec@gmail.com>",
+                from: Preferences.mail.fromString,
                 to: user + "@wesleyan.edu",
                 subject: "Updated Event for " + user + " (IMPORTANT)",
             };
@@ -297,7 +297,7 @@ function reportUpdate(whatToReport, req) {
         var managerList = Preferences.managerEmails;
 
             managerMailOptions = {
-                    from: "Wesleyan Spec <wesleyanspec@gmail.com>",
+                    from: Preferences.mail.fromString,
                     subject: "General Event Update Report (IMPORTANT)",
                 };
 

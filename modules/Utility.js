@@ -18,7 +18,7 @@ var Utility = {
     sendSingleMail: function(options, callback) {
         var smtpTransport = Utility.smtpTransport();
         var mailOptions = {
-            from: "Wesleyan Spec <wesleyanspec@gmail.com>",
+            from: Preferences.mail.fromString,
             subject: options.subject,
             html: options.html,
             to: options.to

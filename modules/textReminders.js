@@ -1,3 +1,5 @@
+var Preferences = require('./../config/Preferences.js');
+
 var Utility = require('./Utility.js'),
     db      = require('./db.js');
     
@@ -24,7 +26,7 @@ module.exports = function() {
                         return false;
                     }
                     var mailOptions = {
-                        from: "Wesleyan Spec <wesleyanspec@gmail.com>",
+                        from: Preferences.mail.fromString,
                         subject: "Text reminder for " + user,
                     };
                     mailOptions.html = ejs.render(fs.readFileSync(__dirname + '/../views/mail/textReminder.ejs', 'utf8'), {

@@ -1,3 +1,5 @@
+var Preferences = require('./../config/Preferences.js');
+
 var Utility   = require('./../modules/Utility.js'),
     User      = require('./../modules/user.js'),
     db        = require('./../modules/db.js');
@@ -140,7 +142,7 @@ module.exports = {
 
                     updated.shifts.forEach(function(shift) {
                         var staffMailOptions = {
-                            from: "Wesleyan Spec <wesleyanspec@gmail.com>",
+                            from: Preferences.mail.fromString,
                             to: shift.staff + "@wesleyan.edu",
                             subject: "Updated Event for " + shift.staff + " (IMPORTANT)",
                         };

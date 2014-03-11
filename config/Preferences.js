@@ -23,7 +23,8 @@ module.exports = {
     mail: {
         service:'Gmail',
         user:'wesleyanspec@gmail.com',
-        pass:'#thisiswhy'
+        pass:'#thisiswhy',
+        fromString: 'Wesleyan Spec <wesleyanspec@gmail.com>'
     },
     managerEmails: ['specialeventsmanagers@gmail.com'],
     //E-mail addresses to send notifications if an event is unstaffed until 1 hour before the event starts

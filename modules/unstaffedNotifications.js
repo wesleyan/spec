@@ -22,7 +22,7 @@ module.exports = function() {
 
                 if(Utility.fullShiftNumber(event) < 1) {
                     var mailOptions = {
-                        from: "Wesleyan Spec <wesleyanspec@gmail.com>",
+                        from: Preferences.mail.fromString,
                         subject: "Unstaffed event in an hour!",
                     };
                     mailOptions.html = ejs.render(fs.readFileSync(__dirname + '/../views/mail/unstaffedNotification.ejs', 'utf8'), {
