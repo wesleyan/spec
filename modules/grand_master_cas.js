@@ -127,4 +127,4 @@ GrandMasterCas.prototype.logout = function(req, res){
   res.redirect(logoutUrl);
 };
 
-module.exports = new GrandMasterCas;
+module.exports = new GrandMasterCas();

@@ -6,27 +6,28 @@ var _          = require('underscore'),
 
 module.exports = {
     events: function (req, res) {
+        var start, end;
         try {
             //Allows to set the starting time
             if(req.query.start) {
-                var start = new Date(req.query.start * 1000);
+                start = new Date(req.query.start * 1000);
             } else {
                 //just now if not set
-                var start = new Date();
+                start = new Date();
             }
 
             //Allows to set the ending time
             if(req.query.end) {
-                var end = new Date(req.query.end * 1000);
+                end = new Date(req.query.end * 1000);
             } else {
-                var end = new Date();
+                end = new Date();
                 end.setTime(start.getTime() + (30 * 60 * 1000));
             }
 
             //Shows the events starting in next given number of minutes
             if(req.query.minutes) {
-                var start = new Date();
-                var end = new Date();
+                start = new Date();
+                end = new Date();
                 end.setTime(start.getTime() + (parseInt(req.query.minutes) * 60 * 1000));
             }
         } catch(e) {
@@ -72,4 +73,4 @@ module.exports = {
         //console.log("Req for events starting at " + start.toDateString() + " and ending before " + end.toDateString());
       return;
     }
-}
+};

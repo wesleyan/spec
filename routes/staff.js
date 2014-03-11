@@ -5,7 +5,7 @@ var Utility  = require('./../modules/Utility.js'),
 var _        = require('underscore'),
     fs       = require('fs'),
     mongo    = require('mongodb-wrapper'),
-    cache    = require('memory-cache');;
+    cache    = require('memory-cache');
 
 module.exports = {
     db: require('./staff/db.js'),
@@ -73,7 +73,7 @@ module.exports = {
     remove: function(req, res) { //post
         var query = {'shifts': {'id': new mongo.ObjectID(req.body.id)} };
         if(User.permission(req) < 10) { //users other than the manager 
-            query['shifts']['staff'] = User.getUser(req);
+            query.shifts.staff = User.getUser(req);
         }
         //console.log("Req for removing shift ID " + req.body.id + " from Event ID " + req.body.eventid);
         db.events.findAndModify({
@@ -207,4 +207,4 @@ module.exports = {
             });                
         //console.log("Req for withdrawing shift ID " + req.body.id + " from Event ID " + req.body.eventid);
     }
-}
+};

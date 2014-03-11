@@ -21,6 +21,6 @@ var User = {
             return false;
         }
     }
-}
+};
 
 module.exports = User;

@@ -77,7 +77,7 @@ module.exports = {
                         result[shift.staff].event = (typeof result[shift.staff].event === 'undefined') ? 0 : result[shift.staff].event;
                         result[shift.staff].event += 1;
                         result[shift.staff].hour += ((Date.parse(shift.end) - Date.parse(shift.start)) / 3600000);
-                    })
+                    });
                 });
                 res.json(result);
             }
@@ -91,4 +91,4 @@ module.exports = {
         User.permissionControl(req, res, 10);
         res.render('staffTable', {});
     }
-}
+};

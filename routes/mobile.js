@@ -19,11 +19,12 @@ module.exports = {
             end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
         
         var title = '';
-        if (req.params.counter == 0) {
+        req.params.counter = parseInt(req.params.counter);
+        if (req.params.counter === 0) {
             title = 'Today';
-        } else if (req.params.counter == -1) {
+        } else if (req.params.counter === -1) {
             title = 'Yesterday';
-        } else if(req.params.counter == 1) {
+        } else if(req.params.counter === 1) {
             title = 'Tomorrow';
         } else {
             title = req.app.locals.getFormattedDate(start);
@@ -74,4 +75,4 @@ module.exports = {
             staff: userObj[0],
         });
     }
-}
+};

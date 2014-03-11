@@ -26,4 +26,4 @@ module.exports = {
         //req.session.cas_user
         res.json({'username':User.getUser(req), 'permission':User.permission(req)});
     }
-}
+};

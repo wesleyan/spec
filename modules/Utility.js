@@ -36,22 +36,22 @@ var Utility = {
         smtpTransport.close();
     },
     fullShiftNumber: function(event) {
-        return event.shifts.map(function(s){return s.staff}).filter(function(n){return n}).length;
+        return event.shifts.map(function(s){return s.staff;}).filter(function(n){return n;}).length;
     },
     addBackgroundColor: function(events) { //changes the events object
         for (index = 0; index < events.length; ++index) {
             event = events[index];
-            if (event.techMustStay == false) {
-                events[index]['className'] = ['striped']; //handles the setup and breakdown events as well
+            if (event.techMustStay === false) {
+                events[index].className = ['striped']; //handles the setup and breakdown events as well
             }
-            if (event.cancelled == true) {
-                events[index]['backgroundColor'] = Preferences.backgroundColors.gray;
-            } else if (Utility.fullShiftNumber(event) == 0) {
-                events[index]['backgroundColor'] = Preferences.backgroundColors.red;
+            if (event.cancelled === true) {
+                events[index].backgroundColor = Preferences.backgroundColors.gray;
+            } else if (Utility.fullShiftNumber(event) === 0) {
+                events[index].backgroundColor = Preferences.backgroundColors.red;
             } else if (Utility.fullShiftNumber(event) < event.staffNeeded) {
-                events[index]['backgroundColor'] = Preferences.backgroundColors.yellow;
-            } else if (Utility.fullShiftNumber(event) == event.staffNeeded) {
-                events[index]['backgroundColor'] = Preferences.backgroundColors.green;
+                events[index].backgroundColor = Preferences.backgroundColors.yellow;
+            } else if (Utility.fullShiftNumber(event) === event.staffNeeded) {
+                events[index].backgroundColor = Preferences.backgroundColors.green;
             }
         }
         return events;
@@ -84,7 +84,7 @@ var Utility = {
             });
     },
     inventoryName: function (id) {
-        var id = parseInt(id);
+        id = parseInt(id);
         return _.findWhere(cache.get('allInventory'), {'id': id}).text;
     }
 };

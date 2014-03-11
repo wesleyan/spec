@@ -8,7 +8,7 @@ module.exports = {
     inventory:      require('./inventory.js'),
     notes:          require('./notes.js'),
 
-    mobile:        	require('./mobile.js'),
+    mobile:         require('./mobile.js'),
     googleCalendar: require('./googleCalendar.js'),
     fileUpload:     require('./fileUpload.js')
 };

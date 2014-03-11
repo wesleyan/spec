@@ -25,8 +25,12 @@ module.exports = {
     post: function(req, res) {
         User.permissionControl(req, res, 10);
 
-        var today = new Date(); today.setHours(0,0,0,0),
-            twoWeeksLater = new Date((new Date).getTime() + 2 * 7 * 24 * 60 * 60 * 1000); twoWeeksLater.setHours(23,59,59,999);
+        var today, twoWeeksLater;
+        today = new Date();
+        today.setHours(0,0,0,0);
+        twoWeeksLater = new Date((new Date()).getTime() + 2 * 7 * 24 * 60 * 60 * 1000);
+        twoWeeksLater.setHours(23,59,59,999);
+
         db.events.find({'start': {$gte: today, $lt: twoWeeksLater}}, function(err, events) {
             if (err || !events) {
                 console.log(req.url);
@@ -46,13 +50,13 @@ module.exports = {
                                 object: true,
                                 trim: true,
                                 arrayNotation: true
-                            })['CopyofIMSforExport']['Data'];
+                            }).CopyofIMSforExport.Data;
                             last = parser.toJson(last, {
                                 object: true,
                                 trim: true,
                                 arrayNotation: true
-                            })['CopyofIMSforExport']['Data'];
-                            if(last == 0) {last = [];} //this is only for the first setup of spec on any machine
+                            }).CopyofIMSforExport.Data;
+                            if(last === "0" || last === 0) {last = [];} //this is only for the first setup of spec on any machine
 
                         var whatToChange = { update: [], add: [], remove: events };
                         console.log(xml.length + ' events in the new XML file');
@@ -61,7 +65,7 @@ module.exports = {
                         xml.forEach(function(xmlEntry) {
                             //try to find an object with the same unique ID
                             var entryInLast = _.findWhere(last, {
-                                'Service_x0020_Order_x0020_Detail_x0020_ID': xmlEntry['Service_x0020_Order_x0020_Detail_x0020_ID']
+                                'Service_x0020_Order_x0020_Detail_x0020_ID': xmlEntry.Service_x0020_Order_x0020_Detail_x0020_ID
                             });
                             if (!_.isUndefined(entryInLast)) { //if exists, then compare if they are the same
                                 if(!_.isEqual(xmlEntry, entryInLast)) {
@@ -74,40 +78,40 @@ module.exports = {
                             find the event with the same XMLid, delete that event from the array
                             the remaining events are apparently deleted from EMS
                             */
-                            whatToChange.remove = _.reject(whatToChange.remove, function(el) { return el['XMLid'] === xmlEntry['Service_x0020_Order_x0020_Detail_x0020_ID']; });
+                            whatToChange.remove = _.reject(whatToChange.remove, function(el) { return el.XMLid === xmlEntry.Service_x0020_Order_x0020_Detail_x0020_ID; });
                         });
                         //should write a part that distinguishes new events and updated events.
                         var process = function(data) {
-                            var bookingDate = data['Booking_x0020_Date'].split(" ")[0],
-                                reservedStart = new Date(Date.parse(bookingDate + ' ' + data['Reserved_x0020_Start'])),
-                                reservedEnd = new Date(Date.parse(bookingDate + ' ' + data['Reserved_x0020_End'])),
-                                eventStart = new Date(Date.parse(bookingDate + ' ' + data['Event_x0020_Start'])),
-                                eventEnd = new Date(Date.parse(bookingDate + ' ' + data['Event_x0020_End'])),
+                            var bookingDate = data.Booking_x0020_Date.split(" ")[0],
+                                reservedStart = new Date(Date.parse(bookingDate + ' ' + data.Reserved_x0020_Start)),
+                                reservedEnd = new Date(Date.parse(bookingDate + ' ' + data.Reserved_x0020_End)),
+                                eventStart = new Date(Date.parse(bookingDate + ' ' + data.Event_x0020_Start)),
+                                eventEnd = new Date(Date.parse(bookingDate + ' ' + data.Event_x0020_End)),
                                 desc;
                                 
-                            if(data['Category'] === 'A/V Services') {
-                                desc = data['Resource'];
+                            if(data.Category === 'A/V Services') {
+                                desc = data.Resource;
                             } else {
-                                desc = data['Notes'];
+                                desc = data.Notes;
                             }
                             
-                            if(_.isObject(desc)) { desc = '' }; //if it's an object rather than a string, make it a blank string
+                            if(_.isObject(desc)) {desc = '';} //if it's an object rather than a string, make it a blank string
 
                             var cancelled = false;
-                            if (data['Booking_x0020_Status'] == 'Cancelled') {
+                            if (data.Booking_x0020_Status == 'Cancelled') {
                                 cancelled = true;
                             }
                             var video = false;
                             ['video','recording'].forEach(function(word) {
-                                if(String(data['Notes']).indexOf(word) != -1) {
+                                if(String(data.Notes).indexOf(word) != -1) {
                                     video = true;
                                 }
                             });
                             return {
-                                XMLid: data['Service_x0020_Order_x0020_Detail_x0020_ID'],
-                                title: req.app.locals.fixParantheses(data['Event_x0020_Name']),
+                                XMLid: data.Service_x0020_Order_x0020_Detail_x0020_ID,
+                                title: req.app.locals.fixParantheses(data.Event_x0020_Name),
                                 desc:  req.app.locals.fixParantheses(desc),
-                                loc:   req.app.locals.fixParantheses(data['Room_x0020_Description']),
+                                loc:   req.app.locals.fixParantheses(data.Room_x0020_Description),
                                 start: reservedStart,
                                 end:   reservedEnd,
                                 'eventStart': eventStart,
@@ -117,8 +121,8 @@ module.exports = {
                                 'audio': false,
                                 'video':  video,
                                 customer: {
-                                    'name':  req.app.locals.fixParantheses(data['Customer']),
-                                    'phone': data['Customer_x0020_Phone_x0020_1'],
+                                    'name':  req.app.locals.fixParantheses(data.Customer),
+                                    'phone': data.Customer_x0020_Phone_x0020_1,
                                 }
                             };
                         };
@@ -129,7 +133,7 @@ module.exports = {
                             data.shifts = [];
                             data.staffNeeded = 1;
                             return data;
-                        }
+                        };
 
                         whatToChange.update = whatToChange.update.map(process);
                         whatToChange.add = whatToChange.add.map(process).map(cleanSheet).map(autoAssign);
@@ -236,7 +240,7 @@ module.exports = {
             }
         });        
     }
-}
+};
 
 
 //this will send messages to the managers and the people who are registered in those events
@@ -303,7 +307,7 @@ function reportUpdate(whatToReport, req) {
 
         managerMailOptions.html = ejs.render(fs.readFileSync(__dirname + '/../views/mail/managerUpdate.ejs', 'utf8'), {'app': req.app, 'items': whatToReport});
         managerList.forEach(function (manager) {
-            managerMailOptions.to = manager.username + "@wesleyan.edu"
+            managerMailOptions.to = manager.username + "@wesleyan.edu";
             smtpTransport.sendMail(managerMailOptions, function(error, response) {
                     if (error) {
                         console.log(error);

@@ -20,7 +20,7 @@ module.exports = {
         toAdd.phone = parseInt(toAdd.phone);
         toAdd.professional = !!parseInt(toAdd.professional);
         toAdd.trainee = !!parseInt(toAdd.trainee);
-        toAdd.task = toAdd.task.split(',').map(function(x) {return x.trim()});
+        toAdd.task = toAdd.task.split(',').map(function(x) {return x.trim();});
 
 
         db.staff.find({'username': toAdd.username}, function(err, data) {
@@ -93,4 +93,4 @@ module.exports = {
                 }
         });
     }
-}
+};

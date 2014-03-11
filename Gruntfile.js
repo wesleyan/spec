@@ -42,7 +42,19 @@ module.exports = function(grunt) {
             }
         },
         jshint: {
-            files: ['Gruntfile.js', 'public/src/js/spec.js', 'public/src/js/manager/*.js'], //no need to lint plugins
+            files: [
+                //Front end files
+                'Gruntfile.js',
+                'public/src/js/spec.js',
+                'public/src/js/manager/*.js',
+            ], //no need to lint plugins
+            ignore_warning: {
+                options: {
+                  '-W030': true,
+                  '-W002': true
+                },
+                src: ['specapp.js','routes/**/*.js', 'modules/**/*.js'], //Back end files
+            },
             options: {
                 // options here to override JSHint defaults
                 globals: {

@@ -22,7 +22,7 @@ module.exports = function() {
             events.forEach(function(event) {
                 event.shifts.forEach(function(shift) {
                     var phone = _.findWhere(cache.get('storeStaff'), {'username': shift.staff});
-                    if(_.isUndefined(phone) || phone == false || phone.toString().length !== 10) {
+                    if(_.isUndefined(phone) || phone === false || phone.toString().length !== 10) {
                         return false;
                     }
                     var mailOptions = {
@@ -49,4 +49,4 @@ module.exports = function() {
             smtpTransport.close();
         }
     });
-}
+};

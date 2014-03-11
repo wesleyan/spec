@@ -5,7 +5,7 @@ var Preferences   = require('./../config/Preferences.js'),
 var fs            = require('fs'),
     _             = require('underscore'),
     request       = require('request'),
-    cache         = require('memory-cache')
+    cache         = require('memory-cache'),
     googleapis    = require('googleapis');
 
 var OAuth2Client = googleapis.OAuth2Client,
@@ -25,7 +25,7 @@ var read_models = function(req, options) {
             auth.credentials = req.session.credentials;
             getCalendar(client, auth, 'me', options, req);
         });
-}
+};
 // Fetches calendar objects from Google calendar
 var getCalendar = function(client, authClient, userId, options, req) {
     client.calendar.events.list({
@@ -51,7 +51,7 @@ var getCalendar = function(client, authClient, userId, options, req) {
             } else
                 options.success(calendar.items);
         });
-}
+};
 
 // Fetch access & refresh token
     /* this function is only for the first time to fetch access & refresh tokens
@@ -71,7 +71,7 @@ var getFirstToken = function(oauth2Client, req, res) {
     // After user authentication
     // Google responds with an access "code"
 
-}
+};
 
 // Refreshes access_token
 var refreshAccessToken = function(options, req, callback) {
@@ -102,7 +102,7 @@ var refreshAccessToken = function(options, req, callback) {
                 if(_.isFunction(callback)){ callback(); }
             }
         });
-}
+};
 
 var gCalToFullCalendar = function(events) {
     return _.map(events, function(event) {
@@ -113,8 +113,8 @@ var gCalToFullCalendar = function(events) {
             backgroundColor: '#7F5417',
             gCal: true, //we could check the bg color in the front end but this way semantically makes more sense
         };
-    })
-}
+    });
+};
 
 var overallGoogleCheck = function(req, res, callback) {
     if (_.isUndefined(req.session.refresh_token)) {
@@ -139,7 +139,7 @@ var overallGoogleCheck = function(req, res, callback) {
     } else {
         if(_.isFunction(callback)){ callback(); }
     }
-}
+};
 
 var oauth2Client;
 
@@ -174,7 +174,7 @@ module.exports = {
                                 }
                             } else { //Now we have the calendar owner and readers, let's check it
                                 //find owner, delete 'user:' from id, split to check the user name and domain
-                                var user = (_.findWhere(names.items, {'role':'owner'}))['id'].substr(5).split('@'); 
+                                var user = (_.findWhere(names.items, {'role':'owner'})).id.substr(5).split('@'); 
                                 if(user[1] === 'wesleyan.edu' && cache.get('staffUsernameArray').indexOf(user[0]) !== -1 && User.getUser(req) === user[0]) {
                                     //console.log(user[0] + ' is in Wesleyan domain and in our staff list, and the logged in user');
                                     req.session.credentials = tokens;
@@ -221,8 +221,8 @@ module.exports = {
                     res.json(gCalToFullCalendar(items));
                 }
             });
-        }
+        };
         overallGoogleCheck(req, res, all);
 
     }
-}
+};
