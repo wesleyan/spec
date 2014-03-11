@@ -1,6 +1,6 @@
 var fixParantheses = function(s) {
   return s.replace("&#35;", "#").replace("&#41;", ")").replace("&amp;#40;", "(");
-}
+};
 var formatAMPM = function(date) {
   var hours = date.getHours();
   var minutes = date.getMinutes();

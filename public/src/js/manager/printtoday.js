@@ -65,7 +65,7 @@ $(document).ready(function() {
   $('body').html(htmlspecialchars_decode($('body').html()));
   //this is important because some HTML characters consist of other HTML characters, so double decoding is needed
   var today = new Date();
-  today.setHours(0,0,0,0)
+  today.setHours(0,0,0,0);
   $('.date').datepicker();
   $('#d').datepicker('setValue', today);
   $('#send').click(function(e) {
@@ -74,4 +74,4 @@ $(document).ready(function() {
   $('#printButton').click(function(e) {
     window.print();
   });
-})
+});

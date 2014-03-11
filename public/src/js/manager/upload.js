@@ -7,7 +7,7 @@ $(function() {
   };
 
   $('input[type="submit"]').on('click', function(evt) {
-    if ($('#myFile').val() == '') {
+    if ($('#myFile').val() === '') {
       return false;
     } //don't allow ajax if there is no file
     evt.preventDefault();

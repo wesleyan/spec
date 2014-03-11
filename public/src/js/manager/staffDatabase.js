@@ -1,8 +1,8 @@
 var splitTrim = function(str) {
   return str.split(',').map(function(x) {
-    return x.trim()
+    return x.trim();
   });
-}
+};
 
 var Staff = Backbone.Model.extend({
   initialize: function() {
@@ -10,9 +10,10 @@ var Staff = Backbone.Model.extend({
       var changed = staff.changed;
       if (Object.keys(staff.changed)[0] === "task") { //check if arrays are the same
         var prev = staff.previousAttributes();
-        var newTasks = splitTrim(staff.get(Object.keys(staff.changed)[0]))
+        var newTasks = splitTrim(staff.get(Object.keys(staff.changed)[0]));
+        var oldTasks;
         try {
-          var oldTasks = prev[Object.keys(staff.changed)[0]];
+          oldTasks = prev[Object.keys(staff.changed)[0]];
           if (!_.isArray(oldTasks)) {
             oldTasks = splitTrim(oldTasks);
           }
@@ -169,20 +170,20 @@ $('#newStaff').click(function() {
   });
   $('#class_year').editable('option', 'validate', function(v) {
     if (!v) return 'Required field!';
-    if (!(/\d{4}/.test(v)) || isNaN(new Date(v, 0, 1)) || parseInt(v) < (new Date).getFullYear()) {
+    if (!(/\d{4}/.test(v)) || isNaN(new Date(v, 0, 1)) || parseInt(v) < (new Date()).getFullYear()) {
       return 'Enter a valid year for this please!';
     }
   });
   $('#phone').editable('option', 'validate', function(v) {
     if (!v) return 'Required field!';
     if (!(/^[0-9\-\+]{9,15}$/.test(v))) {
-      return 'Enter a valid phone number please!'
+      return 'Enter a valid phone number please!';
     }
   });
   $('#level').editable('option', 'validate', function(v) {
     if (!v) return 'Required field!';
     if (!((/\d{1}/.test(v)) || (/\d{2}/.test(v))) || parseInt(v) > 10 || parseInt(v) < 0) {
-      return 'Enter a valid permission level please!'
+      return 'Enter a valid permission level please!';
     }
   });
 
@@ -219,7 +220,7 @@ $('#newModal .btn-primary').click(function() {
       } else if (data) {
         pageableStaffList.fetch({
           reset: true
-        })
+        });
         //show messages
         var msg = 'New user created! Now editables submit individually.';
         $('#msg').addClass('alert-success').removeClass('alert-error').html(msg).show();
@@ -247,7 +248,7 @@ $('#deleteStaff').click(function() {
   idsToDelete = [];
   models.forEach(function(model) {
     idsToDelete.push(model.get('_id'));
-  })
+  });
   $('#deleteModal ul').html(_.template($('#deleteTemplate').html(), {
     'models': models
   }));
@@ -267,7 +268,7 @@ $('#deleteModal .btn-danger').click(function() {
       //one id deleted
       pageableStaffList.fetch({
         reset: true
-      })
+      });
     });
   });
   $('#deleteModal').modal('hide');

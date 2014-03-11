@@ -68,4 +68,4 @@ var addTaskIcon = function (person) {
   }
 
   return html;
-}
+};

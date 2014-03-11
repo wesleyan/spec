@@ -5,7 +5,7 @@ $(document).ready(function() {
   $('body').html(fixParantheses($('body').html()));
   //this is important because some HTML characters consist of other HTML characters, so double decoding is needed
   var today = new Date();
-  today.setHours(0,0,0,0)
+  today.setHours(0,0,0,0);
   var lastWeek = new Date(today.getTime() - 24 * 60 * 60 * 1000 * 7);
   $('.combobox').combobox();
   $('.date').datepicker();

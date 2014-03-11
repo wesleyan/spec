@@ -42,7 +42,7 @@ module.exports = function(grunt) {
             }
         },
         jshint: {
-            files: ['Gruntfile.js', 'public/src/**/*.js'],
+            files: ['Gruntfile.js', 'public/src/js/spec.js', 'public/src/js/manager/*.js'], //no need to lint plugins
             options: {
                 // options here to override JSHint defaults
                 globals: {
@@ -78,7 +78,7 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.registerTask('buildjs', [/*'jshint', */'concat', 'uglify']);
+    grunt.registerTask('buildjs', ['jshint', 'concat', 'uglify']);
     grunt.registerTask('buildcss', ['cssmin']);
 
     grunt.registerTask('default', ['buildjs', 'buildcss']);

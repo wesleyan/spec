@@ -30,18 +30,18 @@
             $('a[href="#' + Backbone.history.fragment + '"]').addClass('drop-active');
         },
         fullShiftNumber: function (event) {
-            return event.shifts.map(function(s){return s.staff}).filter(function(n){return n}).length;
+            return event.shifts.map(function(s){return s.staff;}).filter(function(n){return n;}).length;
         },
         changePopupColor: function (event) {
             $("#popupTitleButton").removeClass("btn-success btn-inverse btn-warning btn-danger btn-info");
             var shiftNumber = Spec.fullShiftNumber(event);
-            if (event.cancelled == true) {
+            if (event.cancelled === true) {
                 $("#popupTitleButton").addClass("btn-inverse");
-            } else if (shiftNumber == 0) {
+            } else if (shiftNumber === 0) {
                 $("#popupTitleButton").addClass("btn-danger");
             } else if (shiftNumber < event.staffNeeded) {
                 $("#popupTitleButton").addClass("btn-warning");
-            } else if (shiftNumber == event.staffNeeded) {
+            } else if (shiftNumber === event.staffNeeded) {
                 $("#popupTitleButton").addClass("btn-success");
             } else if (shiftNumber > event.staffNeeded) {
                 $("#popupTitleButton").addClass("btn-info");
@@ -58,7 +58,7 @@
         setTimeline: function(view) { //this is borrowed from stackoverflow
             var parentDiv = $(".fc-agenda-slots:visible").parent();
             var timeline = parentDiv.children(".timeline");
-            if (timeline.length == 0) { //if timeline isn't there, add it
+            if (timeline.length === 0) { //if timeline isn't there, add it
                 timeline = jQuery("<hr>").addClass("timeline");
                 parentDiv.prepend(timeline);
             }
@@ -118,12 +118,12 @@
                     type: "POST",
                     url: "inventory/remove",
                     data: {
-                        eventid: Spec.lastClickedEvent['_id'],
+                        eventid: Spec.lastClickedEvent._id,
                         inventoryid:pill.data('tag-id')
                     }
                 }).done(function(msg) {
                     console.log('pill with ID ' + id + ' removed');
-                    Spec.setInventoryNumber(-1)
+                    Spec.setInventoryNumber(-1);
                 });
             },
             onBeforeAdd: function(pill) { //this also works for initial/on modal click loading.
@@ -138,7 +138,7 @@
                     type: "POST",
                     url: "inventory/add",
                     data: {
-                        eventid: Spec.lastClickedEvent['_id'],
+                        eventid: Spec.lastClickedEvent._id,
                         inventoryid: pill.data('tag-id')
                     }
                 }).done(function(msg) {
@@ -214,7 +214,7 @@
             }
         });
 
-        Spec.app = new AppRouter;
+        Spec.app = new AppRouter();
 
         Spec.app.on('route:printToday', function() {
             console.log('printToday');
@@ -222,7 +222,7 @@
 
         Spec.app.on('route:all', function(filter) {
             Spec.dropdownActiveFix();
-            if(filter == null) {
+            if(_.isNull(filter) || _.isUndefined(filter)) {
                 Spec.app.navigate(Spec.defaultFilter, {trigger: true});
             } else {
                 Spec.filter = filter;
@@ -264,7 +264,7 @@
                     $('.x-edit-event').on('save', function(e, params) {
                         var result = {};
                         result[this.id] = params.newValue;
-                        $.extend(Spec.storeEdited, result)
+                        $.extend(Spec.storeEdited, result);
                     });
 
                 },
@@ -296,7 +296,7 @@
                        
                 },
                 render: function(options){
-                    var variables = { eventid: Spec.lastClickedEvent['_id'], notes: options.notes };
+                    var variables = { eventid: Spec.lastClickedEvent._id, notes: options.notes };
                     var template = _.template( $("#notes_template").html(), variables );
                     $("#notes").html( template );
                 }
@@ -309,7 +309,7 @@
                     var removedItem;
                 },
                 render: function(note){
-                    var variables = { eventid: Spec.lastClickedEvent['_id'], 'note': note };
+                    var variables = { eventid: Spec.lastClickedEvent._id, 'note': note };
                     var template = _.template( $("#each_note_template").html(), variables );
                     $("#notesBody").append( template );
                 }
@@ -337,14 +337,14 @@
                             type: "POST",
                             url: "event/spinner",
                             data: {
-                                eventid: Spec.lastClickedEvent['_id'],
+                                eventid: Spec.lastClickedEvent._id,
                                 make: val
                             }
                         }).done(function(msg) {
                             Spec.refetchEvents();
                             Spec.lastClickedEvent.staffNeeded = parseInt(val);
                             Spec.changePopupColor(Spec.lastClickedEvent);
-                            console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' staff number changed to ' + val);
+                            console.log('event with ID ' + Spec.lastClickedEvent._id + ' staff number changed to ' + val);
                         });
                     }); //end of staffSpinner
                 }
@@ -361,12 +361,13 @@
             });
 
         Spec.newRowInit = function (lastShift) {
-            if(lastShift == undefined) {
-                var startTime = Spec.formatAMPM(Spec.lastClickedEvent.start);
-                var endTime = Spec.formatAMPM(Spec.lastClickedEvent.end);
+            var startTime, endTime;
+            if(_.isUndefined(lastShift)) {
+                startTime = Spec.formatAMPM(Spec.lastClickedEvent.start);
+                endTime = Spec.formatAMPM(Spec.lastClickedEvent.end);
             } else {
-                var startTime = Spec.formatAMPM(new Date(Date.parse(lastShift.start)));
-                var endTime = Spec.formatAMPM(new Date(Date.parse(lastShift.end)));
+                startTime = Spec.formatAMPM(new Date(Date.parse(lastShift.start)));
+                endTime = Spec.formatAMPM(new Date(Date.parse(lastShift.end)));
             }
              $('#timepicker5').timepicker({
                 defaultTime: startTime
@@ -379,14 +380,14 @@
               });
             $('.combobox').html('');
             Spec.storeAllStaff.forEach(function(person) {
-                if(person.name == false) {return;}
+                if(person.name === false) {return;}
                 $('.combobox')
                     .append($('<option>', {
                             'value': person.username
                         })
                         .text(person.name + ' (' + person.username + ')'));
             });
-        }
+        };
 
     $(document).ready(function() {
         //Spec.updateUser();
@@ -422,10 +423,10 @@
                 $('#popup').modalPopover('hide');
                 //front-end eye-candy stuff
                 symbol = '';
-                if (calEvent.video == true) {
+                if (calEvent.video === true) {
                     symbol += '<i class="icon-facetime-video"></i> ';
                 }
-                if (calEvent.audio == true) {
+                if (calEvent.audio === true) {
                     symbol += '<i class="icon-volume-up"></i> ';
                 }
                 $('#eventButton').removeClass('disabled');
@@ -457,13 +458,13 @@
                 Spec.setInventoryNumber(0, 0);
                 $('#inventory').html('');
                 $('#inventory').tags(_.extend(Spec._inventoryProto, {
-                    values_url: 'inventory/existing/' + calEvent['_id']
+                    values_url: 'inventory/existing/' + calEvent._id
                 }));
 
                 //Notes update
                 $.ajax({
                     type: "GET",
-                    url: "notes/existing/" + calEvent['_id'],
+                    url: "notes/existing/" + calEvent._id,
                 }).done(function(notes) {
                     $('#popup').modalPopover('show');
                     var note_view = new Spec.View.Notes({'notes':notes });
@@ -473,7 +474,7 @@
             eventRightClick: function(calEvent, jsEvent, view) {
                 jsEvent.preventDefault(); //Right click event only prevents default because context menu is binded in eventRender
                 if(calEvent.gCal === true) { return false;} //do none of the stuff below, just show them
-                if(calEvent.cancelled == false) {
+                if(calEvent.cancelled === false) {
                     $('a[href="#cancelEvent"] span').text("Cancel this event");
                 } else {
                     $('a[href="#cancelEvent"] span').text("Uncancel this event");
@@ -484,17 +485,17 @@
                 if(event.gCal !== true) {
                     //Adding all events to an array for event filtering with Backbone.js router
                     symbol = '';
-                    if (event.video == true) {
+                    if (event.video === true) {
                         symbol += '<i class="icon-facetime-video icon-white"></i> ';
                     }
-                    if (event.audio == true) {
+                    if (event.audio === true) {
                         symbol += '<i class="icon-volume-up icon-white"></i> ';
                     }
                     element.find('.fc-event-title').html(symbol + event.title);
                     element.contextmenu({
                         'target': '#context-menu'
                     });
-                    var shiftList = event.shifts.map(function(s){return s.staff}).filter(function(n){return n});
+                    var shiftList = event.shifts.map(function(s){return s.staff;}).filter(function(n){return n;});
                     if (shiftList.length > 0) {
                         element.tooltip({
                             'title': 'Staff: ' + shiftList.join(', ')
@@ -555,10 +556,10 @@
                 url: "notes/add",
                 data: {
                     'note': note,
-                    eventid: Spec.lastClickedEvent['_id']
+                    eventid: Spec.lastClickedEvent._id
                 }
             }).done(function(res) {
-                console.log('note added to event ID ' + Spec.lastClickedEvent['_id'] + ': ' + note);
+                console.log('note added to event ID ' + Spec.lastClickedEvent._id + ': ' + note);
                 //console.log(msg);
                 var each_note_view = new Spec.View.EachNote({ //Backbone new note view used
                         'id': res.id,
@@ -578,14 +579,12 @@
             //This part should get the event data and update staff adding modal box
             $.ajax({
                 type: "GET",
-                url: "staff/get/" + Spec.lastClickedEvent['_id'],
+                url: "staff/get/" + Spec.lastClickedEvent._id,
             }).done(function(shifts) {
                 //staff rendering will happen here
                 for(i = 0; i < shifts.length; i++) {
-                    var staffProfile = Spec.storeAllStaff.filter(function(staff) {
-                        return staff.username == shifts[i].staff;
-                    })[0];
-                    if(staffProfile == undefined) {
+                    var staffProfile = _.findWhere(Spec.storeAllStaff, {username: shifts[i].staff});
+                    if(_.isUndefined(staffProfile)) {
                         shifts[i].staffname = '';
                     } else {
                         shifts[i].staffname = staffProfile.name;
@@ -608,11 +607,11 @@
                 type: "POST",
                 url: "event/cancel",
                 data: {
-                    eventid: Spec.lastClickedEvent['_id'],
-                    make: !Spec.lastClickedEvent['cancelled']
+                    eventid: Spec.lastClickedEvent._id,
+                    make: !Spec.lastClickedEvent.cancelled
                 }
             }).done(function(msg) {
-                console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' cancel toggled');
+                console.log('event with ID ' + Spec.lastClickedEvent._id + ' cancel toggled');
                 Spec.refetchEvents();
             });
         });
@@ -623,14 +622,14 @@
                 type: "POST",
                 url: "event/techMustStay",
                 data: {
-                    eventid: Spec.lastClickedEvent['_id'],
-                    make: !Spec.lastClickedEvent['techMustStay']
+                    eventid: Spec.lastClickedEvent._id,
+                    make: !Spec.lastClickedEvent.techMustStay
                 }
             }).done(function(msg) {
                 Spec.refetchEvents();
-                Spec.lastClickedEvent['techMustStay'] = !Spec.lastClickedEvent['techMustStay'];
+                Spec.lastClickedEvent.techMustStay = !Spec.lastClickedEvent.techMustStay;
                 Spec.techTemplateUpdate();
-                console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' techMustStay toggled');
+                console.log('event with ID ' + Spec.lastClickedEvent._id + ' techMustStay toggled');
             });
         });
         $('body').on('click','.toggleVideo',function(e) {
@@ -638,14 +637,14 @@
                 type: "POST",
                 url: "event/video",
                 data: {
-                    eventid: Spec.lastClickedEvent['_id'],
-                    make: !Spec.lastClickedEvent['video']
+                    eventid: Spec.lastClickedEvent._id,
+                    make: !Spec.lastClickedEvent.video
                 }
             }).done(function(msg) {
                 Spec.refetchEvents();
-                Spec.lastClickedEvent['video'] = !Spec.lastClickedEvent['video'];
+                Spec.lastClickedEvent.video = !Spec.lastClickedEvent.video;
                 $('#popup').modalPopover('hide');
-                console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' video toggled');
+                console.log('event with ID ' + Spec.lastClickedEvent._id + ' video toggled');
             });
         });
         $('body').on('click','.toggleAudio',function(e) {
@@ -653,14 +652,14 @@
                 type: "POST",
                 url: "event/audio",
                 data: {
-                    eventid: Spec.lastClickedEvent['_id'],
-                    make: !Spec.lastClickedEvent['audio']
+                    eventid: Spec.lastClickedEvent._id,
+                    make: !Spec.lastClickedEvent.audio
                 }
             }).done(function(msg) {
                 Spec.refetchEvents();
-                Spec.lastClickedEvent['audio'] = !Spec.lastClickedEvent['audio'];
+                Spec.lastClickedEvent.audio = !Spec.lastClickedEvent.audio;
                 $('#popup').modalPopover('hide');
-                console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' audio toggled');
+                console.log('event with ID ' + Spec.lastClickedEvent._id + ' audio toggled');
             });
         });
         $('body').on('click','.removeNote', function(e) {
@@ -671,7 +670,7 @@
                 url: "notes/remove",
                 data: {
                     'id': noteid,
-                    eventid: Spec.lastClickedEvent['_id']
+                    eventid: Spec.lastClickedEvent._id
                 }
             }).done(function(msg) {
                 console.log('note removed from event ID ' + Spec.lastClickedEvent.id + ', ID: ' + noteid);
@@ -685,10 +684,10 @@
                 type: "POST",
                 url: "event/remove",
                 data: {
-                    eventid: Spec.lastClickedEvent['_id']
+                    eventid: Spec.lastClickedEvent._id
                 }
             }).done(function(msg) {
-                console.log('event with ID ' + Spec.lastClickedEvent['_id'] + ' removed');
+                console.log('event with ID ' + Spec.lastClickedEvent._id + ' removed');
                 Spec.refetchEvents();
                 $('#popup').modalPopover('hide');
                 $('#removeEvent').modal('hide');
@@ -702,26 +701,26 @@
                 url: "staff/remove",
                 data: {
                     'id': shiftid,
-                    'eventid': Spec.lastClickedEvent['_id']
+                    'eventid': Spec.lastClickedEvent._id
                 }
             }).done(function(msg) {
                 Spec.lastClickedEvent.shifts.pop();
                 Spec.changePopupColor(Spec.lastClickedEvent);
                 Spec.refetchEvents();
-                console.log('staff removed from event ID ' + Spec.lastClickedEvent['_id'] + ', ID: ' + shiftid);
+                console.log('staff removed from event ID ' + Spec.lastClickedEvent._id + ', ID: ' + shiftid);
                 $(removedItem).parent().parent().remove();
             });
             return false;
         });
         $('body').on('click','#addNewStaff',function(e) {
             var chosenStaff = '';
-            if($('.combobox').val() == '') {
+            if($('.combobox').val() === '') {
                 //empty shift added
                     
             } else {
                 try {
                     chosenStaff = $('#staffInput').val().match(/\(([^)]+)\)/)[1];
-                } catch(e) {
+                } catch(e1) {
                     chosenStaff = $('.combobox').val().match(/\(([^)]+)\)/)[1];
                 }
             }
@@ -733,7 +732,7 @@
                     'staff': chosenStaff,
                     'start': $('#timepicker5').val(),
                     'end': $('#timepicker6').val(),
-                    'eventid': Spec.lastClickedEvent['_id'],
+                    'eventid': Spec.lastClickedEvent._id,
                     'eventStart': Spec.lastClickedEvent.start,
                     'eventEnd': Spec.lastClickedEvent.end,
                 }
@@ -741,7 +740,7 @@
                 Spec.refetchEvents();
 
 
-                console.log('staff added to event ID ' + Spec.lastClickedEvent['_id'] + ': ' + res.id);
+                console.log('staff added to event ID ' + Spec.lastClickedEvent._id + ': ' + res.id);
                 var newShift = {
                         'id': res.id,
                         'start': res.start,
@@ -752,7 +751,7 @@
                 var each_staff_view2 = new Spec.View.EachStaff({ //Backbone new note view used
                     'item': newShift
                 });
-                if($.grep(Spec.lastClickedEvent.shifts, function(e){ return e.staff == chosenStaff; }).length > 0 && chosenStaff != '') {
+                if($.grep(Spec.lastClickedEvent.shifts, function(e){ return e.staff === chosenStaff; }).length > 0 && chosenStaff !== '') {
                     $.bootstrapGrowl("You have chosen this staff for another shift before, shift is added but you may want to check it again.", {
                       type: 'info',
                       align: 'center',
@@ -767,12 +766,12 @@
 
         Spec.updateShift = function (shiftID, newStaff) {
             for (var i = 0, l = Spec.lastClickedEvent.shifts; i < l; i++) {
-                if (Spec.lastClickedEvent.shifts[i]['_id'] === shiftID) {
-                    Spec.lastClickedEvent.shifts[i]['staff'] = newStaff;
+                if (Spec.lastClickedEvent.shifts[i]._id === shiftID) {
+                    Spec.lastClickedEvent.shifts[i].staff = newStaff;
                     return;
                 }
             }
-        }
+        };
 
         $('body').on('click','.shiftSignUp', function(e) {
             removedItem = this;
@@ -782,7 +781,7 @@
                 url: "staff/shiftsignup",
                 data: {
                     'id': shiftid,
-                    'eventid': Spec.lastClickedEvent['_id']
+                    'eventid': Spec.lastClickedEvent._id
                 }
             }).done(function(msg) {
                 Spec.updateShift(shiftid, Spec.username);
@@ -800,7 +799,7 @@
                 url: "staff/withdraw",
                 data: {
                     'id': shiftid,
-                    'eventid': Spec.lastClickedEvent['_id']
+                    'eventid': Spec.lastClickedEvent._id
                 }
             }).done(function(msg) {
                 Spec.updateShift(shiftid, '');
@@ -826,7 +825,7 @@
                 type: "POST",
                 url: "event/edit",
                 data: {
-                    'eventid': Spec.lastClickedEvent['_id'],
+                    'eventid': Spec.lastClickedEvent._id,
                     'changedData': Spec.storeEdited
                 }
             }).done(function(res) {
@@ -834,7 +833,7 @@
                 $('#editEvent').modal('hide');
                 $('#popup').modalPopover('hide');
                 var title = Spec.storeEdited.title;
-                if(title == undefined) {
+                if(_.isUndefined(title)) {
                     title = Spec.lastClickedEvent.title;
                 }
                 $.bootstrapGrowl("The event <b>" + title + '</b> is edited and saved.' , {
