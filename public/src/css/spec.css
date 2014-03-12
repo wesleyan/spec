@@ -56,9 +56,31 @@ body {
   line-height: 20px;
 }
 
+/* Event colors */
+.fc-staffed {
+  background-color: #097054;
+}
+
+.fc-unstaffed {
+  background-color: #9E3B33;
+}
+
+.fc-partially {
+  background-color: #E48743;
+}
+
+.fc-cancelled {
+  background-color: #666666;
+}
+
+.fc-gcal {
+  background-color: #7F5417;
+}
+
 .striped {
   background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.3) 35px, rgba(255,255,255,.3) 70px);
 }
+/* End of event colors*/
 
 .drop-active {
   background-color: hsl(360, 5%, 81%) !important;

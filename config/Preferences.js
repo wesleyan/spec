@@ -31,13 +31,6 @@ module.exports = {
     notificationEmails: ['specialeventsmanagers@gmail.com', 'imsofficemanagers@gmail.com', 
                          'bmorgan@wesleyan.edu', 'rchristensen@wesleyan.edu', 'hflores@wesleyan.edu'],
 
-    backgroundColors: {
-        'green': '#097054',
-        'red': '#9E3B33',
-        'yellow': '#E48743',
-        'gray': '#666666'
-    },
-    
     //MongoDB preferences
     databaseUrl: "127.0.0.1:27017/spec",
     collections: ['events','staff','inventory','removedShifts']

@@ -39,21 +39,25 @@ var Utility = {
         return event.shifts.map(function(s){return s.staff;}).filter(function(n){return n;}).length;
     },
     addBackgroundColor: function(events) { //changes the events object
-        for (index = 0; index < events.length; ++index) {
-            event = events[index];
+        events.map(function (event) {
+            if(!_.isArray(event.className)) {
+               event.className = [];
+            }
+            var shiftNumber = Utility.fullShiftNumber(event);
             if (event.techMustStay === false) {
-                events[index].className = ['striped']; //handles the setup and breakdown events as well
+                event.className.push('striped'); //handles the setup and breakdown events as well
             }
             if (event.cancelled === true) {
-                events[index].backgroundColor = Preferences.backgroundColors.gray;
+                event.className.push('fc-cancelled');
             } else if (Utility.fullShiftNumber(event) === 0) {
-                events[index].backgroundColor = Preferences.backgroundColors.red;
+                event.className.push('fc-unstaffed');
             } else if (Utility.fullShiftNumber(event) < event.staffNeeded) {
-                events[index].backgroundColor = Preferences.backgroundColors.yellow;
+                event.className.push('fc-partially');
             } else if (Utility.fullShiftNumber(event) === event.staffNeeded) {
-                events[index].backgroundColor = Preferences.backgroundColors.green;
+                event.className.push('fc-staffed');
             }
-        }
+            return event;
+        });
         return events;
     },
     updateCachedUsers: function () {
