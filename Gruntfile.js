@@ -22,7 +22,9 @@ module.exports = function(grunt) {
         uglify: {
             options: {
                 banner: '/*! <%= pkg.name %> <%= pkg.version %> */\n',
-                mangle: true
+                mangle: {
+                          except: ['Spec']
+                        }
             },
             dist: {
                 files: {
