@@ -6,8 +6,8 @@
  |____/ | .__/  \___| \___|
         |_|                
 */
+var Spec = {}; //the only global variable that is supposed to be used in this application.
 (function() {
-    var Spec = {}; //the only global variable that is supposed to be used in this application.
     Spec = { 
         storeAllStaff: [],
         username: '',
