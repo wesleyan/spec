@@ -58,7 +58,7 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
         setTimeline: function(view) { //this is borrowed from stackoverflow
             var parentDiv = $(".fc-agenda-slots:visible").parent();
             var timeline = parentDiv.children(".timeline");
-            if (timeline.length === 0) { //if timeline isn't there, add it
+            if (timeline.length < 1) { //if timeline isn't there, add it
                 timeline = jQuery("<hr>").addClass("timeline");
                 parentDiv.prepend(timeline);
             }
@@ -74,7 +74,7 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
             var percentOfDay = curSeconds / 86400; //24 * 60 * 60 = 86400, # of seconds in a day
             var topLoc = Math.floor(parentDiv.height() * percentOfDay);
             timeline.css("top", topLoc + "px");
-            if (curCalView.name == "agendaWeek") { //week view, don't want the timeline to go the whole way across
+            if (curCalView.name === "agendaWeek") { //week view, don't want the timeline to go the whole way across
                 var dayCol = jQuery(".fc-today:visible");
                 var left = dayCol.position().left + 1;
                 var width = dayCol.width() - 2;
@@ -190,14 +190,14 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
             }
         }, //end techTemplateUpdate
         setNoteNumber: function (addition, int) {
-            if(typeof int == 'undefined') {
+            if(_.isUndefined(int)) {
                 $('#noNote').text(parseInt($('#noNote').text()) + addition);
             } else {
                 $('#noNote').text(int);
             }
         },
         setInventoryNumber: function (addition, int) {
-            if(typeof int == 'undefined') {
+            if(_.isUndefined(int)) {
                 $('#noInventory').text(parseInt($('#noInventory').text()) + addition);
             } else {
                 $('#noInventory').text(int);
@@ -529,6 +529,7 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
         });
 
         // JQUERY EVENTS
+        /* These parts are handled individually */
         $('#gCalButton').click(function(e) {
             $('#gCalButton').toggleClass('active');
             Spec.toggleGCalEvents();
@@ -542,7 +543,7 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
             return false;
         });
         $('#newNote textarea').bind('keypress', function(e) {
-          if ((e.keyCode || e.which) == 13) {
+          if ((e.keyCode || e.which) === 13) { //if enter is pressed
             $( "#noteSubmit" ).trigger("click");
             return false;
           }
@@ -582,14 +583,15 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
                 url: "staff/get/" + Spec.lastClickedEvent._id,
             }).done(function(shifts) {
                 //staff rendering will happen here
-                for(i = 0; i < shifts.length; i++) {
-                    var staffProfile = _.findWhere(Spec.storeAllStaff, {username: shifts[i].staff});
+                shifts.map(function(shift) {
+                    var staffProfile = _.findWhere(Spec.storeAllStaff, {username: shift.staff});
                     if(_.isUndefined(staffProfile)) {
-                        shifts[i].staffname = '';
+                        shift.staffname = '';
                     } else {
-                        shifts[i].staffname = staffProfile.name;
+                        shift.staffname = staffProfile.name;
                     }
-                }
+                    return shift;
+                });
                 var staff_view = new Spec.View.Staff({'shifts': shifts });
             });
         };
@@ -599,7 +601,7 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
             var edit_view = new Spec.View.Edit();
         });
         $('a[href="#removeEvent"]').click(function(e) {
-            //This part should get the event data and update the event editing modal box
+            //This part should get the event data and update the event removing modal box
             var remove_view = new Spec.View.Remove();
         });
         $('a[href="#cancelEvent"]').click(function(e) {
@@ -765,11 +767,11 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
         });     //click event
 
         Spec.updateShift = function (shiftID, newStaff) {
-            for (var i = 0, l = Spec.lastClickedEvent.shifts; i < l; i++) {
-                if (Spec.lastClickedEvent.shifts[i]._id === shiftID) {
-                    Spec.lastClickedEvent.shifts[i].staff = newStaff;
-                    return;
-                }
+            var event = _.find(Spec.lastClickedEvent.shifts, function(shift) {
+                return shift._id === shiftID;
+            });
+            if(!_.isUndefined(event)) {
+                event.staff = newStaff;
             }
         };
 
@@ -813,7 +815,7 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
         $('#editEvent .modal-footer .btn-primary').click(function(e) {
             var editTimepickers = [$('#timepickerResStart'), $('#timepickerResEnd'), $('#timepickerEventStart'), $('#timepickerEventEnd')];
             editTimepickers.forEach(function (pick) {
-                //if(!(pick.val() == pick.prop('defaultValue') || pick.val().substr(1) == pick.prop('defaultValue'))) {
+                //if(!(pick.val() === pick.prop('defaultValue') || pick.val().substr(1) === pick.prop('defaultValue'))) {
                     var result = {};
                     result[pick.prop('id')] = pick.val();
                     $.extend(Spec.storeEdited,result);
@@ -856,16 +858,13 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
         $(document).keydown(function(e) {
             if (!$(event.target).is(':not(input, textarea)')) { return; } //don't do anything if on input/textarea
             switch (e.keyCode) {
-                // User pressed "right" arrow
-                case 39:
+                case 39: // pressed "right" arrow
                     $('#calendar').fullCalendar('next');
                     break;
-                    // User pressed "left" arrow
-                case 37:
+                case 37: // pressed "left" arrow
                     $('#calendar').fullCalendar('prev');
                     break;
-                    // User pressed "up" arrow
-                case 38:
+                case 38: // pressed "up" arrow
                     $('#calendar').fullCalendar('today');
                     break;
             }
