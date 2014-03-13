@@ -1,7 +1,8 @@
 var Preferences = require('./../config/Preferences.js');
 
 var Utility = require('./Utility.js'),
-    db      = require('./db.js');
+    db      = require('./db.js'),
+    app     = require('./app.js');
     
 var _       = require('underscore'),
     cache   = require('memory-cache'),
@@ -30,7 +31,7 @@ module.exports = function() {
                         subject: "Text reminder for " + user,
                     };
                     mailOptions.html = ejs.render(fs.readFileSync(__dirname + '/../views/mail/textReminder.ejs', 'utf8'), {
-                        'app': req.app,
+                        'app': app,
                         'event': event,
                         'shift': shift
                     });

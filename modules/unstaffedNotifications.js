@@ -1,7 +1,8 @@
 var Preferences = require('./../config/Preferences.js');
 
 var Utility = require('./Utility.js'),
-    db      = require('./db.js');
+    db      = require('./db.js'),
+    app     = require('./app.js');
     
 var _       = require('underscore'),
     fs      = require('fs'),
@@ -26,7 +27,7 @@ module.exports = function() {
                         subject: "Unstaffed event in an hour!",
                     };
                     mailOptions.html = ejs.render(fs.readFileSync(__dirname + '/../views/mail/unstaffedNotification.ejs', 'utf8'), {
-                        'app': req.app,
+                        'app': app,
                         'event': event
                     });
                     Preferences.notificationEmails.each(function(address) {
