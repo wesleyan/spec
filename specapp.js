@@ -15,7 +15,7 @@
     ejs.close = '}}';
 
     var express = require('express'),
-        app     = require('app'),
+        app     = require('./modules/app.js'),
         _       = require('underscore'),
         cas     = require('./modules/grand_master_cas.js'),
         cache   = require('memory-cache');
