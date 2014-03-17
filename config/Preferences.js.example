@@ -1,3 +1,5 @@
+// information/password existing here is only for documentational purposes
+
 module.exports = {
     
     //general preferences
@@ -28,8 +30,7 @@ module.exports = {
     },
     managerEmails: ['specialeventsmanagers@gmail.com'],
     //E-mail addresses to send notifications if an event is unstaffed until 1 hour before the event starts
-    notificationEmails: ['specialeventsmanagers@gmail.com', 'imsofficemanagers@gmail.com', 
-                         'bmorgan@wesleyan.edu', 'rchristensen@wesleyan.edu', 'hflores@wesleyan.edu'],
+    notificationEmails: ['specialeventsmanagers@gmail.com', 'imsofficemanagers@gmail.com'],
 
     //MongoDB preferences
     databaseUrl: "127.0.0.1:27017/spec",
