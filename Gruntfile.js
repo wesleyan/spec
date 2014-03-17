@@ -9,6 +9,12 @@ module.exports = function(grunt) {
         grunt.loadNpmTasks(task);
     });
 
+    var files = {
+        gruntfile: ['Gruntfile.js'],
+        frontjs: ['public/src/js/spec.js', 'public/src/js/manager/*.js'], //to be compressed
+        backjs: ['specapp.js','routes/**/*.js', 'modules/**/*.js'],
+    };
+
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         concat: {
@@ -44,18 +50,15 @@ module.exports = function(grunt) {
             }
         },
         jshint: {
-            files: [
-                //Front end files
-                'Gruntfile.js',
-                'public/src/js/spec.js',
-                'public/src/js/manager/*.js',
-            ], //no need to lint plugins
+            //Front end files
+            //no need to lint plugins
+            files: [].concat(files.frontjs, files.gruntfile),
             ignore_warning: {
                 options: {
                   '-W030': true,
                   '-W002': true
                 },
-                src: ['specapp.js','routes/**/*.js', 'modules/**/*.js'], //Back end files
+                src: files.backjs, //Back end files
             },
             options: {
                 // options here to override JSHint defaults
@@ -73,7 +76,7 @@ module.exports = function(grunt) {
             },
             combine: {
                 files: {
-                      'public/dist/css/db.min.css': ['public/src/css/db/*.css'],
+                    'public/dist/css/db.min.css': ['public/src/css/db/*.css'],
                     'public/dist/css/manager.min.css': ['public/src/css/manager/*.css'],
                     'public/dist/css/plugins.min.css': ['public/src/css/plugins/*.css'],
                 }
@@ -87,8 +90,18 @@ module.exports = function(grunt) {
             }
         },
         watch: {
-            files: ['<%= jshint.files %>'],
-            tasks: ['jshint']
+            frontjs: {
+              files: files.frontjs,
+              tasks: ['buildjs']
+            },
+            otherjs: {
+              files: [].concat(files.backjs, files.gruntfile),
+              tasks: ['jshint']
+            },
+            css: {
+              files: 'public/src/css/*',
+              tasks: ['buildcss']
+            }
         }
     });
 

@@ -50,7 +50,7 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
             $('#popupStaffInfo').html(shiftNumber + '/' + event.staffNeeded);
         },
         resizeMap: function() {
-            var height = $(window).height() - 40;
+            var height = $(window).height() - 30;
             $('#calendar').fullCalendar('option', 'height', height);
             //$(".fc-view-month").css("height", height-100 + "px");
             $('#modifyCSSRule').html('.fc-view-month { height:' + (height - 70) + 'px !important; }');
