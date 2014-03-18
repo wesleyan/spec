@@ -195,12 +195,12 @@ module.exports = {
                                             }
                                         });
                                     
-                                    res.redirect('/');
+                                    res.redirect(Preferences.path_on_server);
                                 } else {
                                     // should explain the user that they have to use their valid wesleyan.edu accounts
                                     //         or they are not registered in the Spec system.
                                     console.log('Something is wrong with this user ' + User.getUser(req));
-                                    res.redirect('/authorize');
+                                    res.redirect(Preferences.path_on_server + 'authorize');
                                 }
                             }
                         });

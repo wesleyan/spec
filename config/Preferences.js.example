@@ -3,19 +3,21 @@
 module.exports = {
     
     //general preferences
+    path_on_server: '/spec/',
     path_last_xml: '/../uploads/lastfile.xml',
     path_last_upload_info: '/../logs/lastUpload.txt',
     path_client_secret: '/../config/client_secret.json',
     
-    //the one below must match with the one you have saved in https://code.google.com/apis/console
-    googleRedirectUrl: 'http://ims-dev.wesleyan.edu:8080/oauth2callback',
+    /* the one below must match with the one you have saved in 
+       APIs & auth -> Credentials in https://console.developers.google.com/ */
+    googleRedirectUrl: 'http://ims-dev.wesleyan.edu/spec/oauth2callback',
     
     //CAS Configurations
     casOptions: {
         casHost: 'sso.wesleyan.edu',
         ssl: true,
         service: 'http://ims-dev.wesleyan.edu:8080/',
-        redirectUrl: '/login'
+        redirectUrl: 'login'
     },
     
     //Port that Spec will run on

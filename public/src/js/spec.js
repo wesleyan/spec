@@ -881,8 +881,8 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
         $("#eventButton i").addClass('icon-book');
     });
     $(document).ajaxError(function(event, jqxhr, settings, exception) {
-      if (settings.url.substring(0,11) == "gCalEvents/") { //if not authorized by google, get authorization
-        window.location.href = '/authorize';
-      }
+      //if (settings.url.substring(0,11) == "gCalEvents/") { //if not authorized by google, get authorization
+        window.location.href = '/spec/authorize';
+      //}
     });
 })();

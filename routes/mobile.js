@@ -1,6 +1,7 @@
-var Utility  = require('./../modules/Utility.js'),
-    User     = require('./../modules/user.js'),
-    db       = require('./../modules/db.js');
+var Utility     = require('./../modules/Utility.js'),
+    User        = require('./../modules/user.js'),
+    db          = require('./../modules/db.js'),
+    Preferences = require('./../config/Preferences.js');
     
 var _        = require('underscore'),
     $        = require('jquery'),
@@ -9,8 +10,8 @@ var _        = require('underscore'),
 
 module.exports = {
     m: function (req, res) {
-        if(req.query.ticket) {res.redirect('/m/');} //redirect to the base if there is a ticket in the URL
-        res.redirect('/m/0/');
+        if(req.query.ticket) {res.redirect(Preferences.path_on_server + 'm/');} //redirect to the base if there is a ticket in the URL
+        res.redirect(Preferences.path_on_server + 'm/0/');
     },
     mWithCounter: function (req, res) {
         var today = new Date();
