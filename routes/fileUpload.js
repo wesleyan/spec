@@ -20,7 +20,7 @@ module.exports = {
             var readFile = fs.readFileSync(__dirname + Preferences.path_last_upload_info); //see the last upload time & user
             lastInfo = readFile.toString().split('&');
         } catch(e) {}
-         res.render('upload', {lastUploadTime: lastInfo[0], lastUploadUser: lastInfo[1]});
+         res.render('upload', {app: req.app, lastUploadTime: lastInfo[0], lastUploadUser: lastInfo[1]});
     },
     post: function(req, res) {
         User.permissionControl(req, res, 10);

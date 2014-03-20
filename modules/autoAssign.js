@@ -7,7 +7,7 @@ If there should be no auto assign tasks, the function should just return the eve
 var mongo = require('mongodb-wrapper');
 
 module.exports = function(event) {
-	if(event.title === 'Luncheon: Division III NSM Luncheon') {
+	if(event.title === 'Luncheon: Division III NSM Luncheon' && event.cancelled === false) {
 		event.shifts.push({
 			id: new mongo.ObjectID(),
 			start: event.start,

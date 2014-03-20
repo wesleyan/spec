@@ -883,7 +883,8 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
     $(document).ajaxError(function(event, jqxhr, settings, exception) {
       console.log(settings.url);
       if (settings.url.substring(0,11) == "gCalEvents/") { //if not authorized by google, get authorization
-        window.location.href = '/spec/authorize';
+        window.location.href = window.location.pathname + (window.location.pathname.slice(-1) !== '/')?'/':'' + 'authorize';
+
       }
     });
 })();
