@@ -85,10 +85,10 @@ module.exports = {
     },
     staffCheck: function(req, res) {
         User.permissionControl(req, res, 10);
-        res.render('staffCheck', {cache: cache});
+        res.render('staffCheck', {app: req.app, cache: cache});
     },
     staffTable: function(req, res) {
         User.permissionControl(req, res, 10);
-        res.render('staffTable', {});
+        res.render('staffTable', {app: req.app});
     }
 };

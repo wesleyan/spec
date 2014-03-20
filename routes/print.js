@@ -23,6 +23,7 @@ module.exports = function(req, res) {
     db.events.find({start: {$gte: today, $lt: tomorrow}, cancelled:false}).sort({start: 1},
         function(err, data) {
                 res.render('printtoday', {
+                    'app': req.app,
                     'events': data,
                     'dateString': today.toDateString(),
                     'Utility': Utility,

@@ -39,6 +39,7 @@ module.exports = {
             } else {
                 
                 res.render('mobile/index', {
+                    app: req.app,
                     username: User.getUser(req),
                     permission: User.permission(req),
                     events: events,
@@ -57,6 +58,7 @@ module.exports = {
                 console.log("No events found" + err);
             } else {
                 res.render('mobile/event', {
+                    app: req.app,
                     username: User.getUser(req),
                     permission: User.permission(req),
                     event: events[0],
@@ -71,6 +73,7 @@ module.exports = {
             return false;
         }
         res.render('mobile/staff', {
+            app: req.app,
             username: User.getUser(req),
             permission: User.permission(req),
             staff: userObj[0],

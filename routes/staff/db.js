@@ -8,7 +8,7 @@ var _          = require('underscore'),
 module.exports = {
     db: function(req, res) {
         User.permissionControl(req, res, 10);
-        res.render('staffDatabase', {});
+        res.render('staffDatabase', {app: req.app});
     },
     add: function (req, res) {
         User.permissionControl(req, res, 10);

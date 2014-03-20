@@ -14,6 +14,7 @@ module.exports = {
             res.render('notStaff', {cas_user: User.getUser(req)});
         } else {
             res.render('index', {
+                app: req.app,
                 username: currentUser.username,
                 permission: currentUser.level,
                 staffname: currentUser.name,
