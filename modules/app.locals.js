@@ -1,4 +1,7 @@
+var Preferences = require('./../config/Preferences.js');
+
 module.exports = {
+    path: Preferences.path_on_server,
     formatAMPM : function(date) {
         var hours = date.getHours();
         var minutes = date.getMinutes();
