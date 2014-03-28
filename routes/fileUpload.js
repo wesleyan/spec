@@ -51,6 +51,21 @@ module.exports = {
                                 trim: true,
                                 arrayNotation: true
                             }).CopyofIMSforExport.Data;
+
+                            // calculate the start and end dates for the event list
+                            /*
+                            var dates = xml.map(function(event) {
+                                return new Date(Date.parse(bookingDate + ' ' + data.Reserved_x0020_Start));
+                            });
+                            dates = _.sortBy(dates, function(date) {
+                                return date.getTime();
+                            });
+                            dates = {
+                                first: _(dates).first(),
+                                last: _(dates).last()
+                            };
+                            */
+
                             last = parser.toJson(last, {
                                 object: true,
                                 trim: true,
