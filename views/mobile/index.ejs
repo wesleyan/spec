@@ -77,16 +77,16 @@
                 event.class = 'staffed';
             }
         }}
-            <li class='{{=event.class}}' href=""><a href="/m/event/{{=event['_id']}}">{{=event.title}}</a></li>
+            <li class='{{=event.class}}' href=""><a href="{{=path}}m/event/{{=event['_id']}}">{{=event.title}}</a></li>
         {{ }) }}
         </ul>
 	</div><!-- /content -->
 	<div data-role="footer" data-position="fixed">
         <div data-role="navbar">
             <ul>
-                <li><a href='/spec/m/{{=parseInt(counter)-1}}/' data-icon="arrow-l"> <span class="filler"/>  </a></li>
-                <li><a href='/spec/m/' data-icon="home"> <span class="filler"/> </a></li>
-                <li><a href='/spec/m/{{=parseInt(counter)+1}}/' data-icon="arrow-r"> <span class="filler"/> </a></li>
+                <li><a href='{{=path}}m/{{=parseInt(counter)-1}}/' data-icon="arrow-l"> <span class="filler"/>  </a></li>
+                <li><a href='{{=path}}m/' data-icon="home"> <span class="filler"/> </a></li>
+                <li><a href='{{=path}}m/{{=parseInt(counter)+1}}/' data-icon="arrow-r"> <span class="filler"/> </a></li>
             </ul>
         </div>
     </div>

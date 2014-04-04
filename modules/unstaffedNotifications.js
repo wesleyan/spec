@@ -30,7 +30,7 @@ module.exports = function() {
                         'app': app,
                         'event': event
                     });
-                    Preferences.notificationEmails.each(function(address) {
+                    Preferences.notificationEmails.forEach(function(address) {
                         mailOptions.to = address; //we need to fetch the phone actually
                         smtpTransport.sendMail(mailOptions, function(error, response) {
                             if (error) {
