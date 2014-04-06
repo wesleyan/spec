@@ -20,6 +20,9 @@ module.exports = function() {
             //not using a function for e-mail sending because we need to close the connection after all stuff
             var smtpTransport = Utility.smtpTransport();
             events.forEach(function(event) {
+                if(event.cancelled) {
+                    return; //don't send notifications for cancelled events
+                }
 
                 if(Utility.fullShiftNumber(event) < 1) {
                     var mailOptions = {
