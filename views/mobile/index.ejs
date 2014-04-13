@@ -41,14 +41,17 @@
         }
 
         .filler {
-            white-space:        nowrap;
+            white-space: nowrap;
         }
 
         .ui-icon {
             margin-top:     6px;
         }
         .ui-btn-text {
-                color: inherit !important;
+            color: inherit !important;
+        }
+        .ui-btn-text a {
+            white-space: normal !important;
         }
     </style>
     <script type="text/javascript">
@@ -69,8 +72,9 @@
 		<ul data-role="listview" id="eventList">
 		{{ events.forEach(function(event) { }}
         {{
-            if(event.valid == false) {
-                event.class = 'cancelled';
+            if(event.cancelled === true) {
+                return;
+                //event.class = 'cancelled';
             } else if(event.shifts.length < event.staffNeeded) {
                 event.class = 'notStaffed';
             } else {
