@@ -67,12 +67,12 @@ var Utility = {
                     console.log(req.url);
                     console.log(err);
                 } else {
-                    var arr = [];
                     cache.put('storeStaff', data);
-                    cache.get('storeStaff').forEach(function(item) {
-                        arr.push(item.username);
-                    });
-                    cache.put('staffUsernameArray', arr);
+                    cache.put('staffUsernameArray', 
+                        cache.get('storeStaff').map(function(item) {
+                            return item.username;
+                        })
+                    );
                 }
             });
     },

@@ -1,4 +1,5 @@
 var Preferences   = require('./../config/Preferences.js'),
+    Utility       = require('./../modules/Utility.js'),
     User          = require('./../modules/user.js'),
     db            = require('./../modules/db.js');
 
@@ -189,6 +190,7 @@ module.exports = {
                                                 console.log(req.url);
                                                 console.log("Refresh token not updated:" + err);
                                             } else {
+                                                Utility.updateCachedUsers();
                                                 //console.log("Refresh token updated for " + User.getUser(req));
                                                 res.write(JSON.stringify(true).toString("utf-8"));
                                                 res.end();
