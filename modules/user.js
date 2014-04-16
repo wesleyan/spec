@@ -20,6 +20,11 @@ var User = {
             res.json(false);
             return false;
         }
+    },
+    gCalIsActive: function(req) {
+        //returns true if the user has a registered refresh token
+        var userObj = _.findWhere(cache.get('storeStaff'), {username: User.getUser(req)});
+        return !_.isUndefined(userObj.refresh_token);
     }
 };
 

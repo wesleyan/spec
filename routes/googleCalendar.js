@@ -219,6 +219,10 @@ module.exports = {
                 //timeMax: new Date((new Date).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString(), //next week
                 success: function(items) {
                     res.json(gCalToFullCalendar(items));
+                },
+                error: function(items) {
+                    console.log('failed gcal fetch');
+                    res.json(false);
                 }
             });
         };

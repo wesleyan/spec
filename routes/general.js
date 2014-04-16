@@ -18,6 +18,7 @@ module.exports = {
                 username: currentUser.username,
                 permission: currentUser.level,
                 staffname: currentUser.name,
+                gCalIsActive: User.gCalIsActive(req)
             });
         }
     },
