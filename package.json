@@ -30,7 +30,8 @@
     "googleapis": "*",
     "xml2json": "*",
     "memory-cache": "*",
-    "moment": "*"
+    "moment": "*",
+    "q": "*"
   },
   "devDependencies": {
     "grunt": "^0.4.3",

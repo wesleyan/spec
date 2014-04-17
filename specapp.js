@@ -24,6 +24,7 @@
         Utility                = require('./modules/Utility.js'),
         db                     = require('./modules/db.js'),
         routes                 = require('./routes/index.js'),
+        updateEvents           = require('./modules/updateEvents.js');
         textReminders          = require('./modules/textReminders.js'),
         unstaffedNotifications = require('./modules/unstaffedNotifications.js');
 
@@ -164,6 +165,8 @@
     // Mobile route for showing single staff info. (GET)
     app.get('/m/staff/:username', cas.blocker, routes.mobile.staff);
 
+// UPDATING EVENTS
+    setInterval(updateEvents, 1000 * 60 * 60 * 4); //every 4 hours
 // TEXT REMINDERS
     setInterval(textReminders, 1000 * 60 * 5); //every 5 minutes
 // UNSTAFFED NOTIFICATIONS
