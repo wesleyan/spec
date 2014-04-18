@@ -860,6 +860,11 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
             $(this).css('overflow', 'hidden');
         });
 
+        // hide modal popover when user clicks on empty areas in calendar
+        $('.fc-widget-content').click(function(e) {
+            $('#popup').modalPopover('hide');
+        });
+
         $(document).keydown(function(e) {
             if (!$(event.target).is(':not(input, textarea)')) { return; } //don't do anything if on input/textarea
             switch (e.keyCode) {
