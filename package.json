@@ -31,7 +31,8 @@
     "xml2json": "*",
     "memory-cache": "*",
     "moment": "*",
-    "q": "*"
+    "q": "*",
+    "promised-mongo": "*"
   },
   "devDependencies": {
     "grunt": "^0.4.3",

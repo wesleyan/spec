@@ -1,11 +1,13 @@
 var Preferences = require('./../config/Preferences.js');
 
 var Utility = require('./Utility.js'),
-    db      = require('./db.js'),
+    db      = require('./promised-db.js'),
     app     = require('./app.js');
     
+var request = require('promised-request');
+
 var _       = require('underscore'),
-    q       = require('q'),
+    Q       = require('q'),
     cache   = require('memory-cache'),
     ejs     = require('ejs'),
     moment  = require('moment');   
@@ -21,14 +23,20 @@ module.exports = function() {
     var today         = moment(),
         twoWeeksLater = moment().add('w', 2);
 
-    db.events.find({'start': {$gte: today, $lt: twoWeeksLater}}, function(err, events) {
-        if (err || !events) {
-            console.log(req.url);
-            console.log("No events found:" + err);
-        } else {
-            // store events, do something
-            // promises?
-        }
-    });
-    
+    var apiEvents, dbEvents;
+
+    // make a request to the API
+    request(generateApiUrl(today,twoWeeksLater))
+        .then(function(body) {
+            apiResponse = body;
+            // fetch the events in the period from Spec database
+            return db.events.find({'start': {$gte: today, $lt: twoWeeksLater}}).toArray();
+        })
+        .then(function(events) {
+            dbEvents = events;
+            // compare apiEvents and dbEvents
+        })
+        .fail(function(err) { //triggered in any error
+            console.log(err);
+        });
 };
