@@ -11,6 +11,7 @@ var _       = require('underscore'),
     Q       = require('q'),
     cache   = require('memory-cache'),
     ejs     = require('ejs'),
+    async   = require('async'),
     moment  = require('moment');
 
 // takes two moment.js objects and gives the API url to make a request to.
@@ -20,10 +21,17 @@ var generateApiUrl = function(start, end) {
     return "http://webapps-test.wesleyan.edu/wapi/v1/public/ems/spec/booking_start/" + start + "/booking_end/" + end + "/";
 };
 
-var keysEqual = function(obj1, obj2, fieldList) {
-    return fieldList.map(function(field) {
-        return _.isEqual(obj1[field], obj2[field]);
-    }).indexOf(false) === -1;
+//returns an object of the different fields.
+//takes the value from the first object if different
+var giveDifferenceOnFields = function(obj1, obj2, fieldList) {
+    return fieldList.reduce(function(prev, field) {
+        if(_.isEqual(obj1[field], obj2[field])) {
+            return prev;
+        } else {
+            prev[field] = obj1[field];
+            return prev;
+        }
+    }, {});
 };
 
 var processEvent = function(apiEvent) {
@@ -93,7 +101,9 @@ module.exports = function() {
                 var fieldsToCheck = ['start', 'end', 'eventStart', 'eventEnd', 'desc', 'title', 'loc', 'cancelled'];
 
                 var shouldInsert = _.isUndefined(correspondent);
-                var shouldUpdate = !keysEqual(processEvent, correspondent, fieldsToCheck);
+
+                var eventDifference = giveDifferenceOnFields(processEvent, correspondent, fieldsToCheck);
+                var shouldUpdate = _.isEqual(eventDifference, {});
                
                 if(shouldInsert) {
                     //insert event
@@ -116,10 +126,72 @@ module.exports = function() {
                 return item.status !== 'pass';
             });
 
+            var changeNumbers = {add:0, update:0, remove: 0},
+                parallel      = [],
+                whatToReport  = {update:[], remove: dbEvents};
+
             //deal with apiEvents, insert or update accordingly
-
+            apiEvents.forEach(function(obj) { 
+                if(obj.status === 'insert') {
+                    // Push a function to insert the event
+                    parallel.push(function(callback) {
+                        db.events.save(obj.event, function(err, saved) {
+                            if (err || !saved) {
+                                console.log("New event is not saved");
+                            } else {
+                                changeNumbers.add++;
+                                callback();
+                            }
+                        });
+                    });
+                } else if(obj.status === 'update') {
+                    parallel.push(function(callback) {
+                        db.events.findAndModify({
+                            query: {XMLid: obj.event.XMLid},
+                            update: {$set: obj.update }, 
+                            new: true
+                        },
+                        function(err, updated) {
+                            if (err || !updated) {
+                                console.log("Event could not be updated: " + err);
+                                console.log(obj.event.title);
+                            } else {
+                                changeNumbers.update++;
+                                whatToReport.update.push(updated);
+                                callback();
+                            }
+                        });
+                    });
+                }
+            });
             //the remaining events in dbEvents should be set cancelled.
+            dbEvents.forEach(function(event) {
+                parallel.push(function(callback) {
+                    db.events.findAndModify({
+                        query: {XMLid: obj.event.XMLid},
+                        update: {$set: obj.update }, 
+                        new: true
+                    },
+                    function(err, updated) {
+                        if (err || !updated) {
+                            console.log("Event could not be called off: " + err);
+                            console.log(obj.event.title);
+                        } else {
+                            changeNumbers.remove++;
+                            callback();
+                        }
+                    });
+                });
+            });
 
+            async.parallel(parallel, function() {
+                console.log(changeNumbers.add + ' events added, ' + 
+                            changeNumbers.update + ' updated and ' + 
+                            changeNumbers.remove + ' called off, ' + 
+                            'upload and saving progress ended successfully.');
+
+                //send notifications to the updated/called off event staff / managers
+            });
         })
         .fail(function(err) { //triggered in any error
             console.log(err);
