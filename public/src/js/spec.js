@@ -442,10 +442,10 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
                 }
                 $('#popupContentInside').html(inside);
                 try {
-                $('#popupContentHeader').html('<b>' + defaults.dayNames[calEvent.start.getDay()] + ' | ' + Spec.decodeEntities(calEvent.loc) + '</b>'+
-                    '<br><i class="icon-time"></i> <b>'+Spec.formatAMPM(calEvent.start)+'</b> ' + ' <i>'+ Spec.formatAMPM(new Date(Date.parse(calEvent.eventStart)))+'</i>' +
-                    ' <i class="icon-arrow-right"></i>   <i>'+ Spec.formatAMPM(new Date(Date.parse(calEvent.eventEnd)))+'</i>' + ' <b>'+Spec.formatAMPM(calEvent.end)+'</b>'
-                    );
+                    $('#popupContentHeader').html('<b>' + defaults.dayNames[calEvent.start.getDay()] + ' | ' + Spec.decodeEntities(calEvent.loc) + '</b>'+
+                        '<br><i class="icon-time"></i> <b>'+Spec.formatAMPM(calEvent.start)+'</b> ' + ' <i>'+ Spec.formatAMPM(new Date(Date.parse(calEvent.eventStart)))+'</i>' +
+                        ' <i class="icon-arrow-right"></i>   <i>'+ Spec.formatAMPM(new Date(Date.parse(calEvent.eventEnd)))+'</i>' + ' <b>'+Spec.formatAMPM(calEvent.end)+'</b>'
+                        );
                 } catch(err) {
                     $('#popupContentHeader').html('<b>' + defaults.dayNames[calEvent.start.getDay()] + ' | ' + Spec.decodeEntities(calEvent.loc) + '</b>');
                     $.bootstrapGrowl("Time data of the event <b>" + Spec.lastClickedEvent.title + "</b> is improper. Please edit the event to make it's data type valid.", {
@@ -453,6 +453,11 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
                       align: 'center',
                       delay: 40000,
                     });
+                } finally {
+                    $('#popupContentHeader').append('<br>' + calEvent.customer.name);
+                    if(_.isNumber(calEvent.customer.phone)) {
+                        $('#popupContentHeader').append(', ' + calEvent.customer.phone);
+                    }
                 }
                 //Inventory update
                 Spec.setInventoryNumber(0, 0);
