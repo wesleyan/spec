@@ -35,16 +35,27 @@ var giveDifferenceOnFields = function(obj1, obj2, fieldList) {
 };
 
 var processEvent = function(apiEvent) {
+
+    var multipleDaysEvent = false;
+    if(apiEvent.booking_start_time.slice(-2) === 'PM' && apiEvent.booking_end_time.slice(-2) === 'AM') {
+        multipleDaysEvent = true;
+    }
+
     apiEvent.start      = new Date(apiEvent.booking_start_date + ' ' + apiEvent.booking_start_time);
     apiEvent.eventStart = new Date(apiEvent.booking_start_date + ' ' + apiEvent.event_start_time);
     // TODO: check if the event ends goes over midnight
     apiEvent.end        = new Date(apiEvent.booking_start_date + ' ' + apiEvent.booking_end_time);
     apiEvent.eventEnd   = new Date(apiEvent.booking_start_date + ' ' + apiEvent.event_end_time);
 
+    if(multipleDaysEvent) {
+        apiEvent.end      = moment(apiEvent.end).add('d', 1).toDate();
+        apiEvent.eventEnd = moment(apiEvent.eventEnd).add('d', 1).toDate();
+    }
+
     return {
         XMLid:        apiEvent.service_order_detail_id,
         title:        apiEvent.event_name,
-        desc:         apiEvent.notes,
+        desc:         apiEvent.category !== 'A/V Services' ? apiEvent.notes : apiEvent.resources,
         loc:          apiEvent.room_description,
         start:        apiEvent.start,
         end:          apiEvent.end,
@@ -79,7 +90,7 @@ module.exports = function() {
     // make a request to the API
     request(generateApiUrl(today,twoWeeksLater))
         .then(function(body) {
-            apiResponse = body;
+            apiResponse = body.records;
             // fetch the events in the period from Spec database
             return db.events.find({'start': {$gte: today, $lt: twoWeeksLater}}).toArray();
         })
@@ -109,7 +120,7 @@ module.exports = function() {
                     //insert event
                     return {
                         status: 'insert',
-                        event: processedEvent,
+                        event: autoAssign(processedEvent), //hacky auto staff assignment stuff
                     };
                 } else if(shouldUpdate) {
                     //update event
