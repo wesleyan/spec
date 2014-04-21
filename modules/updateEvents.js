@@ -6,7 +6,9 @@ var Utility     = require('./Utility.js'),
     autoAssign  = require('./autoAssign.js');
 
 var sendEmsUpdateNotifications = require('./sendEmsUpdateNotifications.js');
-var request = require('promised-request');
+
+var request   = require('./promised-request.js'),
+    dumpError = require('./dumpError.js');
 
 var _       = require('underscore'),
     Q       = require('q'),
@@ -36,6 +38,9 @@ var giveDifferenceOnFields = function(obj1, obj2, fieldList) {
 };
 
 var processEvent = function(apiEvent) {
+    if(_.isNull(apiEvent.notes)) {
+        apiEvent.notes = '';
+    }
 
     var multipleDaysEvent = false;
     if(apiEvent.booking_start_time.slice(-2) === 'PM' && apiEvent.booking_end_time.slice(-2) === 'AM') {
@@ -83,17 +88,17 @@ var processEvent = function(apiEvent) {
 };
 
 module.exports = function() {
-    var today         = moment(),
-        twoWeeksLater = moment().add('w', 2);
+    var today         = moment().startOf('day'),
+        twoWeeksLater = moment().add('w', 2).endOf('day');
 
     var apiEvents, dbEvents;
 
     // make a request to the API
     request(generateApiUrl(today,twoWeeksLater))
         .then(function(body) {
-            apiResponse = body.records;
+            apiEvents = JSON.parse(body).records;
             // fetch the events in the period from Spec database
-            return db.events.find({'start': {$gte: today, $lt: twoWeeksLater}}).toArray();
+            return db.events.find({'start': {$gte: today.toDate(), $lt: twoWeeksLater.toDate()}}).toArray();
         })
         .then(function(events) {
             dbEvents = events;
@@ -104,18 +109,20 @@ module.exports = function() {
                 //find the same event in dbEvents
                 var correspondent = _.findWhere(dbEvents, {XMLid: apiEvent.service_order_detail_id});
                 // delete correspondent from dbEvents
-                dbEvents = _.reject(dbEvents, function(event) {
-                    return event.XMLid == apiEvent.service_order_detail_id;
+                dbEvents = dbEvents.filter(function(event) {
+                    return (event.XMLid !== apiEvent.service_order_detail_id);
                 });
 
-                var processedEvent = apiProcessedEventToSpecEvent(apiEvent);
+                var processedEvent = processEvent(apiEvent);
 
                 var fieldsToCheck = ['start', 'end', 'eventStart', 'eventEnd', 'desc', 'title', 'loc', 'cancelled'];
 
                 var shouldInsert = _.isUndefined(correspondent);
 
-                var eventDifference = giveDifferenceOnFields(processEvent, correspondent, fieldsToCheck);
-                var shouldUpdate = _.isEqual(eventDifference, {});
+                if(!shouldInsert) {
+                    var eventDifference = giveDifferenceOnFields(processedEvent, correspondent, fieldsToCheck);
+                    var shouldUpdate = _.isEqual(eventDifference, {});
+                }
                
                 if(shouldInsert) {
                     //insert event
@@ -128,6 +135,7 @@ module.exports = function() {
                     return {
                         status: 'update',
                         event: processedEvent,
+                        update: eventDifference
                     };
                 } else {
                     return {
@@ -180,14 +188,14 @@ module.exports = function() {
             dbEvents.forEach(function(event) {
                 parallel.push(function(callback) {
                     db.events.findAndModify({
-                        query: {XMLid: obj.event.XMLid},
-                        update: {$set: obj.update }, 
+                        query: {XMLid: event.XMLid},
+                        update: {$set: {cancelled: true} }, 
                         new: true
                     },
                     function(err, updated) {
                         if (err || !updated) {
                             console.log("Event could not be called off: " + err);
-                            console.log(obj.event.title);
+                            console.log(event.title);
                         } else {
                             changeNumbers.remove++;
                             callback();
@@ -200,7 +208,7 @@ module.exports = function() {
                 console.log(changeNumbers.add + ' events added, ' + 
                             changeNumbers.update + ' updated and ' + 
                             changeNumbers.remove + ' called off, ' + 
-                            'upload and saving progress ended successfully.');
+                            'update process ended successfully.');
 
                 // send notifications to the updated/called off event staff / managers
                 /* sendEmsUpdateNotifications(
@@ -213,6 +221,6 @@ module.exports = function() {
             });
         })
         .fail(function(err) { //triggered in any error
-            console.log(err);
+            dumpError(err);
         });
 };
