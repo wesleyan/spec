@@ -96,7 +96,10 @@ module.exports = function() {
     // make a request to the API
     request(generateApiUrl(today,twoWeeksLater))
         .then(function(body) {
-            apiEvents = JSON.parse(body).records;
+            apiEvents = JSON.parse(body).records.map(function(e) {
+                e.service_order_detail_id = parseInt(e.service_order_detail_id);
+                return e;
+            });
             // fetch the events in the period from Spec database
             return db.events.find({'start': {$gte: today.toDate(), $lt: twoWeeksLater.toDate()}}).toArray();
         })
