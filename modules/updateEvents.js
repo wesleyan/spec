@@ -4,7 +4,8 @@ var Utility     = require('./Utility.js'),
     db          = require('./promised-db.js'),
     app         = require('./app.js'),
     autoAssign  = require('./autoAssign.js');
-    
+
+var sendEmsUpdateNotifications = require('./sendEmsUpdateNotifications.js');
 var request = require('promised-request');
 
 var _       = require('underscore'),
@@ -119,7 +120,7 @@ module.exports = function() {
                 if(shouldInsert) {
                     //insert event
                     return {
-                        status: 'insert',
+                        status: 'add',
                         event: autoAssign(processedEvent), //hacky auto staff assignment stuff
                     };
                 } else if(shouldUpdate) {
@@ -143,7 +144,7 @@ module.exports = function() {
 
             //deal with apiEvents, insert or update accordingly
             apiEvents.forEach(function(obj) { 
-                if(obj.status === 'insert') {
+                if(obj.status === 'add') {
                     // Push a function to insert the event
                     parallel.push(function(callback) {
                         db.events.save(obj.event, function(err, saved) {
@@ -201,7 +202,14 @@ module.exports = function() {
                             changeNumbers.remove + ' called off, ' + 
                             'upload and saving progress ended successfully.');
 
-                //send notifications to the updated/called off event staff / managers
+                // send notifications to the updated/called off event staff / managers
+                /* sendEmsUpdateNotifications(
+                    [{status:'insert', event:...}, {status:'update',event:...}, {status:'pass'}],
+                    [{CANCELLED EVENT OBJECT}])
+                   // the data structure of the first parameter can be seen above
+                   // second parameter contains an array of cancelled event objects
+                */
+                sendEmsUpdateNotifications(apiEvents, dbEvents);
             });
         })
         .fail(function(err) { //triggered in any error
