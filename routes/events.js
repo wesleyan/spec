@@ -110,7 +110,7 @@ module.exports = {
         User.permissionControl(req, res, 10);
 
         //console.log("Req for event edit Event ID " + req.body.eventid);
-        var query = {};
+        var query = {updated:true};
         $.each(req.body.changedData, function(key, value) {
             if(key == 'title' || key == 'desc' || key == 'loc') {
                 query[key] = value;

@@ -121,10 +121,15 @@ module.exports = function() {
                 var fieldsToCheck = ['start', 'end', 'eventStart', 'eventEnd', 'desc', 'title', 'loc', 'cancelled'];
 
                 var shouldInsert = _.isUndefined(correspondent);
-
+                var shouldUpdate, eventDifference;
+                
                 if(!shouldInsert) {
-                    var eventDifference = giveDifferenceOnFields(processedEvent, correspondent, fieldsToCheck);
-                    var shouldUpdate = _.isEqual(eventDifference, {});
+                    eventDifference = giveDifferenceOnFields(processedEvent, correspondent, fieldsToCheck);
+                    shouldUpdate = !_.isEqual(eventDifference, {});
+                    if(correspondent.updated) {
+                        //if the event info is updated at a point, the integration system shouldn't update it.
+                        shouldUpdate = false;
+                    }
                 }
                
                 if(shouldInsert) {
