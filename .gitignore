@@ -1,5 +1,4 @@
 node_modules/*
-uploads/*
 config/client_secret.json
 config/calendarv3-rest
 config/Preferences.js

@@ -23,6 +23,7 @@
     var Preferences            = require('./config/Preferences.js'),
         Utility                = require('./modules/Utility.js'),
         db                     = require('./modules/db.js'),
+        User                   = require('./modules/user.js'),
         routes                 = require('./routes/index.js'),
         updateEvents           = require('./modules/updateEvents.js');
         textReminders          = require('./modules/textReminders.js'),
@@ -143,12 +144,6 @@
     // Updates staff in database (POST)
     app.post('/staff/db/update', cas.blocker, routes.staff.db.update);
 
-// FILE UPLOAD
-    // Static page for EMS XML file upload (GET)
-    app.get('/fileUpload', cas.blocker, routes.fileUpload.get);
-    // Route that handles the whole upload process and database update (POST)
-    app.post('/fileUpload', cas.blocker, routes.fileUpload.post);
-
 // GENERAL
     // Main Spec route (GET)
     app.get('/', cas.blocker, routes.general.main);
@@ -167,6 +162,11 @@
 
 // UPDATING EVENTS
     setInterval(updateEvents, 1000 * 60 * 60 * 4); //every 4 hours
+    app.get('/update', function(req, res) {
+        User.permissionControl(req, res, 10);
+        updateEvents();
+        res.json(true);
+    });
 // TEXT REMINDERS
     setInterval(textReminders, 1000 * 60 * 5); //every 5 minutes
 // UNSTAFFED NOTIFICATIONS
