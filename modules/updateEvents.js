@@ -87,7 +87,7 @@ var processEvent = function(apiEvent) {
     };
 };
 
-module.exports = function() {
+module.exports = function(cb) {
     var today         = moment().startOf('day'),
         twoWeeksLater = moment().add('w', 2).endOf('day');
 
@@ -226,6 +226,9 @@ module.exports = function() {
                    // second parameter contains an array of cancelled event objects
                 */
                 sendEmsUpdateNotifications(apiEvents, dbEvents);
+                if(!_.isUndefined(cb)) {
+                    cb(changeNumbers);
+                }
             });
         })
         .fail(function(err) { //triggered in any error

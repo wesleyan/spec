@@ -164,8 +164,9 @@
     setInterval(updateEvents, 1000 * 60 * 60 * 4); //every 4 hours
     app.get('/update', function(req, res) {
         User.permissionControl(req, res, 10);
-        updateEvents();
-        res.json(true);
+        updateEvents(function(change) {
+            res.redirect(Preferences.path_on_server);
+        });
     });
 // TEXT REMINDERS
     setInterval(textReminders, 1000 * 60 * 5); //every 5 minutes
