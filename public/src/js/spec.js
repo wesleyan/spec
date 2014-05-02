@@ -462,47 +462,8 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
                 //Inventory update
                 Spec.setInventoryNumber(0, 0);
                 $('#inventory').html('');
-
-                var existing = {};
                 $('#inventory').tags(_.extend(Spec._inventoryProto, {
-                    values_url: 'inventory/existing/' + calEvent._id,
-                    onDuplicate: function(original, duplicate) {
-                        return true;
-                    },
-                    onBeforeAdd: function(pill, item) {
-                        if (typeof existing[item.text] === 'undefined') {
-                            existing[item.text] = 1;
-                        } else {
-                            existing[item.text]++;
-                        }
-                        if (existing[item.text] > 1) {
-                            $('[data-tag-id="' + item.text + '"]')
-                                .contents().first()
-                                .replaceWith(item.text + ' (x ' + existing[item.text] + ')');
-                            return $('');
-                        } else {
-                            return pill;
-                        }
-                    },
-                    onBeforeRemove: function(pill) {
-                        var id = $(pill).data('tag-id');
-
-                        if (typeof existing[id] === 'undefined' || existing[id] < 1) {
-                            throw new Error("Non-existent tag cannot be deleted");
-                        }
-
-                        existing[id]--;
-                        if(existing[id] === 0) {
-                            // no such tag left
-                            return true;
-                        } else {
-                            // still exists
-                            $('[data-tag-id="' + id + '"]')
-                                .contents().first()
-                                .replaceWith(id + ' (x ' + existing[id] + ')');
-                            return false; //still removed from the back-end
-                        }
-                    }
+                    values_url: 'inventory/existing/' + calEvent._id
                 }));
 
                 //Notes update
