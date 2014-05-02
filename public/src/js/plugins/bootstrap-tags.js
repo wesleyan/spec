@@ -1,15 +1,15 @@
 ;
 (function($) {
     "use strict";
-    var afterInitial = false;
+
     var defaults = {
         values: [],
         values_url: '',
 
         templates: {
-            pill: '<span class="badge btn-primary tag-badge">{0}</span>',
-            add_pill: '<span class="badge tag-badge">...</span>',
-            input_pill: '<span class="badge tag-badge"></span>',
+            pill: '<span class="badge badge-info tag-badge">{0}</span>',
+            add_pill: '<span class="badge badge-success tag-badge">...</span>',
+            input_pill: '<span class="badge badge-success tag-badge"></span>',
             number: ' <sup><small>{0}</small></sup>',
             plus_icon: '<i class="icon-plus-sign tag-icon"></i>',
             delete_icon: '<i class="icon-remove-sign tag-icon" data-toggle="tooltip" title="Delete"></i>',
@@ -51,17 +51,18 @@
         onBeforeAdd: function(pill, value) {
             return pill;
         },
-        onBeforeNewAdd: function(pill, value) {
-            return pill;
-        },
         onLoadSuggestions: function(values) {
             return values;
+        },
+        onDuplicate: null,
+        onBeforeRemove: function(pill) {
+            return true;
         }
     }
 
 
     function Tags(context, params) {
-        afterInitial = false;
+
         this.options = $.extend(true, {}, defaults, params);
 
         var $self = this;
@@ -102,7 +103,7 @@
 
                         if($self.options.suggestion_url) {
                             $.ajax({
-                                dataType: 'json', type: 'get', async: false, url: $self.options.suggestion_url,
+                                dataType: 'json', type: 'post', async: false, url: $self.options.suggestion_url,
                                 data: {q: query, limit: $self.options.suggestion_limit}
                             }).done(function(json) {
                                     if(typeof json == "object") {
@@ -130,10 +131,11 @@
                 });
 
             if($self.options.only_suggestions == false) {
-                input.keyup(function(e) {
+                input.keypress(function(e) {
                     if(!$(this).val()) return;
                     if(e.keyCode == 13) {
                         $self._addTag(pills_list, $(this));
+                        return false;
                     }
                 });
             }
@@ -231,13 +233,19 @@
         });
 
         if(unique) {
-            var color = $(pills_list.children()[0]).css('background-color');
-            unique.stop().animate({"backgroundColor": $self.options.double_hilight}, 100, 'swing', function() {
-                unique.stop().animate({"backgroundColor": color}, 100, 'swing', function(){
-                   unique.css('background-color', '');
+            if(!$self.options.onDuplicate){
+                var color = $(pills_list.children()[0]).css('background-color');
+                unique.stop().animate({"backgroundColor": $self.options.double_hilight}, 100, 'swing', function() {
+                    unique.stop().animate({"backgroundColor": color}, 100, 'swing', function(){
+                        unique.css('background-color', '');
+                    });
                 });
-            });
-            return false;
+                return false;
+            } else {
+                if($self.options.onDuplicate(unique, value) != true) {
+                    return false;
+                }
+            }
         }
 
         if(value.url) {
@@ -271,15 +279,11 @@
                 })
             )
             .css({
-                //"overflow": "hidden",
+                "overflow": "hidden",
                 "white-space": "nowrap"
             });
-        if(afterInitial == false) {
-             tag = $self.options.onBeforeAdd(tag, value);
-         } else {
-            tag = $self.options.onBeforeNewAdd(tag, value);
-         }
-       
+
+        tag = $self.options.onBeforeAdd(tag, value);
 
         pills_list.append(tag);
 
@@ -290,13 +294,21 @@
 
     Tags.prototype.removeTag = function(tag) {
         var $self = this;
-        $(tag).closest('[data-tag-id]').animate({width: 0, "padding-right": 0, "padding-left": 0}, 200, 'swing', function() {
+        var $tag = $(tag).closest('[data-tag-id]');
+
+        if($self.options.remove_url) {
+            $.ajax({
+                dataType: 'json', type: 'post', async: false, url: $self.options.remove_url, data: {id: $tag.data('tag-id')}
+            });
+        }
+
+        if($self.options.onBeforeRemove($tag) === false) {
+            return;
+        }
+
+        $tag.animate({width: 0, "padding-right": 0, "padding-left": 0}, 200, 'swing', function() {
             var $this = $(this);
-            if($self.options.remove_url) {
-                $.ajax({
-                    dataType: 'json', type: 'post', async: false, url: $self.options.remove_url, data: {id: $this.data('tag-id')}
-                });
-            }
+ 
             $self.options.onRemove($this);
             $this.remove();
         });
@@ -305,7 +317,6 @@
     $.fn.tags = function(params) {
         return this.each(function() {
             new Tags($(this), params);
-            afterInitial = true;
         })
     }
 }(window.jQuery));
