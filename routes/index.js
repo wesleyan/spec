@@ -9,6 +9,5 @@ module.exports = {
     notes:          require('./notes.js'),
 
     mobile:         require('./mobile.js'),
-    googleCalendar: require('./googleCalendar.js'),
-    fileUpload:     require('./fileUpload.js')
+    googleCalendar: require('./googleCalendar.js')
 };

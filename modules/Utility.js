@@ -64,7 +64,6 @@ var Utility = {
         //We can store all staff in memory, since it is not a big array and it will be used VERY frequently, will save time.
         db.staff.find({}, function(err, data) {
                 if (err || !data) {
-                    console.log(req.url);
                     console.log(err);
                 } else {
                     cache.put('storeStaff', data);
@@ -80,7 +79,6 @@ var Utility = {
         //We are storing the inventory in the memory as well
         db.inventory.find({}, function(err, data) {
                 if (err || !data) {
-                    console.log(req.url);
                     console.log(err);
                 } else {
                     cache.put('allInventory', data);
