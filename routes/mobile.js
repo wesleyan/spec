@@ -4,7 +4,6 @@ var Utility     = require('./../modules/Utility.js'),
     Preferences = require('./../config/Preferences.js');
     
 var _        = require('underscore'),
-    $        = require('jquery'),
     cache    = require('memory-cache'),
     mongo    = require('mongodb-wrapper');
 
@@ -30,8 +29,7 @@ module.exports = {
         } else {
             title = req.app.locals.getFormattedDate(start);
         }
-        query = {};
-        $.extend(query, {'start': {$gte: start, $lt: end}});
+        query = {'start': {$gte: start, $lt: end}};
         db.events.find(query, function(err, events) {
             if (err || !events) {
                 console.log(req.url);
@@ -50,8 +48,7 @@ module.exports = {
         });    
     },
     event: function (req, res) {
-        query = {};
-        $.extend(query, {'_id': new mongo.ObjectID(req.params.id)});
+        query = {'_id': new mongo.ObjectID(req.params.id)};
         db.events.find(query, function(err, events) {
             if (err || !events) {
                 console.log(req.url);
@@ -67,7 +64,7 @@ module.exports = {
         });    
     },
     staff: function (req, res) {
-        var userObj = $.grep(cache.get('storeStaff'), function(e){ return e.username == req.params.username; });
+        var userObj = _.findWhere(cache.get('storeStaff'), {username: req.params.username});
         if(userObj.length != 1) {
             res.end();
             return false;
