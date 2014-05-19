@@ -17,12 +17,12 @@ module.exports = {
             return event.id == req.params.id;
         })[0];*/
         db.events.findOne({_id: new mongo.ObjectID(req.params.id)}, function(err, event) {
-            if (err || !data) {
+            if (err || !event) {
                 console.log(req.url);
                 console.log("No events found: " + err);
             } else {
                 var inv = event.inventory.map(function (item) {
-                    thing = _.findWhere(cache.get('allInventory'), {id: item.id});
+                    thing = _.findWhere(cache.get('allInventory'), {id: parseInt(item.id)});
                     thing.amt = item.amt;
                     return thing;
                 });
@@ -38,7 +38,7 @@ module.exports = {
         //console.log("Req for adding inventory ID " + req.body.inventoryid + " to Event ID " + req.body.eventid);
         //frontend checks for the same inventory adding, so no control needed for that
          //try to find the thing by its id and use the same data
-        var selected = _.findWhere(cache.get('allInventory'), {id: req.body.inventoryid});
+        var selected = _.findWhere(cache.get('allInventory'), {id: parseInt(req.body.inventoryid)});
         if(_.isUndefined(selected)) {
             console.log("Such an inventory item doesn't exist");
             return false;
