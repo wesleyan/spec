@@ -22,7 +22,7 @@ module.exports = {
                 console.log("No events found: " + err);
             } else {
                 var inv = event.inventory.map(function (item) {
-                    thing = _.findWhere(cache.get('allInventory'), {id: parseInt(item.id)});
+                    var thing = _.findWhere(cache.get('allInventory'), {id: parseInt(item.item)});
                     thing.amt = item.amt;
                     return thing;
                 });
