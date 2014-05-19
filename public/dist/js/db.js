@@ -1,4 +1,3 @@
-'use strict';
 // Source: public/src/js/db/backgrid-filter.min.js
 /*
   backgrid-filter

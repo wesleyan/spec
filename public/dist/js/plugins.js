@@ -1,4 +1,3 @@
-'use strict';
 // Source: public/src/js/plugins/bootstrap-combobox.js
 /* =============================================================
  * bootstrap-combobox.js v1.1.1
