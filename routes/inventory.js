@@ -83,7 +83,7 @@ module.exports = {
         }
         //console.log("Req for removing inventory ID " + req.body.inventoryid + " from Event ID " + req.body.eventid);
         db.events.update(
-            {_id: new mongo.ObjectID(req.body.eventid), {'inventory.id': req.body.inventoryid }},
+            {_id: new mongo.ObjectID(req.body.eventid), 'inventory.id': req.body.inventoryid},
             { $set: {'inventory.$.amt': req.body.amount} }, 
             function(err, updated) {
                 if (err || !updated) {
