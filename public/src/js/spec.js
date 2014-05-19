@@ -143,7 +143,7 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
                                                   function () {
                     // after the update in the back end
                     Spec.setInventoryNumber(1);
-                    var input = $('[data-tag-id="' + duplicate.text +
+                    var input = $('[data-tag-id="' + duplicate.id +
                         '"]').find('input');
                     input.val(parseInt(input.val()) + 1);
                     $('.tag-input').val('');
@@ -172,6 +172,7 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
                 return Spec._inventoryProto.extraRender(pill, item);
             },
             onBeforeNewAdd: function(pill, item) { //this also works for initial/on modal click loading.
+                item.amt = 1;
                 var id = pill.data('tag-id');
                 $.ajax({
                     type: "POST",
