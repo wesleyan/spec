@@ -1,3 +1,5 @@
+'use strict';
+// Source: public/src/js/plugins/bootstrap-combobox.js
 /* =============================================================
  * bootstrap-combobox.js v1.1.1
  * =============================================================
@@ -18,9 +20,7 @@
 
 !function( $ ) {
 
- "use strict";
-
-  var Combobox = function ( element, options ) {
+var Combobox = function ( element, options ) {
     this.options = $.extend({}, $.fn.combobox.defaults, options)
     this.$source = $(element)
     this.$container = this.setup()
@@ -236,6 +236,7 @@
 
 }( window.jQuery );
 
+// Source: public/src/js/plugins/bootstrap-contextmenu.js
 /*!
  * Bootstrap Context Menu
  * Version: 2.1
@@ -268,7 +269,7 @@
 
 !(function($) {
 
-	"use strict"; // jshint ;_;
+// jshint ;_;
 
 	/* CONTEXTMENU CLASS DEFINITION
 	 * ============================ */
@@ -432,6 +433,7 @@
 
 }(window.jQuery));
 
+// Source: public/src/js/plugins/bootstrap-datepicker.js
 /* =========================================================
  * bootstrap-datepicker.js 
  * http://www.eyecon.ro/bootstrap-datepicker
@@ -906,6 +908,7 @@
 						'</div>';
 
 }( window.jQuery );
+// Source: public/src/js/plugins/bootstrap-modal-popover.js
 !function ($) {
 
     /* MODAL POPOVER PUBLIC CLASS DEFINITION
@@ -1058,10 +1061,10 @@
 
 }(window.jQuery);
 //
+// Source: public/src/js/plugins/bootstrap-tags.js
 ;
 (function($) {
-    "use strict";
-    var afterInitial = false;
+var afterInitial = false;
     var defaults = {
         values: [],
         values_url: '',
@@ -1399,6 +1402,7 @@ if(!String.prototype.format) {
 }
 ;
 
+// Source: public/src/js/plugins/bootstrap-timepicker.js
 /*!
  * Timepicker Component for Twitter Bootstrap
  *
@@ -1410,9 +1414,7 @@ if(!String.prototype.format) {
  * file that was distributed with this source code.
  */
 (function($, window, document, undefined) {
-  'use strict';
-
-  // TIMEPICKER PUBLIC CLASS DEFINITION
+// TIMEPICKER PUBLIC CLASS DEFINITION
   var Timepicker = function(element, options) {
     this.widget = '';
     this.$element = $(element);
@@ -2288,6 +2290,7 @@ if(!String.prototype.format) {
 
 })(jQuery, window, document);
 
+// Source: public/src/js/plugins/fullcalendarSpec.js
 /*!
  * FullCalendar v1.6.4
  * Docs & License: http://arshaw.com/fullcalendar/
@@ -8420,6 +8423,7 @@ function HorizontalPositionCache(getElement) {
 
 })(jQuery);
 
+// Source: public/src/js/plugins/jquery.bootstrap-growl.js
 (function() {
   var $;
 
@@ -8498,6 +8502,7 @@ function HorizontalPositionCache(getElement) {
 
 }).call(this);
 
+// Source: public/src/js/plugins/spinner.js
 /*
  * Fuel UX Spinner
  * https://github.com/ExactTarget/fuelux
