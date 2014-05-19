@@ -6,7 +6,6 @@ var Utility   = require('./../modules/Utility.js'),
     
 var fs         = require('fs'),
     _          = require('underscore'),
-    $          = require('jquery'),
     mongo      = require('mongodb-wrapper');
 
 module.exports = {
@@ -34,7 +33,7 @@ module.exports = {
             default:
                 query = {};
         }
-        $.extend(query, {'start': {$gte: start, $lt: end}});
+        query = _.extend(query, {'start': {$gte: start, $lt: end}});
         db.events.find(query, function(err, events) {
             if (err || !events) {
                 console.log(req.url);
@@ -110,8 +109,8 @@ module.exports = {
         User.permissionControl(req, res, 10);
 
         //console.log("Req for event edit Event ID " + req.body.eventid);
-        var query = {};
-        $.each(req.body.changedData, function(key, value) {
+        var query = {updated:true};
+        _.each(req.body.changedData, function(value, key) {
             if(key == 'title' || key == 'desc' || key == 'loc') {
                 query[key] = value;
             }

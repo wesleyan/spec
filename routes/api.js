@@ -1,8 +1,7 @@
 var Utility    = require('./../modules/Utility.js'),
     db         = require('./../modules/db.js');
     
-var _          = require('underscore'),
-    $          = require('jquery');
+var _          = require('underscore');
 
 module.exports = {
     events: function (req, res) {
@@ -53,7 +52,7 @@ module.exports = {
             default:
                 query = {};
         }
-        $.extend(query, {'start': {$gte: start, $lt: end}});
+        query = _.extend(query, {'start': {$gte: start, $lt: end}});
         db.events.find(query, function(err, events) {
             if (err || !events) {
                 console.log(req.url);

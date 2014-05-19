@@ -3,7 +3,6 @@ var Utility  = require('./../../modules/Utility.js'),
     db       = require('./../../modules/db.js');
     
 var _        = require('underscore'),
-    $        = require('jquery'),
     mongo    = require('mongodb-wrapper'),
     cache    = require('memory-cache');
 
@@ -15,8 +14,7 @@ module.exports = {
         var start = new Date(req.query.start * 1000),
             end = new Date(req.query.end * 1000);
         //console.log("Req for staff available starting at " + start.toDateString() + " and ending before " + end.toDateString());
-        var query = {};
-        $.extend(query, {'start': {$gte: start, $lt: end}});
+        var query = {'start': {$gte: start, $lt: end}};
         db.events.find(query, function(err, events) {
             if (err || !events) {
                 console.log(req.url);
@@ -27,7 +25,7 @@ module.exports = {
                         busyStaff.push(shift.staff);
                     });
                 });
-                var availableStaff = $(cache.get('staffUsernameArray')).not(busyStaff).get();
+                var availableStaff = _.difference(cache.get('staffUsernameArray'), busyStaff);
                 res.json(availableStaff);
             }    
         });

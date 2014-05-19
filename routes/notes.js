@@ -63,7 +63,7 @@ module.exports = {
                 } else if(events.length < 1) {
                     console.log("No such note/event found");
                 } else {
-                    var theNote = $.grep(events[0].notes, function(e){ return e._id === req.body.id; });
+                    var theNote = _.findWhere(events[0].notes, {_id: req.body.id});
                     if(theNote.user == User.getUser(req)) {
                         deleteNote();
                     } else {

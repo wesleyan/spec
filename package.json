@@ -19,7 +19,6 @@
   "dependencies": {
     "express": "3.4.0",
     "ejs": "*",
-    "jquery": "*",
     "underscore": "*",
     "mongojs": "*",
     "mongodb-wrapper": "*",
@@ -30,7 +29,9 @@
     "googleapis": "*",
     "xml2json": "*",
     "memory-cache": "*",
-    "moment": "*"
+    "moment": "*",
+    "q": "*",
+    "promised-mongo": "*"
   },
   "devDependencies": {
     "grunt": "^0.4.3",
