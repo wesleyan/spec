@@ -160,7 +160,7 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
                     item.amt + '" min="1">');
                 pill.find('input').change(function () {
                   Spec._inventoryProto.updateAmount(item.id, 
-                                                    parseInt(this.val()), 
+                                                    parseInt($(this).val()), 
                                                     function(){});
                 });
                 Spec.setInventoryNumber(1);
