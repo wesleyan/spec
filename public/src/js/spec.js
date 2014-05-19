@@ -142,7 +142,6 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
                                                   parseInt(original.find('input').val()) + 1, 
                                                   function () {
                     // after the update in the back end
-                    Spec.setInventoryNumber(1);
                     var input = $('[data-tag-id="' + duplicate.id +
                         '"]').find('input');
                     input.val(parseInt(input.val()) + 1);
