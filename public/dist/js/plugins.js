@@ -1108,6 +1108,7 @@
         onError: function(num, msg) {
             alert(msg);
         },
+        onDuplicate: null,
         onBeforeAdd: function(pill, value) {
             return pill;
         },
@@ -1116,6 +1117,10 @@
         },
         onLoadSuggestions: function(values) {
             return values;
+        },
+        onDuplicate: null,
+        onBeforeRemove: function(pill) {
+            return true;
         }
     }
 
@@ -1291,13 +1296,19 @@
         });
 
         if(unique) {
-            var color = $(pills_list.children()[0]).css('background-color');
-            unique.stop().animate({"backgroundColor": $self.options.double_hilight}, 100, 'swing', function() {
-                unique.stop().animate({"backgroundColor": color}, 100, 'swing', function(){
-                   unique.css('background-color', '');
+            if(!$self.options.onDuplicate){
+                var color = $(pills_list.children()[0]).css('background-color');
+                unique.stop().animate({"backgroundColor": $self.options.double_hilight}, 100, 'swing', function() {
+                    unique.stop().animate({"backgroundColor": color}, 100, 'swing', function(){
+                        unique.css('background-color', '');
+                    });
                 });
-            });
-            return false;
+                return false;
+            } else {
+                if($self.options.onDuplicate(unique, value) != true) {
+                    return false;
+                }
+            }
         }
 
         if(value.url) {
@@ -1350,13 +1361,21 @@
 
     Tags.prototype.removeTag = function(tag) {
         var $self = this;
-        $(tag).closest('[data-tag-id]').animate({width: 0, "padding-right": 0, "padding-left": 0}, 200, 'swing', function() {
+        var $tag = $(tag).closest('[data-tag-id]');
+
+        if($self.options.remove_url) {
+            $.ajax({
+                dataType: 'json', type: 'post', async: false, url: $self.options.remove_url, data: {id: $tag.data('tag-id')}
+            });
+        }
+
+        if($self.options.onBeforeRemove($tag) === false) {
+            return;
+        }
+
+        $tag.animate({width: 0, "padding-right": 0, "padding-left": 0}, 200, 'swing', function() {
             var $this = $(this);
-            if($self.options.remove_url) {
-                $.ajax({
-                    dataType: 'json', type: 'post', async: false, url: $self.options.remove_url, data: {id: $this.data('tag-id')}
-                });
-            }
+ 
             $self.options.onRemove($this);
             $this.remove();
         });
@@ -1379,6 +1398,7 @@ if(!String.prototype.format) {
     };
 }
 ;
+
 /*!
  * Timepicker Component for Twitter Bootstrap
  *

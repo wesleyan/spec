@@ -101,6 +101,8 @@
     app.post("/inventory/add", cas.blocker, routes.inventory.add);
     // Remove inventory from an event (POST)
     app.post("/inventory/remove", cas.blocker, routes.inventory.remove);
+    // Update the inventory amount of a specific item in an event (POST)
+    app.post("/inventory/update", cas.blocker, routes.inventory.update);
 
     // NOTES
     // Existing notes for each event (GET)

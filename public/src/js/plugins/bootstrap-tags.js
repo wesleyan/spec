@@ -48,6 +48,7 @@
         onError: function(num, msg) {
             alert(msg);
         },
+        onDuplicate: null,
         onBeforeAdd: function(pill, value) {
             return pill;
         },

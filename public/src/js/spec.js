@@ -126,13 +126,52 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
                     Spec.setInventoryNumber(-1);
                 });
             },
-            onBeforeAdd: function(pill) { //this also works for initial/on modal click loading.
-                //var id = pill.data('tag-id');
-                //console.log('initial pill with ID ' + id + ' added');
+            updateAmount: function (itemId, amount, cb) {
+                $.ajax({
+                    type: "POST",
+                    url: "inventory/update",
+                    data: {
+                        eventid: Spec.lastClickedEvent._id,
+                        inventoryid:itemId,
+                        amount: amount
+                    }
+                }).done(cb);
+            },
+            onDuplicate: function(original, duplicate) {
+                Spec._inventoryProto.updateAmount(duplicate.id, 
+                                                  parseInt(original.find('input').val()) + 1, 
+                                                  function () {
+                    // after the update in the back end
+                    var input = $('[data-tag-id="' + duplicate.id +
+                        '"]').find('input');
+                    input.val(parseInt(input.val()) + 1);
+                    $('.tag-input').val('');
+                });
+                return false;
+            },
+            extraRender: function (pill, item) {
+                if (!item.amt) {
+                    item.amt = 1;
+                }
+                pill = $(pill);
+                pill.contents().first().before(
+                    '<input class="tag-amt" type="number" value="' +
+                    item.amt + '" min="1">');
+                pill.find('input').change(function () {
+                  Spec._inventoryProto.updateAmount(item.id, 
+                                                    parseInt($(this).val()), 
+                                                    function(){});
+                });
                 Spec.setInventoryNumber(1);
                 return pill; //has to return pill
             },
-            onBeforeNewAdd: function(pill) { //this also works for initial/on modal click loading.
+            onBeforeAdd: function(pill, item) { //this also works for initial/on modal click loading.
+                //var id = pill.data('tag-id');
+                //console.log('initial pill with ID ' + id + ' added');
+                return Spec._inventoryProto.extraRender(pill, item);
+            },
+            onBeforeNewAdd: function(pill, item) { //this also works for initial/on modal click loading.
+                item.amt = 1;
                 var id = pill.data('tag-id');
                 $.ajax({
                     type: "POST",
@@ -143,9 +182,8 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
                     }
                 }).done(function(msg) {
                     console.log('pill with ID ' + id + ' added');
-                    Spec.setInventoryNumber(1);
                 });
-                return pill; //has to return pill
+                return Spec._inventoryProto.extraRender(pill, item);
             }
         }, //end _inventoryProto
         decodeEntities: function(s){

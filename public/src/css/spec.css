@@ -146,6 +146,16 @@ body {
   outline: none;
 }
 
+#inventory .tag-amt {
+    width: 35px;
+    margin-right: 5px;
+    margin-bottom: 0;
+    text-align: right;
+    border: 0;
+    background: transparent;
+    color: white;
+}
+
 #popoverAccordion {
   margin-top: 10px;
   margin-bottom: -5px;
