@@ -208,7 +208,10 @@
     eventEnd: "2014-01-25T23:00:00.000Z",
     eventStart: "2014-01-25T21:00:00.000Z",
     inventory: [
-      "0"
+      {
+        item: "0",
+        amt: 1
+      }
     ],
     loc: "Silloway Gymnasium",
     notes: [],
@@ -558,10 +561,42 @@
               <strong>inventory</strong>
             </td>
             <td>
-              <strong>Array of strings</strong>
+              <strong>Array of objects</strong>
             </td>
             <td>
-              The inventory needed for the event. Strings contain numbers that indicate what the inventory item is. Inventory list needed to determine what item it is.
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Fields</th>
+                    <th>Type</th>
+                    <th>Explanation</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <strong>item</strong>
+                    </td>
+                    <td>
+                      <strong>String</strong>
+                    </td>
+                    <td>
+                      The inventory needed for the event. Strings contain numbers that indicate what the inventory item is. Inventory list needed to determine what item it is.
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>amt</strong>
+                    </td>
+                    <td>
+                      <strong>Integer</strong>
+                    </td>
+                    <td>
+                      The amount of the item.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </td>
           </tr>
         </tbody>
