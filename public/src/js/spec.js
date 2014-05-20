@@ -216,9 +216,9 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
         }, //end toggleGCalEvents
         refetchEvents: function() {
             $('#calendar').fullCalendar('removeEventSource', Spec.lastEventSource); //for fetching the whole month events
-            $('#calendar').fullCalendar('changeView', 'month'); //this should be after removing to avoid unnecessary ajax requests
+            // $('#calendar').fullCalendar('changeView', 'month'); //this should be after removing to avoid unnecessary ajax requests
             $('#calendar').fullCalendar('addEventSource', Spec.generateEventSource());
-            $('#calendar').fullCalendar('changeView', 'agendaWeek');
+            // $('#calendar').fullCalendar('changeView', 'agendaWeek');
         }, //end refetchEvents
         techTemplateUpdate: function() {
             if(Spec.lastClickedEvent.techMustStay === false) {
