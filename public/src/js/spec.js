@@ -733,7 +733,7 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
                 }
             }).done(function(msg) {
                 console.log('event with ID ' + Spec.lastClickedEvent._id + ' removed');
-                Spec.refetchEvents();
+                $('#calendar').fullCalendar('removeEvents', Spec.lastClickedEvent._id);
                 $('#popup').modalPopover('hide');
                 $('#removeEvent').modal('hide');
             });
