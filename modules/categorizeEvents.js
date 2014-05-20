@@ -35,25 +35,25 @@ var detectCategory = function (event) {
   event.category = "A";
 
   //B event detection
-  if(hasKeywords(bEventKeywords, event.desc) {
+  if(hasKeywords(bEventKeywords, event.desc)) {
     event.category = "B";
   }
 
   // set to B if in specific locations
-  if(hasKeywords(bLocations, event.desc) {
+  if(hasKeywords(bLocations, event.desc)) {
     event.category = "B";
   }
 
   //C event detection
-  if(hasKeywords(cEventKeywords, event.desc) {
+  if(hasKeywords(cEventKeywords, event.desc)) {
     event.category = "C";
   }
 
   // Check if before 9am or after 10pm
-  var 9am = moment(event.start).hours(9).minutes(0);
-  var 10pm = moment(event.end).hours(22).minutes(0);
+  var at9am = moment(event.start).hours(9).minutes(0);
+  var at10pm = moment(event.end).hours(22).minutes(0);
 
-  if(moment(event.start).isBefore(9am) || moment(event.end).isAfter(10pm)) {
+  if(moment(event.start).isBefore(at9am) || moment(event.end).isAfter(at10pm)) {
     event.category = "C";
   }
 
@@ -61,7 +61,6 @@ var detectCategory = function (event) {
 };
 
 module.exports = function(event) {
-  event.category = "A";
-  //event.category = detectCategory(event);
+  event.category = detectCategory(event);
 	return event;
 };
