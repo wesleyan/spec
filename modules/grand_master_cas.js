@@ -117,12 +117,17 @@ GrandMasterCas.prototype.handleTicket = function( req, res, next ){
   request.end();
 };
 
+// Modified for Spec -ckorkut
 GrandMasterCas.prototype.logout = function(req, res){
   var logoutUrl = [this.casScheme, '://',
                    this.casHost, ':', this.port,
-                   this.casPath, '/logout'].join('');
+                   this.casPath, '/logout', '?url=',
+                   encodeURIComponent(this.service),
+                   '&nicename=', 'Spec'
+                   ].join('');
 
-  delete req.session[this.sessionName];
+  //delete req.session[this.sessionName];
+  req.session = null;
   // Doesn't destroy the whole session!
   res.redirect(logoutUrl);
 };
