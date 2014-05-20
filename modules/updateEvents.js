@@ -3,7 +3,7 @@ var Preferences = require('./../config/Preferences.js');
 var Utility     = require('./Utility.js'),
     db          = require('./promised-db.js'),
     app         = require('./app.js'),
-    autoAssign  = require('./autoAssign.js'),
+    hackyAssign = require('./hackyAssign.js'),
     categorize  = require('./categorizeEvents.js');
 
 var sendEmsUpdateNotifications = require('./sendEmsUpdateNotifications.js');
@@ -137,7 +137,7 @@ module.exports = function(cb) {
                     //insert event
                     return {
                         status: 'add',
-                        event: autoAssign(categorize(processedEvent)), //hacky auto staff assignment stuff
+                        event: hackyAssign(categorize(processedEvent)), //hacky auto staff assignment stuff
                     };
                 } else if(shouldUpdate) {
                     //update event
