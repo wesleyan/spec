@@ -131,6 +131,7 @@
     XMLid: 1435616,
     title: "Varsity Swim vs Bowdoin, Colby and Trinity",
     desc: "Client will be contacted directly by IMS",
+    category: "A",
     loc: "FAC Pool",
     start: "2014-01-25T16:00:00.000Z",
     end: "2014-01-25T21:00:00.000Z",
@@ -157,6 +158,7 @@
     XMLid: 1461265,
     title: "Training: WesGUIDE Coaches",
     desc: "This will be video recorded by IMS. Single camera, \&quot;nothing special\&quot; according to the customer.",
+    category: "B",
     loc: "Judd 113",
     start: "2014-01-25T17:25:00.000Z",
     end: "2014-01-25T22:05:00.000Z",
@@ -178,6 +180,7 @@
     XMLid: 1464233,
     _id: "52e02da02194810212000002",
     cancelled: false,
+    category: "A",
     customer: {
         name: "Prometheus",
         phone: {}
@@ -199,6 +202,7 @@
     XMLid: 1464054,
     _id: "52e02da02194810212000003",
     cancelled: false,
+    category: "A",
     customer: {
         name: "Reilly, Joseph P.",
         phone: 2918
@@ -281,6 +285,17 @@
             </td>
             <td>
               Event description.
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong>category</strong>
+            </td>
+            <td>
+              <strong>String</strong>
+            </td>
+            <td>
+              Event category. Either "A", "B" or "C". Contact special event managers for the specifications.
             </td>
           </tr>
           <tr>
