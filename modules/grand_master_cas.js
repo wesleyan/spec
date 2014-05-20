@@ -121,8 +121,8 @@ GrandMasterCas.prototype.handleTicket = function( req, res, next ){
 GrandMasterCas.prototype.logout = function(req, res){
   var logoutUrl = [this.casScheme, '://',
                    this.casHost, ':', this.port,
-                   this.casPath, '/logout', '?url=',
-                   encodeURIComponent(this.service),
+                   '/logout', 
+                   '?url=', this.service,
                    '&nicename=', 'Spec'
                    ].join('');
 
