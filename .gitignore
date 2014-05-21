@@ -3,3 +3,5 @@ config/client_secret.json
 config/calendarv3-rest
 config/Preferences.js
 npm-debug.log
+*.swp
+*.swo

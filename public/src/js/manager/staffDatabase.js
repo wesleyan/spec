@@ -62,6 +62,23 @@ pageableStaffList.sort();
 var plainInteger = Backgrid.IntegerCell.extend({
   orderSeparator: ''
 });
+
+var strikeCell = Backgrid.Cell.extend({
+    template: _.template("<%=strikes.length%>"),
+    events: {
+      "click": "deleteRow"
+    },
+    deleteRow: function (e) {
+      e.preventDefault();
+      alert(JSON.stringify(this.model.get('strikes')));
+    },
+    render: function () {
+      this.$el.html(this.template({strikes:this.model.get('strikes')}));
+      this.delegateEvents();
+      return this;
+    }
+});
+
 var columns = [{
   name: "",
   cell: "select-row",
@@ -100,6 +117,10 @@ var columns = [{
   name: "trainee",
   label: "Trainee",
   cell: "boolean",
+},{
+  name: "strikes",
+  label: "Strikes",
+  cell: strikeCell
 }];
 var pageableGrid = new Backgrid.Grid({
   columns: columns,
