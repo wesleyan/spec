@@ -36,6 +36,7 @@
     app.configure(function() {
         app.set('views', __dirname + '/views');
         app.set('view engine', 'ejs');
+        app.enable('trust proxy');
         
         app.use(express.bodyParser({keepExtensions: true, uploadDir: __dirname + '/uploads'}));
         app.use(express.methodOverride());
