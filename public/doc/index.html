@@ -153,6 +153,7 @@
     }],
     shifts: [],
     staffNeeded: 1,
+    onHold: false,
     _id: "52d40fa6cc5ea0506b00009c"
 }, {
     XMLid: 1461265,
@@ -175,6 +176,7 @@
     notes: [],
     shifts: [],
     staffNeeded: 1,
+    onHold: false,
     _id: "52d9822acc5ea0506b0000a7"
 }, {
     XMLid: 1464233,
@@ -197,7 +199,8 @@
     start: "2014-01-25T13:45:00.000Z",
     techMustStay: true,
     title: "Conference: Winter Fire Arts",
-    video: false
+    video: false,
+    onHold: false
 }, {
     XMLid: 1464054,
     _id: "52e02da02194810212000003",
@@ -229,7 +232,8 @@
     start: "2014-01-25T20:00:00.000Z",
     techMustStay: true,
     title: "Varsity Men&apos;s Basketball vs Conn",
-    video: true
+    video: true,
+    onHold: false
 }]
       </pre>
     <h4>Fields</h4>
@@ -612,6 +616,17 @@
                   </tr>
                 </tbody>
               </table>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong>onHold</strong>
+            </td>
+            <td>
+              <strong>Boolean</strong>
+            </td>
+            <td>
+              True if the event has been added to EMS without three days in advance. Affects automatic staff assignments and manager decisions.
             </td>
           </tr>
         </tbody>

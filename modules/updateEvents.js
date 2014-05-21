@@ -59,6 +59,9 @@ var processEvent = function(apiEvent) {
         apiEvent.eventEnd = moment(apiEvent.eventEnd).add('d', 1).toDate();
     }
 
+    //onHold = true if the event is added before three days notice
+    var onHold = moment().add('d', 3).endOf('day').isAfter(apiEvent.start);
+    
     return {
         XMLid:        apiEvent.service_order_detail_id,
         title:        apiEvent.event_name,
@@ -84,7 +87,8 @@ var processEvent = function(apiEvent) {
         inventory:    [],
         notes:        [],
         shifts:       [],
-        staffNeeded:  1
+        staffNeeded:  1,
+        onHold:       onHold
     };
 };
 
