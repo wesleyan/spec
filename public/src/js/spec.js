@@ -461,6 +461,10 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
                 $('#popup').modalPopover('hide');
                 //front-end eye-candy stuff
                 symbol = '';
+
+                if (calEvent.onHold === true) {
+                    symbol += '<i class="icon-ban-circle icon-white"></i> ';
+                }
                 if (calEvent.video === true) {
                     symbol += '<i class="icon-facetime-video"></i> ';
                 }
@@ -528,6 +532,10 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
                 if(event.gCal !== true) {
                     //Adding all events to an array for event filtering with Backbone.js router
                     symbol = '';
+
+                    if (event.onHold === true) {
+                        symbol += '<i class="icon-ban-circle icon-white"></i> ';
+                    }
                     if (event.video === true) {
                         symbol += '<i class="icon-facetime-video icon-white"></i> ';
                     }
