@@ -294,3 +294,16 @@ $('#deleteModal .btn-danger').click(function() {
   });
   $('#deleteModal').modal('hide');
 });
+
+$(document).keydown(function(e) {
+    if (!$(event.target).is(':not(input, textarea)')) { return; } //don't do anything if on input/textarea
+    switch (e.keyCode) {
+	case 39: // pressed "right" arrow
+            $('.backgrid-paginator a[title="Next"]').trigger('click');
+            break;
+	case 37: // pressed "left" arrow
+            $('.backgrid-paginator a[title="Previous"]').trigger('click');
+            break;
+    }
+});
+
