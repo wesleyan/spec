@@ -899,8 +899,15 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
         });
 
         // hide modal popover when user clicks on empty areas in calendar
-        $('.fc-widget-content').click(function(e) {
+        $('body').on('click', '.fc-widget-content', function(e) {
             $('#popup').modalPopover('hide');
+        });
+
+        // go to a day when a header is clicked in week view
+        $('body').on('click', '.fc-view-agendaWeek .fc-widget-header', function(e) {
+            var t = new Date($(e.target).data('timestamp'));
+            $('#calendar').fullCalendar('gotoDate', t);
+            $('#calendar').fullCalendar('changeView', 'agendaDay');
         });
 
         $(document).keydown(function(e) {
