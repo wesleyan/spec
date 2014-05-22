@@ -66,12 +66,30 @@ var plainInteger = Backgrid.IntegerCell.extend({
 var strikeCell = Backgrid.Cell.extend({
     template: _.template("<a href='#'><%=strikes.length%></a>"),
     events: {
-      "click": "deleteRow"
+      "click": "manageStrikes"
     },
-    deleteRow: function (e) {
+    refreshModal: function() {
+      var self = this;
+      $('#strikesModal').html(_.template($('#strikesTemplate').html(), this));
+      $('#strikesModal #strikeSubmit').click(function(e) {
+          var desc = $('#strikesModal input').val();
+          // send description to the back end
+          self.model.set('strikes', self.model.get('strikes').concat({date: (new Date()).toISOString(), desc:desc}));
+          self.refreshModal();
+      });
+      $('#strikesModal .modal-body .btn-danger').click(function(e) {
+          var d = $(e.currentTarget).data('date');
+          self.model.set('strikes', self.model.get('strikes').filter(function(i) {
+              return i.date !== d;
+          }));
+          self.refreshModal();
+      });
+    },
+    manageStrikes: function (e) {
       e.preventDefault();
       //alert(JSON.stringify(this.model.get('strikes')));
-      $('#strikesModal .modal-body').html(_.template($('#strikesTemplate').html(), this));
+      $('#strikesModal').html(_.template($('#strikesTemplate').html(), this));
+      this.refreshModal();
       $('#strikesModal').modal('show');
     },
     render: function () {

@@ -97,18 +97,6 @@
       </div>
     </div>
     <div id="strikesModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="myModalLabel">Strikes</h3>
-      </div>
-      <div class="modal-body">
-        <p>Strikes</p>
-        <ul>
-        </ul>
-      </div>
-      <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-      </div>
     </div>
     <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
@@ -166,14 +154,21 @@
       </table>
     </script>
     <script type="text/template" id="strikesTemplate">
-        <%=model.get('name') %> has <%=model.get('strikes').length %> strike<%=model.get('strikes').length===1 ? '' : 's' %>.
-
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">Strikes</h3>
+      </div>
+      <div class="modal-body">
+        <p>
+          <%=model.get('name') %> has <%=model.get('strikes').length %> strike<%=model.get('strikes').length===1 ? '' : 's' %>.
+        </p>
 
         <% if (model.get('strikes').length > 0) { %>
           <table class="table table-bordered table-striped">
             <t>
               <th>Date</th>
               <th>Description</th>
+              <th>Action</th>
             </tr>
         <% model.get('strikes').forEach(function(strike) { %>
           <tr>
@@ -183,10 +178,21 @@
             <td>
               <%=strike.desc %>
             </td>
+            <td>
+              <button class="btn btn-mini btn-danger" data-date="<%=(new Date(strike.date)).toISOString() %>"><i class="icon-white icon-remove"></i></button>
+            </td>
           </tr>
         <% }); %>
           </table>
         <% } %>
+      </div>
+      <div class="modal-footer">
+        <div class="controls controls-row">
+          <input type="text" class="span4">
+          <button class="btn btn-danger" id="strikeSubmit">Add strike</button>
+          <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        </div>
+      </div>
     </script>
   </body>
 </html>

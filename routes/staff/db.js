@@ -80,6 +80,13 @@ module.exports = {
         if(req.body.what.trainee) {
             req.body.what.trainee = JSON.parse(req.body.what.trainee);
         }
+        if(req.body.what.strikes) {
+          req.body.what.strikes = req.body.what.strikes.map(function(x) {
+              x.date = new Date(x.date);
+              return x;
+          });
+        }
+
         db.staff.update( 
             {'_id': new mongo.ObjectID(req.body.id)},
             { $set: req.body.what }, 
