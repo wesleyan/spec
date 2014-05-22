@@ -64,13 +64,15 @@ var plainInteger = Backgrid.IntegerCell.extend({
 });
 
 var strikeCell = Backgrid.Cell.extend({
-    template: _.template("<%=strikes.length%>"),
+    template: _.template("<a href='#'><%=strikes.length%></a>"),
     events: {
       "click": "deleteRow"
     },
     deleteRow: function (e) {
       e.preventDefault();
-      alert(JSON.stringify(this.model.get('strikes')));
+      //alert(JSON.stringify(this.model.get('strikes')));
+      $('#strikesModal .modal-body').html(_.template($('#strikesTemplate').html(), this));
+      $('#strikesModal').modal('show');
     },
     render: function () {
       this.$el.html(this.template({strikes:this.model.get('strikes')}));
