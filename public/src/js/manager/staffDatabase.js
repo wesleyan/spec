@@ -8,6 +8,11 @@ var Staff = Backbone.Model.extend({
   initialize: function() {
     this.on('change', function(staff) {
       var changed = staff.changed;
+
+      if (Object.keys(staff.changed)[0] === "strikes" && staff.get('strikes').length === 0) { //if strikes are empty
+        changed = {strikes: false};
+      }
+
       if (Object.keys(staff.changed)[0] === "task") { //check if arrays are the same
         var prev = staff.previousAttributes();
         var newTasks = splitTrim(staff.get(Object.keys(staff.changed)[0]));

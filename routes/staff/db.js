@@ -62,7 +62,7 @@ module.exports = {
     },
     update: function (req, res) {
         User.permissionControl(req, res, 10);
-        
+        console.log(req.body.what);
         //req.body.id is the _id in the database
         //req.body.what is the update query
         if(req.body.what.level) {
@@ -81,6 +81,9 @@ module.exports = {
             req.body.what.trainee = JSON.parse(req.body.what.trainee);
         }
         if(req.body.what.strikes) {
+          if(req.body.what.strikes === 'false') {
+             req.body.what.strikes = [];
+          }
           req.body.what.strikes = req.body.what.strikes.map(function(x) {
               x.date = new Date(x.date);
               return x;
