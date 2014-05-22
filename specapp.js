@@ -14,11 +14,15 @@
     ejs.open = '{{';
     ejs.close = '}}';
 
-    var express = require('express'),
-        app     = require('./modules/app.js'),
-        _       = require('underscore'),
-        cas     = require('./modules/grand_master_cas.js'),
-        cache   = require('memory-cache');
+    var express        = require('express'),
+        app            = require('./modules/app.js'),
+        _              = require('underscore'),
+        cas            = require('./modules/grand_master_cas.js'),
+        cache          = require('memory-cache'),
+        bodyParser     = require('body-parser'),
+        methodOverride = require('method-override'),
+        cookieParser   = require('cookie-parser'),
+        session        = require('express-session');
 
     var Preferences            = require('./config/Preferences.js'),
         Utility                = require('./modules/Utility.js'),
@@ -33,18 +37,15 @@
 
     cas.configure(Preferences.casOptions);
 
-    app.configure(function() {
-        app.set('views', __dirname + '/views');
-        app.set('view engine', 'ejs');
-        app.enable('trust proxy');
-        
-        app.use(express.bodyParser({keepExtensions: true, uploadDir: __dirname + '/uploads'}));
-        app.use(express.methodOverride());
-        app.use(express.cookieParser('secret'));
-        app.use(express.session());
-        app.use(app.router);
-        app.use(express.static(__dirname + '/public'));
-    });
+    app.set('views', __dirname + '/views');
+    app.set('view engine', 'ejs');
+    app.enable('trust proxy');
+    
+    app.use(bodyParser({keepExtensions: true, uploadDir: __dirname + '/uploads'}));
+    app.use(methodOverride());
+    app.use(cookieParser());
+    app.use(session({secret: Preferences.session.secret, name: 'sid', proxy: Preferences.session.proxy}));
+    app.use(express.static(__dirname + '/public'));
 
     app.all('/api/*', function(req, res, next) {
       res.header("Access-Control-Allow-Origin", "*"); //or just allowed domains if wanted
@@ -54,114 +55,114 @@
 
 // CAS SESSION MANAGEMENT
     // CAS route to redirect to Wesleyan SSO system (GET)
-    app.get('/login', cas.bouncer, routes.general.login);
+    app.route('/login').get(cas.bouncer, routes.general.login);
     // Log out route, deletes session info (GET)
-    app.get('/logout', cas.logout);
+    app.route('/logout').get(cas.logout);
     // Returns username and permission for the user info saved in session (GET)
-    app.get("/user", cas.blocker, routes.general.user);
+    app.route('/user').get(cas.blocker, routes.general.user);
 
 // GOOGLE CALENDAR INTEGRATION
     // Route to redirect to appropriate Google authorization page (GET)
-    app.get('/authorize', cas.blocker, routes.googleCalendar.authorize);
+    app.route('/authorize').get(cas.blocker, routes.googleCalendar.authorize);
     // Route to handle the data coming from Google OAuth (GET)
-    app.get('/oauth2callback', cas.blocker, routes.googleCalendar.oauth2callback);
+    app.route('/oauth2callback').get(cas.blocker, routes.googleCalendar.oauth2callback);
     // Returns the events in the main calendar of the Wesleyan user, in FullCalendar format. (GET)
-    app.get('/gCalEvents/', cas.blocker, routes.googleCalendar.events);
+    app.route('/gCalEvents/').get(cas.blocker, routes.googleCalendar.events);
 
 // EVENTS
     // Returns the events in the given time period (GET)
-    app.get("/events", cas.blocker, routes.events.events);
+    app.route("/events").get(cas.blocker, routes.events.events);
     // Toggle techMustStay to change if staff stays at the duration of the event (POST)
-    app.post("/event/techMustStay", cas.blocker, routes.events.techMustStay);
+    app.route("/event/techMustStay").post(cas.blocker, routes.events.techMustStay);
     // Toggle if it's a video event (POST)
-    app.post("/event/video", cas.blocker, routes.events.video);
+    app.route("/event/video").post(cas.blocker, routes.events.video);
     // Toggle if it's a audio event (POST)
-    app.post("/event/audio", cas.blocker, routes.events.audio);
+    app.route("/event/audio").post(cas.blocker, routes.events.audio);
     // Edit event (POST)
-    app.post("/event/edit", cas.blocker, routes.events.edit);
+    app.route("/event/edit").post(cas.blocker, routes.events.edit);
     // Change needed staff number (POST)
-    app.post("/event/spinner", cas.blocker, routes.events.spinner);
+    app.route("/event/spinner").post(cas.blocker, routes.events.spinner);
     // Toggle event cancel (POST)
-    app.post("/event/cancel", cas.blocker, routes.events.cancel);
+    app.route("/event/cancel").post(cas.blocker, routes.events.cancel);
     // Remove event (POST)
-    app.post("/event/remove", cas.blocker, routes.events.remove);
+    app.route("/event/remove").post(cas.blocker, routes.events.remove);
 
 // API
     // To be used by other IMS applications like PullEffect. (GET)
     // More info can be found in public/doc/index.html
-    app.get('/api/events', routes.api.events);
+    app.route('/api/events').get(routes.api.events);
 
 // TRIVIAL STUFF
 
     // INVENTORY
     // All inventory (GET)
-    app.get("/inventory/all", cas.blocker, routes.inventory.all);
+    app.route("/inventory/all").get(cas.blocker, routes.inventory.all);
     // Existing inventory for each event (GET)
-    app.get("/inventory/existing/:id", cas.blocker, routes.inventory.existing);
+    app.route("/inventory/existing/:id").get(cas.blocker, routes.inventory.existing);
     // Add inventory to an event (POST)
-    app.post("/inventory/add", cas.blocker, routes.inventory.add);
+    app.route("/inventory/add").post(cas.blocker, routes.inventory.add);
     // Remove inventory from an event (POST)
-    app.post("/inventory/remove", cas.blocker, routes.inventory.remove);
+    app.route("/inventory/remove").post(cas.blocker, routes.inventory.remove);
     // Update the inventory amount of a specific item in an event (POST)
-    app.post("/inventory/update", cas.blocker, routes.inventory.update);
+    app.route("/inventory/update").post(cas.blocker, routes.inventory.update);
 
     // NOTES
     // Existing notes for each event (GET)
-    app.get("/notes/existing/:id", cas.blocker, routes.notes.existing);
+    app.route("/notes/existing/:id").get(cas.blocker, routes.notes.existing);
     // Add inventory to an event (POST)
-    app.post("/notes/add", cas.blocker, routes.notes.add);
+    app.route("/notes/add").post(cas.blocker, routes.notes.add);
     // Remove inventory from an event (POST)
-    app.post("/notes/remove", cas.blocker, routes.notes.remove);
+    app.route("/notes/remove").post(cas.blocker, routes.notes.remove);
 
     // STAFF
-    // All event staff in IMS
-    app.get("/staff/all", cas.blocker, routes.staff.all);
-    // Get the existing staff of an event
-    app.get("/staff/get/:id", cas.blocker, routes.staff.get);
+    // All event staff in IMS (GET)
+    app.route("/staff/all").post(cas.blocker, routes.staff.all);
+    // Get the existing staff of an event (GET)
+    app.route("/staff/get/:id").get(cas.blocker, routes.staff.get);
     // Add staff/shift to an event (POST)
-    app.post("/staff/add", cas.blocker, routes.staff.add);
+    app.route("/staff/add").post(cas.blocker, routes.staff.add);
     // Remove staff/shift from an event (POST)
-    app.post("/staff/remove", cas.blocker, routes.staff.remove);
+    app.route("/staff/remove").post(cas.blocker, routes.staff.remove);
     // Sign up for an empty shift for an event (POST)
-    app.post("/staff/shiftsignup", cas.blocker, routes.staff.shiftsignup);
+    app.route("/staff/shiftsignup").post(cas.blocker, routes.staff.shiftsignup);
     // Withdrawing from a shift for an event (POST)
-    app.post("/staff/withdraw", cas.blocker, routes.staff.withdraw);
+    app.route("/staff/withdraw").post(cas.blocker, routes.staff.withdraw);
     // Staff available today (GET)
-    app.get("/staff/available/today", cas.blocker, routes.staff.info.availableToday);
+    app.route("/staff/available/today").get(cas.blocker, routes.staff.info.availableToday);
 
     // Returns the events the given staff has worked in - used in /staffCheck (GET)
-    app.get("/staff/check", cas.blocker, routes.staff.info.check);
+    app.route("/staff/check").get(cas.blocker, routes.staff.info.check);
     // Static page for single staff check (GET)
-    app.get('/staffCheck', cas.blocker, routes.staff.info.staffCheck);
+    app.route('/staffCheck').get(cas.blocker, routes.staff.info.staffCheck);
     // Returns staff table with their work hours in the given time period (GET)
-    app.get("/staff/table", cas.blocker, routes.staff.info.table);
+    app.route("/staff/table").get(cas.blocker, routes.staff.info.table);
     // Static page for staff table (GET)
-    app.get('/staffTable', cas.blocker, routes.staff.info.staffTable);
+    app.route('/staffTable').get(cas.blocker, routes.staff.info.staffTable);
 
     // Static page for staff database (GET)
-    app.get('/staff/db', cas.blocker, routes.staff.db.db);
+    app.route('/staff/db').get(cas.blocker, routes.staff.db.db);
     // Adds staff to database (POST)
-    app.post('/staff/db/add', cas.blocker, routes.staff.db.add);
+    app.route('/staff/db/add').post(cas.blocker, routes.staff.db.add);
     // Deletes staff from database (POST)
-    app.post('/staff/db/delete', cas.blocker, routes.staff.db.delete);
+    app.route('/staff/db/delete').post(cas.blocker, routes.staff.db.delete);
     // Updates staff in database (POST)
-    app.post('/staff/db/update', cas.blocker, routes.staff.db.update);
+    app.route('/staff/db/update').post(cas.blocker, routes.staff.db.update);
 
 // GENERAL
     // Main Spec route (GET)
-    app.get('/', cas.blocker, routes.general.main);
+    app.route('/').get(cas.blocker, routes.general.main);
     // Show events of a date in a printer friendly way (GET)
-    app.get('/print', cas.blocker, routes.print);
+    app.route('/print').get(cas.blocker, routes.print);
 
 // MOBILE
     // Route for the mobile site (GET)
-    app.get('/m', cas.blocker, routes.mobile.m);
+    app.route('/m').get(cas.blocker, routes.mobile.m);
     // Route for the mobile site, counter indicates the requested date. (GET)
-    app.get('/m/:counter/', cas.blocker, routes.mobile.mWithCounter);
+    app.route('/m/:counter/').get(cas.blocker, routes.mobile.mWithCounter);
     // Mobile route for showing single event info. (GET)
-    app.get('/m/event/:id', cas.blocker, routes.mobile.event);
+    app.route('/m/event/:id').get(cas.blocker, routes.mobile.event);
     // Mobile route for showing single staff info. (GET)
-    app.get('/m/staff/:username', cas.blocker, routes.mobile.staff);
+    app.route('/m/staff/:username').get(cas.blocker, routes.mobile.staff);
 
 // UPDATING EVENTS
     setInterval(updateEvents, 1000 * 60 * 60 * 4); //every 4 hours

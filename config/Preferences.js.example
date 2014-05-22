@@ -17,6 +17,11 @@ module.exports = {
         service: 'http://ims-dev.wesleyan.edu:8080/',
         redirectUrl: 'login'
     },
+
+    session: {
+        secret: 'secret',
+        proxy: false // if you do SSL outside of node.
+    },
     
     //Port that Spec will run on
     port: 8080,
