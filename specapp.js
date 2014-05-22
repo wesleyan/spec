@@ -116,7 +116,7 @@
 
     // STAFF
     // All event staff in IMS (GET)
-    app.route("/staff/all").post(cas.blocker, routes.staff.all);
+    app.route("/staff/all").get(cas.blocker, routes.staff.all);
     // Get the existing staff of an event (GET)
     app.route("/staff/get/:id").get(cas.blocker, routes.staff.get);
     // Add staff/shift to an event (POST)
