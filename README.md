@@ -10,4 +10,4 @@ On the backend it uses [Node.js](http://nodejs.org/), [MongoDB](http://www.mongo
 For documentation, please see the [wiki](https://github.com/wesleyan/spec/wiki).
 
 ## License
-[The MIT License](http://github.com/wesleyan/spec/blob/develop/LICENSE)
+[The MIT License](http://github.com/wesleyan/spec/blob/master/LICENSE)
