@@ -463,7 +463,7 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
                 symbol = '';
 
                 if (calEvent.onHold === true) {
-                    symbol += '<i class="icon-ban-circle icon-white"></i> ';
+                    symbol += '<i class="icon-ban-circle"></i> ';
                 }
                 if (calEvent.video === true) {
                     symbol += '<i class="icon-facetime-video"></i> ';
