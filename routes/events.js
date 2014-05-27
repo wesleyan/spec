@@ -218,6 +218,7 @@ module.exports = {
                 } else {
                     //console.log("Event removed");
                     res.json(true);
+                    db.removedEvents.save({XMLid: req.body.XMLid});
                 }
             });
     }

@@ -168,13 +168,18 @@ module.exports = function(cb) {
                 if(obj.status === 'add') {
                     // Push a function to insert the event
                     parallel.push(function(callback) {
-                        db.events.save(obj.event, function(err, saved) {
-                            if (err || !saved) {
-                                console.log("New event is not saved");
-                            } else {
-                                changeNumbers.add++;
-                                callback();
-                            }
+                        db.removedEvents.find({XMLid: obj.event.XMLid}, function(err, result) {
+                            if(err) {console.log('Removed event could not be found');return;}
+                            if(result.length > 0) {return;} //This event has been added and removed before
+
+                            db.events.save(obj.event, function(err, saved) {
+                                if (err || !saved) {
+                                    console.log("New event is not saved");
+                                } else {
+                                    changeNumbers.add++;
+                                    callback();
+                                }
+                            });
                         });
                     });
                 } else if(obj.status === 'update') {
