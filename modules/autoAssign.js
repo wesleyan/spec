@@ -1,23 +1,42 @@
 // This module runs regularly to assign staff to unstaffed events
-var db = require('./promised-db.js');
+var db             = require('./promised-db.js'),
+    fetchCalendars = require('./fetchCalendars.js');
 
 var _      = require('underscore'),
     moment = require('moment');
 
+var fetch = function(start, end, user, callback) {
+    fetchCalendars({
+        start: start,
+        end:   end,
+        user:  user,
+        success: function(items) {
+            callback(items);
+        },
+        error: function(err) {
+            callback([]);
+        }
+    });
+}
+
 module.exports = function () {
   var threeDaysLater = moment().add('d', 3);
+  threeDaysLater = {
+      start: threeDaysLater.startOf('day'),
+      end: threeDaysLater.endOf('day')
+  };
   
   db.events.find({
     start: {
-      $gte: threeDaysLater.startOf('day'),
-      $lt: threeDaysLater.endOf('day')
+      $gte: threeDaysLater.start,
+      $lt: threeDaysLater.end
     }
   }).toArray().then(function (events) {
     return db.staff.find({task: 'events'}).toArray();
   }).then(function (employees) {
      parallel = employees.map(function (employee) {
        return function (cb) {
-         db.staff.find({
+         db.events.find({
                          start: {
                            $gte: moment().subtract('d', 30).startOf('day')
                          }, 
@@ -49,6 +68,21 @@ module.exports = function () {
        //pointList is a sorted array of objects
        //fields in objects: staff, point
        //array asc sorted by point
+
+       async.map(pointList, 
+       function(pointObj, cb) {
+         fetch(threeDaysLater.start,
+               threeDaysLater.end,
+               pointObj.staff, function(events) {
+                 pointObj.events = events;
+                 cb(pointObj);
+               });
+       },
+       function(err, pointListWithEvents) {
+       //pointListWithEvents is a sorted array of objects
+       //fields in objects: staff, point, events
+
+       });
 
       //TODO: starting from the top of the list,
       // 1) check availability for the user for each event
