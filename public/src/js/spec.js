@@ -738,7 +738,7 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
                 url: "event/remove",
                 data: {
                     eventid: Spec.lastClickedEvent._id,
-                    XMLid: Spec.lastClickedEvent._id
+                    XMLid: Spec.lastClickedEvent.XMLid
                 }
             }).done(function(msg) {
                 console.log('event with ID ' + Spec.lastClickedEvent._id + ' removed');
