@@ -104,6 +104,14 @@ var strikeCell = Backgrid.Cell.extend({
     }
 });
 
+var gCalCell = Backgrid.Cell.extend({
+    template: _.template("<%=exists?'Yes':'No' %>"),
+    render: function() {
+      this.$el.html(this.template({exists:!!this.model.get('refresh_token')}));
+      return this;
+    }
+});
+
 var columns = [{
   name: "",
   cell: "select-row",
@@ -143,6 +151,11 @@ var columns = [{
   label: "Trainee",
   cell: "boolean",
 },{
+  name: "refresh_token",
+  label: "GCal",
+  cell: gCalCell,
+  editable: false
+}, {
   name: "strikes",
   label: "Strikes",
   cell: strikeCell
