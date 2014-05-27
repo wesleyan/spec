@@ -193,7 +193,7 @@ module.exports = {
         //console.log("Req for cancel toggle Event ID " + req.body.eventid);
         db.events.update(
             {_id: new mongo.ObjectID(req.body.eventid)},
-            { $set: {'cancelled': JSON.parse(req.body.make) } }, 
+            { $set: {'cancelled': JSON.parse(req.body.make), 'updated': true} }, 
             function(err, updated) {
                 if (err || !updated) {
                     console.log(req.url);
@@ -218,7 +218,7 @@ module.exports = {
                 } else {
                     //console.log("Event removed");
                     res.json(true);
-                    db.removedEvents.save({XMLid: req.body.XMLid});
+                    db.removedEvents.save({XMLid: parseInt(req.body.XMLid)});
                 }
             });
     }
