@@ -170,7 +170,7 @@ module.exports = function(cb) {
                     parallel.push(function(callback) {
                         db.removedEvents.find({XMLid: obj.event.XMLid}, function(err, result) {
                             if(err) {console.log('Removed event could not be found');return;}
-                            if(result.length > 0) {return;} //This event has been added and removed before
+                            if(result.length > 0) {callback();return;} //This event has been added and removed before
 
                             db.events.save(obj.event, function(err, saved) {
                                 if (err || !saved) {
