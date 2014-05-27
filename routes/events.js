@@ -111,16 +111,16 @@ module.exports = {
         //console.log("Req for event edit Event ID " + req.body.eventid);
         var query = {updated:true};
         _.each(req.body.changedData, function(value, key) {
-            if(key == 'title' || key == 'desc' || key == 'loc') {
+            if(['title', 'desc', 'loc'].indexOf(key) > -1) {
                 query[key] = value;
             }
         });
         var reqDate = new Date(Date.parse(req.body.changedData.date));
-        reqDate = (reqDate.getMonth() + 1) + '/' + reqDate.getDate() + '/' +  reqDate.getFullYear() + ' ';
+            reqDate = (reqDate.getMonth() + 1) + '/' + reqDate.getDate() + '/' +  reqDate.getFullYear() + ' ';
         query.start = new Date(Date.parse(reqDate + req.body.changedData.timepickerResStart));
-        query.end = new Date(Date.parse(reqDate + req.body.changedData.timepickerResEnd));
-        query.eventStart = new Date(Date.parse(reqDate + req.body.changedData.timepickerEventStart));
-        query.eventEnd = new Date(Date.parse(reqDate + req.body.changedData.timepickerEventEnd));
+        query.end   = new Date(Date.parse(reqDate + req.body.changedData.timepickerResEnd));
+        query.eventStart  = new Date(Date.parse(reqDate + req.body.changedData.timepickerEventStart));
+        query.eventEnd    = new Date(Date.parse(reqDate + req.body.changedData.timepickerEventEnd));
         query.staffNeeded = parseInt(req.body.changedData.staffNeeded);
         db.events.findAndModify(
             {

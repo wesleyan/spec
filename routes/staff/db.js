@@ -62,7 +62,6 @@ module.exports = {
     },
     update: function (req, res) {
         User.permissionControl(req, res, 10);
-        console.log(req.body.what);
         //req.body.id is the _id in the database
         //req.body.what is the update query
         if(req.body.what.level) {
