@@ -83,9 +83,13 @@ module.exports = function() {
     start: {
       $gte: threeDaysLater.start,
       $lt: threeDaysLater.end
-    }
+    },
   }).toArray().then(function(events) {
-    eventsToAssign = events;
+    //events has all events of the next 3 days
+    //eventsToAssign are the ones that have no full shifts.
+    eventsToAssign = events.filter(function(event) {
+      return event.shifts.map(function(s){return s.staff;}).filter(function(n){return n;}).length < 1;
+    });
     return db.staff.find({
       task: 'events',
       professional: {
