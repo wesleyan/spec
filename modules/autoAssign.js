@@ -30,12 +30,11 @@ var assignEventStaff = function(event, pointStaffObj) {
 };
 
 module.exports = function () {
-  var threeDaysLater = moment().add('d', 3);
-  threeDaysLater = {
-      start: threeDaysLater.startOf('day'),
-      end: threeDaysLater.endOf('day')
+  var threeDaysLater = {
+      start: moment().add('d', 3).startOf('day').toDate(),
+      end: moment().add('d', 3).endOf('day').toDate()
   };
-  
+
   var eventsToAssign = [];
 
   db.events.find({
@@ -51,9 +50,9 @@ module.exports = function () {
        return function (cb) {
          db.events.find({
                          start: {
-                           $gte: moment().subtract('d', 30).startOf('day')
+                           $gte: moment().subtract('d', 30).startOf('day').toDate()
                          }, 
-                         shifts: {$elemMatch: {staff: employee}}
+                         shifts: {$elemMatch: {staff: employee.username}}
                        }, function (err, events) {
            if(err || !events) {return false;}
            cb(null, {staff: employee, events: events});
@@ -87,10 +86,10 @@ module.exports = function () {
          //fetch events for the user and assign them to `events` key.
          fetch(threeDaysLater.start,
                threeDaysLater.end,
-               pointObj.staff, 
+               pointObj.staff.username, 
                function(events) {
                  pointObj.events = events;
-                 cb(pointObj);
+                 cb(null, pointObj);
                });
        },
        function(err, pointListWithEvents) {
