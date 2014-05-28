@@ -5,6 +5,10 @@ var db             = require('./promised-db.js'),
 var _      = require('underscore'),
     moment = require('moment');
 
+var isValidDate = function(d) {
+  return !isNaN(d.getTime());
+};
+
 var fetch = function(start, end, user, callback) {
     fetchCalendars({
         start: start,
@@ -17,7 +21,7 @@ var fetch = function(start, end, user, callback) {
             callback([]);
         }
     });
-}
+};
 
 var isStaffAvailable = function(event, pointStaffObj) {
   //check each event in the events key of the pointStaffObj
@@ -27,6 +31,7 @@ var isStaffAvailable = function(event, pointStaffObj) {
 
 var assignEventStaff = function(event, pointStaffObj) {
   //assigns the staff to the event
+  console.log('Assign ' + pointStaffObj.staff.username + ' to ' + event.title);
 };
 
 module.exports = function () {
@@ -88,18 +93,30 @@ module.exports = function () {
                threeDaysLater.end,
                pointObj.staff.username, 
                function(events) {
-                 pointObj.events = events;
+                 pointObj.events = events.map(function(gEvent) {
+                   return {
+                     start: new Date(gEvent.start.dateTime),
+                     end:   new Date(gEvent.end.dateTime)
+                   };
+                 }).filter(function(event) {
+                   return isValidDate(event.start) && isValidDate(event.end);
+                 });
+
                  cb(null, pointObj);
                });
        },
        function(err, pointListWithEvents) {
        //pointListWithEvents is a sorted array of objects
        //fields in objects: staff, point, events
-
+      
+        // Starting from the top of the list,
+        // 1) check availability for the user for each event
+        // 2) assign staff to the first possible event
+        // 3) remove the assigned staff from the candidate list
+        // 4) Continue looping through the events
          eventsToAssign.forEach(function(event) {
            //using a for loop to be able to break it when a match is found
            for (var i = pointListWithEvents.length - 1; i >= 0; i--) {
-             pointListWithEvents[i]
              if(isStaffAvailable(event, pointListWithEvents[i])) {
                //staff is available, assign
                assignEventStaff(event, pointListWithEvents[i]);
@@ -112,12 +129,7 @@ module.exports = function () {
          });
 
        });
-
-      //TODO: starting from the top of the list,
-      // 1) check availability for the user for each event
-      // 2) assign staff to the first possible event
-      // 3) move to next staff if not available or if there's any other staff
-
+      //end of async.map
      });
   });
 };
