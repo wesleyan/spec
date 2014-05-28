@@ -19,6 +19,16 @@ var fetch = function(start, end, user, callback) {
     });
 }
 
+var isStaffAvailable = function(event, pointStaffObj) {
+  //check each event in the events key of the pointStaffObj
+  // to determine if the staff has any conflicting thing
+  return false;
+};
+
+var assignEventStaff = function(event, pointStaffObj) {
+  //assigns the staff to the event
+};
+
 module.exports = function () {
   var threeDaysLater = moment().add('d', 3);
   threeDaysLater = {
@@ -26,12 +36,15 @@ module.exports = function () {
       end: threeDaysLater.endOf('day')
   };
   
+  var eventsToAssign = [];
+
   db.events.find({
     start: {
       $gte: threeDaysLater.start,
       $lt: threeDaysLater.end
     }
   }).toArray().then(function (events) {
+    eventsToAssign = events;
     return db.staff.find({task: 'events'}).toArray();
   }).then(function (employees) {
      parallel = employees.map(function (employee) {
@@ -71,9 +84,11 @@ module.exports = function () {
 
        async.map(pointList, 
        function(pointObj, cb) {
+         //fetch events for the user and assign them to `events` key.
          fetch(threeDaysLater.start,
                threeDaysLater.end,
-               pointObj.staff, function(events) {
+               pointObj.staff, 
+               function(events) {
                  pointObj.events = events;
                  cb(pointObj);
                });
@@ -81,6 +96,21 @@ module.exports = function () {
        function(err, pointListWithEvents) {
        //pointListWithEvents is a sorted array of objects
        //fields in objects: staff, point, events
+
+         eventsToAssign.forEach(function(event) {
+           //using a for loop to be able to break it when a match is found
+           for (var i = pointListWithEvents.length - 1; i >= 0; i--) {
+             pointListWithEvents[i]
+             if(isStaffAvailable(event, pointListWithEvents[i])) {
+               //staff is available, assign
+               assignEventStaff(event, pointListWithEvents[i]);
+               //remove the staff from the candidate list for next events
+               pointListWithEvents = _.without(pointListWithEvents, pointListWithEvents[i]);
+               break;
+             }
+           }
+
+         });
 
        });
 
