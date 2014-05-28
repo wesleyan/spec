@@ -1,0 +1,8 @@
+<h1>You are assigned to a new shift!</h1>
+<p><strong>{{=event.title}}</strong></p>
+<p>from {{=app.locals.formatAMPM(shift.start)}} to {{=app.locals.formatAMPM(shift.end)}}, on from {{=app.locals.getFormattedDate(event.start)}}</p>
+<p>in {{=event.loc}}</p>
+<p><b>This is the event description for the event:</b></p><p>{{=event.desc}}</p>
+
+<h2><a href="{{=app.locals.url}}/staff/confirm/{{=shift._id}}">Click here to confirm your availability!</a></h2>
+<p><i>If you need further information, please check Spec or ask your managers.</i></p>

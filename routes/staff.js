@@ -206,5 +206,18 @@ module.exports = {
                 }
             });                
         //console.log("Req for withdrawing shift ID " + req.body.id + " from Event ID " + req.body.eventid);
+    },
+    confirm: function(req, res) { //GET
+        db.events.update(
+            {'shifts._id': new mongo.ObjectID(req.params.id)},
+            {$set: {'shifts.$.confirmed': true}}, 
+            function(err, updated) {
+                if(err || !updated) {
+                    console.log('Shift could not be confirmed.');
+                    return;
+                }
+                //show a page
+                res.json(true);
+            });
     }
 };

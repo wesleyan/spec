@@ -148,6 +148,9 @@
     // Updates staff in database (POST)
     app.route('/staff/db/update').post(cas.blocker, routes.staff.db.update);
 
+    //Shift confirmation for automatic assignment system (GET)
+    app.route('/staff/confirm/:id').get(routes.staff.confirm);
+
 // GENERAL
     // Main Spec route (GET)
     app.route('/').get(cas.blocker, routes.general.main);

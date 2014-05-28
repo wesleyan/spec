@@ -1,8 +1,12 @@
 // This module runs regularly to assign staff to unstaffed events
-var db             = require('./promised-db.js'),
+var app            = require('./app.js'),
+    db             = require('./promised-db.js'),
+    Utility        = require('./Utility.js'),
     fetchCalendars = require('./fetchCalendars.js');
 
 var _      = require('underscore'),
+    ejs    = require('ejs'),
+    mongo  = require('mongodb-wrapper'),
     moment = require('moment-range');
 
 var isValidDate = function(d) {
@@ -38,11 +42,38 @@ var isStaffAvailable = function(event, pointStaffObj) {
 var assignEventStaff = function(event, pointStaffObj) {
   //assigns the staff to the event
   console.log('Assign ' + pointStaffObj.staff.username + ' to ' + event.title);
+
+  var newShift = {
+    id:        new mongo.ObjectID(),
+    staff:     pointStaffObj.staff.username,
+    start:     event.start,
+    end:       event.end,
+    confirmed: false
+  };
+
+  //add shift to database.
+  db.events.update({
+    _id: new mongo.ObjectID(event._id)
+  }, {
+    $push: {
+      shifts: newShift
+    }
+  }).then(function() {
+    //send notification/confirmation e-mail to the staff
+    Utility.sendSingleMail({
+      to: pointStaffObj.staff.username + '@wesleyan.edu',
+      subject: 'You are assigned to a new shift! : ' + event.title,
+      html: ejs.render(fs.readFileSync(__dirname + '/../views/mail/autoAssignConfirmation.ejs', 'utf8'), 
+                       {'app': app, 'event': event, 'shift': newShift})
+    });
+
+    //mail sent, assignment finished.
+  });
 };
 
 module.exports = function() {
   var threeDaysLater = {
-    start: moment().add('d', 3).startOf('day').toDate(),
+    start: moment().add('d', 1).startOf('day').toDate(),
     end: moment().add('d', 3).endOf('day').toDate()
   };
 
