@@ -1,4 +1,4 @@
-var moment = require('moment');
+var moment = require('moment-range');
 
 var bLocations = [
   /\bBeckham Hall\b/gi,

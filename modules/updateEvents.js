@@ -16,7 +16,7 @@ var _       = require('underscore'),
     cache   = require('memory-cache'),
     ejs     = require('ejs'),
     async   = require('async'),
-    moment  = require('moment');
+    moment  = require('moment-range');
 
 // takes two moment.js objects and gives the API url to make a request to.
 var generateApiUrl = function(start, end) {

@@ -7,7 +7,7 @@ var Utility = require('./Utility.js'),
 var _       = require('underscore'),
     fs      = require('fs'),
     ejs     = require('ejs'),
-    moment  = require('moment');
+    moment  = require('moment-range');
 
 module.exports = function() {
     //check if there is an event starting in an hour

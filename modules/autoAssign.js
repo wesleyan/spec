@@ -3,7 +3,7 @@ var db             = require('./promised-db.js'),
     fetchCalendars = require('./fetchCalendars.js');
 
 var _      = require('underscore'),
-    moment = require('moment');
+    moment = require('moment-range');
 
 var isValidDate = function(d) {
   return !isNaN(d.getTime());
@@ -26,7 +26,13 @@ var fetch = function(start, end, user, callback) {
 var isStaffAvailable = function(event, pointStaffObj) {
   //check each event in the events key of the pointStaffObj
   // to determine if the staff has any conflicting thing
-  return false;
+  event.range = moment().range(event.start, event.end);
+
+  return pointStaffObj.gEvents.map(function(gEvent) {
+    return moment().range(gEvent.start, gEvent.end);
+  }).reduceRight(function(prev, current) {
+    return prev && (!event.range.overlaps(current));
+  }, true);
 };
 
 var assignEventStaff = function(event, pointStaffObj) {
@@ -92,14 +98,14 @@ module.exports = function () {
          fetch(threeDaysLater.start,
                threeDaysLater.end,
                pointObj.staff.username, 
-               function(events) {
-                 pointObj.events = events.map(function(gEvent) {
+               function(gEvents) {
+                 pointObj.gEvents = gEvents.map(function(gEvent) {
                    return {
                      start: new Date(gEvent.start.dateTime),
                      end:   new Date(gEvent.end.dateTime)
                    };
-                 }).filter(function(event) {
-                   return isValidDate(event.start) && isValidDate(event.end);
+                 }).filter(function(gEvent) {
+                   return isValidDate(gEvent.start) && isValidDate(gEvent.end);
                  });
 
                  cb(null, pointObj);
@@ -107,7 +113,7 @@ module.exports = function () {
        },
        function(err, pointListWithEvents) {
        //pointListWithEvents is a sorted array of objects
-       //fields in objects: staff, point, events
+       //fields in objects: staff, point, gEvents
       
         // Starting from the top of the list,
         // 1) check availability for the user for each event
