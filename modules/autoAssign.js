@@ -93,7 +93,7 @@ var assignEventStaff = function(event, pointStaffObj, shift) {
 
 };
 
-module.exports = function() {
+module.exports = function(cb) {
   var threeDaysLater = {
     start: moment().add('d', 1).startOf('day').toDate(),
     end: moment().add('d', 3).endOf('day').toDate()
@@ -199,12 +199,16 @@ module.exports = function() {
           // lookForStaff: 
           // precondition : pointListWithEvents have the staff 
           //                who are not auto assigned yet
+
+          var count = 0;
+
           var lookForStaff = function(event, start, end, shift) {
             //using a for loop to be able to break it when a match is found
             for (var i = 0; i < pointListWithEvents.length; i++) {
               if (isStaffAvailable(start, end, pointListWithEvents[i])) {
                 //staff is available, assign
                 assignEventStaff(event, pointListWithEvents[i], shift);
+                count++;
                 //remove the staff from the candidate list for next events
                 pointListWithEvents = _.without(pointListWithEvents, pointListWithEvents[i]);
                 break;
@@ -224,6 +228,9 @@ module.exports = function() {
               });
             }
           });
+
+          cb(count);
+
         });
       //end of async.map
     });

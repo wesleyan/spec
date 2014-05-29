@@ -4,6 +4,7 @@ var Utility     = require('./Utility.js'),
     db          = require('./promised-db.js'),
     app         = require('./app.js'),
     hackyAssign = require('./hackyAssign.js'),
+    autoAssign  = require('./autoAssign.js'),
     categorize  = require('./categorizeEvents.js');
 
 var sendEmsUpdateNotifications = require('./sendEmsUpdateNotifications.js');
@@ -236,6 +237,12 @@ module.exports = function(cb) {
                    // second parameter contains an array of cancelled event objects
                 */
                 sendEmsUpdateNotifications(apiEvents, dbEvents);
+
+                // start auto assignment module
+                autoAssign(function(count) {
+                    console.log('Auto assignment system filled ' + count + ' shifts.');
+                });
+
                 if(!_.isUndefined(cb)) {
                     cb(changeNumbers);
                 }
