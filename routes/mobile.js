@@ -5,7 +5,7 @@ var Utility     = require('./../modules/Utility.js'),
     
 var _        = require('underscore'),
     cache    = require('memory-cache'),
-    mongo    = require('mongodb-wrapper');
+    mongo    = require('mongojs');
 
 module.exports = {
     m: function (req, res) {
@@ -48,7 +48,7 @@ module.exports = {
         });    
     },
     event: function (req, res) {
-        query = {'_id': new mongo.ObjectID(req.params.id)};
+        query = {'_id': mongo.ObjectId(req.params.id)};
         db.events.find(query, function(err, events) {
             if (err || !events) {
                 console.log(req.url);

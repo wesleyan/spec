@@ -3,7 +3,7 @@ var Utility  = require('./../../modules/Utility.js'),
     db       = require('./../../modules/db.js');
     
 var _        = require('underscore'),
-    mongo    = require('mongodb-wrapper'),
+    mongo    = require('mongojs'),
     cache    = require('memory-cache');
 
 module.exports = {

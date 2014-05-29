@@ -2,14 +2,14 @@ var User      = require('./../modules/user.js'),
     db        = require('./../modules/db.js');
     
 var _         = require('underscore'),
-    mongo     = require('mongodb-wrapper');
+    mongo     = require('mongojs');
 
 module.exports = {
     existing: function(req, res) {
         
         //console.log("Req for fetching notes of Event ID " + req.params.id);
         //Event filtering and inventory
-        db.events.find({_id: new mongo.ObjectID(req.params.id)}, function(err, events) {
+        db.events.find({_id: mongo.ObjectId(req.params.id)}, function(err, events) {
             if (err || !events) {
                 console.log(req.url);
                 console.log("No events found: " + err);
@@ -21,9 +21,9 @@ module.exports = {
     add: function(req, res) { //post
         
         //console.log("Req for adding note \"" + req.body.note + "\" to Event ID " + req.body.eventid);
-        var generatedID = new mongo.ObjectID();
+        var generatedID = mongo.ObjectId();
         db.events.update(
-            {_id: new mongo.ObjectID(req.body.eventid)},
+            {_id: mongo.ObjectId(req.body.eventid)},
             { $addToSet: {'notes': {'id': generatedID, 'text': req.body.note,'user': User.getUser(req), 'date': new Date()}} }, 
             function(err, updated) {
                 if (err || !updated) {
@@ -41,8 +41,8 @@ module.exports = {
         //console.log("Req for removing note ID " + req.body.id + " from Event ID " + req.body.eventid);
         var deleteNote = function() {
             db.events.update(
-                {_id: new mongo.ObjectID(req.body.eventid)},
-                { $pull: {'notes': {'id': new mongo.ObjectID(req.body.id)} } }, 
+                {_id: mongo.ObjectId(req.body.eventid)},
+                { $pull: {'notes': {'id': mongo.ObjectId(req.body.id)} } }, 
                 function(err, updated) {
                     if (err || !updated) {
                         console.log(req.url);
@@ -56,7 +56,7 @@ module.exports = {
         if(User.permission(req) == 10) { //remove the note if it's a manager
             deleteNote();
         } else {
-            db.events.find({_id: new mongo.ObjectID(req.body.eventid)}, function(err, events) {
+            db.events.find({_id: mongo.ObjectId(req.body.eventid)}, function(err, events) {
                 if (err || !events) {
                     console.log(req.url);
                     console.log(err);

@@ -1,7 +1,7 @@
 var User      = require('./../modules/user.js'),
     db        = require('./../modules/db.js');
     
-var mongo     = require('mongodb-wrapper'),
+var mongo     = require('mongojs'),
     cache     = require('memory-cache'),
     _         = require('underscore');
 
@@ -16,7 +16,7 @@ module.exports = {
         /*var selectedEvent = events.filter(function(event) {
             return event.id == req.params.id;
         })[0];*/
-        db.events.findOne({_id: new mongo.ObjectID(req.params.id)}, function(err, event) {
+        db.events.findOne({_id: mongo.ObjectId(req.params.id)}, function(err, event) {
             if (err || !event) {
                 console.log(req.url);
                 console.log("No events found: " + err);
@@ -45,7 +45,7 @@ module.exports = {
         }
 
         db.events.update(
-            {_id: new mongo.ObjectID(req.body.eventid)},
+            {_id: mongo.ObjectId(req.body.eventid)},
             { $addToSet: {'inventory': {item: req.body.inventoryid, amt: 1} } }, 
             function(err, updated) {
                 if (err || !updated) {
@@ -64,7 +64,7 @@ module.exports = {
         }
         //console.log("Req for removing inventory ID " + req.body.inventoryid + " from Event ID " + req.body.eventid);
         db.events.update(
-            {_id: new mongo.ObjectID(req.body.eventid)},
+            {_id: mongo.ObjectId(req.body.eventid)},
             { $pull: {'inventory': {item: req.body.inventoryid} } }, 
             function(err, updated) {
                 if (err || !updated) {
@@ -83,7 +83,7 @@ module.exports = {
         }
         //console.log("Req for updating inventory ID " + req.body.inventoryid + " from Event ID " + req.body.eventid);
         db.events.update(
-            {_id: new mongo.ObjectID(req.body.eventid), 'inventory.item': req.body.inventoryid},
+            {_id: mongo.ObjectId(req.body.eventid), 'inventory.item': req.body.inventoryid},
             { $set: {'inventory.$.amt': req.body.amount} }, 
             function(err, updated) {
                 if (err || !updated) {

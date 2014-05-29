@@ -6,7 +6,7 @@ var app            = require('./app.js'),
 
 var _      = require('underscore'),
     ejs    = require('ejs'),
-    mongo  = require('mongodb-wrapper'),
+    mongo  = require('mongojs'),
     moment = require('moment-range');
 
 var isValidDate = function(d) {
@@ -56,7 +56,7 @@ var assignEventStaff = function(event, pointStaffObj, shift) {
   if(shift === false) {
     // assign to a new shift
     var newShift = {
-      id:        new mongo.ObjectID(),
+      id:        mongo.ObjectId(),
       staff:     pointStaffObj.staff.username,
       start:     event.start,
       end:       event.end,
@@ -65,7 +65,7 @@ var assignEventStaff = function(event, pointStaffObj, shift) {
 
     //add shift to database.
     db.events.update({
-      _id: new mongo.ObjectID(event._id)
+      _id: event._id
     }, {
       $push: {
         shifts: newShift
@@ -78,8 +78,8 @@ var assignEventStaff = function(event, pointStaffObj, shift) {
     //assign to a specific shift
     shift.staff = pointStaffObj.staff.username;
     db.events.update({
-      '_id':       new mongo.ObjectID(event._id),
-      'shifts.id': new mongo.ObjectID(shift.id)
+      '_id':       event._id,
+      'shifts.id': shift.id
     }, {
       $set: {
         'shifts.$.staff': shift.staff
@@ -112,12 +112,10 @@ module.exports = function(cb) {
     eventsToAssign = events.filter(function(event) {
       return event.shifts.map(function(s){return s.staff;}).filter(function(n){return n;}).length < 1;
     });
-    return db.staff.find({
-      task: 'events',
-      professional: {
-        $exists: false //don't include professional staff
-      },
-      isWorking: true
+    return db.staff.find({ //pick candidates
+      task: 'events',      //who do events
+      professional: false  //are not professional
+      isWorking: true      //and currently on campus
     }).toArray();
   }).then(function(employees) {
     parallel = employees.map(function(employee) {

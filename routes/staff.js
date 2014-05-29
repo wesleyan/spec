@@ -4,7 +4,7 @@ var Utility  = require('./../modules/Utility.js'),
     
 var _        = require('underscore'),
     fs       = require('fs'),
-    mongo    = require('mongodb-wrapper'),
+    mongo    = require('mongojs'),
     cache    = require('memory-cache');
 
 module.exports = {
@@ -23,7 +23,7 @@ module.exports = {
     },
     get: function(req, res) {
         // Filter the events/database and return the staff and shifts info (requires to decide on db structure)
-        db.events.find({_id: new mongo.ObjectID(req.params.id)}, function(err, events) {
+        db.events.find({_id: mongo.ObjectId(req.params.id)}, function(err, events) {
             if (err || !events) {
                 console.log(req.url);
                 console.log("No events found");
@@ -45,12 +45,12 @@ module.exports = {
         //console.log("Req for adding shift \"" + chosenStaff + "\" to Event ID " + req.body.eventid);
         var eventStart = new Date(Date.parse(req.body.eventStart)),
             eventEnd = new Date(Date.parse(req.body.eventEnd)),
-            generatedID = new mongo.ObjectID(),
+            generatedID = mongo.ObjectId(),
             startDate = new Date(Date.parse(eventStart.getFullYear() + "-" + (eventStart.getMonth()+1) + "-" + eventStart.getDate() + " " +req.body.start)),
             endDate = new Date(Date.parse(eventEnd.getFullYear() + "-" + (eventStart.getMonth()+1) + "-" + eventEnd.getDate() + " " +req.body.end)),
             newShift = {'id': generatedID, 'start': startDate,'end': endDate, 'staff': chosenStaff};
         db.events.findAndModify({
-                            query: {_id: new mongo.ObjectID(req.body.eventid)},
+                            query: {_id: mongo.ObjectId(req.body.eventid)},
                             update: { $addToSet: {'shifts': newShift} }, 
                             new: true
                         },
@@ -71,13 +71,13 @@ module.exports = {
             });
     },
     remove: function(req, res) { //post
-        var query = {'shifts': {'id': new mongo.ObjectID(req.body.id)} };
+        var query = {'shifts': {'id': mongo.ObjectId(req.body.id)} };
         if(User.permission(req) < 10) { //users other than the manager 
             query.shifts.staff = User.getUser(req);
         }
         //console.log("Req for removing shift ID " + req.body.id + " from Event ID " + req.body.eventid);
         db.events.findAndModify({
-                            query: {_id: new mongo.ObjectID(req.body.eventid)},
+                            query: {_id: mongo.ObjectId(req.body.eventid)},
                             update: { $pull: query }, 
                             new: false //return the data before the update
                         },
@@ -117,7 +117,7 @@ module.exports = {
     },
     shiftsignup: function(req, res) { //post
         //find the data to be updated (before update!)
-        db.events.findOne({_id: new mongo.ObjectID(req.body.eventid)},
+        db.events.findOne({_id: mongo.ObjectId(req.body.eventid)},
             function(err, updated) {
                 if (err || !updated) {
                     console.log(req.url);
@@ -137,7 +137,7 @@ module.exports = {
                         return false;
                     }
                     //it is safe to update now
-                    db.events.update({_id: new mongo.ObjectID(req.body.eventid), 'shifts.id': new mongo.ObjectID(req.body.id)},
+                    db.events.update({_id: mongo.ObjectId(req.body.eventid), 'shifts.id': mongo.ObjectId(req.body.id)},
                                      {$set: {'shifts.$.staff': User.getUser(req)}},
                                      function(err, ifUpdated) {
                                         if (err || !ifUpdated) {
@@ -160,7 +160,7 @@ module.exports = {
     },
     withdraw: function(req, res) { //post
         //find the data to be updated (before update!)
-        db.events.findOne({_id: new mongo.ObjectID(req.body.eventid)},
+        db.events.findOne({_id: mongo.ObjectId(req.body.eventid)},
             function(err, updated) {
                 if (err || !updated) {
                     console.log(req.url);
@@ -180,7 +180,7 @@ module.exports = {
                         return false;
                     }
                     //it is safe to update now
-                    db.events.update({_id: new mongo.ObjectID(req.body.eventid), 'shifts.id': new mongo.ObjectID(req.body.id)},
+                    db.events.update({_id: mongo.ObjectId(req.body.eventid), 'shifts.id': mongo.ObjectId(req.body.id)},
                                      {$set: {'shifts.$.staff': ''}},
                                      function(err, ifUpdated) {
                                         if (err || !ifUpdated) {
@@ -209,7 +209,7 @@ module.exports = {
     },
     confirm: function(req, res) { //GET
         db.events.update(
-            {'shifts._id': new mongo.ObjectID(req.params.id)},
+            {'shifts._id': mongo.ObjectId(req.params.id)},
             {$set: {'shifts.$.confirmed': true}}, 
             function(err, updated) {
                 if(err || !updated) {

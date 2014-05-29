@@ -6,7 +6,7 @@ var Utility   = require('./../modules/Utility.js'),
     
 var fs         = require('fs'),
     _          = require('underscore'),
-    mongo      = require('mongodb-wrapper');
+    mongo      = require('mongojs');
 
 module.exports = {
     events: function(req, res) {
@@ -57,7 +57,7 @@ module.exports = {
         
         //console.log("Req for techMustStay toggle Event ID " + req.body.eventid);
         db.events.update(
-            {_id: new mongo.ObjectID(req.body.eventid)},
+            {_id: mongo.ObjectId(req.body.eventid)},
             { $set: {'techMustStay': JSON.parse(req.body.make) } }, 
             function(err, updated) {
                 if (err || !updated) {
@@ -75,7 +75,7 @@ module.exports = {
 
         //console.log("Req for techMustStay toggle Event ID " + req.body.eventid);
         db.events.update(
-            {_id: new mongo.ObjectID(req.body.eventid)},
+            {_id: mongo.ObjectId(req.body.eventid)},
             { $set: {'video': JSON.parse(req.body.make) } }, 
             function(err, updated) {
                 if (err || !updated) {
@@ -92,7 +92,7 @@ module.exports = {
         User.permissionControl(req, res, 10);
 
         db.events.update(
-            {_id: new mongo.ObjectID(req.body.eventid)},
+            {_id: mongo.ObjectId(req.body.eventid)},
             { $set: {'audio': JSON.parse(req.body.make) } }, 
             function(err, updated) {
                 if (err || !updated) {
@@ -124,7 +124,7 @@ module.exports = {
         query.staffNeeded = parseInt(req.body.changedData.staffNeeded);
         db.events.findAndModify(
             {
-                query: {_id: new mongo.ObjectID(req.body.eventid)},
+                query: {_id: mongo.ObjectId(req.body.eventid)},
                 update: { $set: query }, 
                 new: true
             },
@@ -174,7 +174,7 @@ module.exports = {
 
         //console.log("Req for staffNeeded spinner for Event ID " + req.body.eventid);
         db.events.update(
-            {_id: new mongo.ObjectID(req.body.eventid)},
+            {_id: mongo.ObjectId(req.body.eventid)},
             { $set: {'staffNeeded': parseInt(req.body.make) } }, 
             function(err, updated) {
                 if (err || !updated) {
@@ -192,7 +192,7 @@ module.exports = {
 
         //console.log("Req for cancel toggle Event ID " + req.body.eventid);
         db.events.update(
-            {_id: new mongo.ObjectID(req.body.eventid)},
+            {_id: mongo.ObjectId(req.body.eventid)},
             { $set: {'cancelled': JSON.parse(req.body.make), 'updated': true} }, 
             function(err, updated) {
                 if (err || !updated) {
@@ -210,7 +210,7 @@ module.exports = {
 
         //console.log("Req for remove Event ID " + req.body.eventid);
         db.events.remove(
-            {_id: new mongo.ObjectID(req.body.eventid)},
+            {_id: mongo.ObjectId(req.body.eventid)},
             function(err, removed) {
                 if (err || !removed) {
                     console.log(req.url);

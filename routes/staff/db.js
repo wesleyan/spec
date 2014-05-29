@@ -3,7 +3,7 @@ var Utility  = require('./../../modules/Utility.js'),
     db       = require('./../../modules/db.js');
     
 var _          = require('underscore'),
-    mongo      = require('mongodb-wrapper');
+    mongo      = require('mongojs');
     
 module.exports = {
     db: function(req, res) {
@@ -50,7 +50,7 @@ module.exports = {
         
         //req.body.id is the _id in the database
         db.staff.remove(
-            {'_id': new mongo.ObjectID(req.body.id)},
+            {'_id': mongo.ObjectId(req.body.id)},
             function(err, removed) {
                 if (err || !removed) {
                     console.log("Staff could not be deleted:" + err);
@@ -94,7 +94,7 @@ module.exports = {
         }
 
         db.staff.update( 
-            {'_id': new mongo.ObjectID(req.body.id)},
+            {'_id': mongo.ObjectId(req.body.id)},
             { $set: req.body.what }, 
             function(err, updated) {
                 if (err || !updated) {

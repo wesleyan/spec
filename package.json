@@ -25,7 +25,6 @@
     "ejs": "*",
     "underscore": "*",
     "mongojs": "*",
-    "mongodb-wrapper": "*",
     "ofe": "*",
     "nodemailer": "*",
     "async": "*",
