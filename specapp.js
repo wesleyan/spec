@@ -171,7 +171,11 @@
     setInterval(updateEvents, 1000 * 60 * 60 * 4); //every 4 hours
     app.get('/update', function(req, res) {
         User.permissionControl(req, res, 10);
-        updateEvents(function(change) {
+        updateEvents(function(result) {
+            //result structure -> {update: {add: int, update: int, remove: int}, 
+            //                     autoAssignCount: int}
+            
+            //console.log(JSON.stringify(result));
             res.redirect(Preferences.path_on_server);
         });
     });

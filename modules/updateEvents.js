@@ -240,12 +240,10 @@ module.exports = function(cb) {
 
                 // start auto assignment module
                 autoAssign(function(count) {
-                    console.log('Auto assignment system filled ' + count + ' shifts.');
+                    if(!_.isUndefined(cb)) {
+                        cb({update: changeNumbers, autoAssignCount: count});
+                    }
                 });
-
-                if(!_.isUndefined(cb)) {
-                    cb(changeNumbers);
-                }
             });
         })
         .fail(function(err) { //triggered in any error
