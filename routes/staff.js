@@ -209,7 +209,7 @@ module.exports = {
     },
     confirm: function(req, res) { //GET
         db.events.update(
-            {'shifts._id': mongo.ObjectId(req.params.id)},
+            {'shifts.id': mongo.ObjectId(req.params.id)},
             {$set: {'shifts.$.confirmed': true}}, 
             function(err, updated) {
                 if(err || !updated) {
@@ -217,7 +217,7 @@ module.exports = {
                     return;
                 }
                 //show a page
-                res.json(true);
+                res.send("<h2>Your shift is confirmed!</h2>");
             });
     }
 };

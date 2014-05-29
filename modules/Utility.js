@@ -33,7 +33,7 @@ var Utility = {
                 }
             }
         });
-        smtpTransport.close();
+        //smtpTransport.close();
     },
     fullShiftNumber: function(event) {
         return event.shifts.map(function(s){return s.staff;}).filter(function(n){return n;}).length;

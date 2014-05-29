@@ -370,6 +370,9 @@
 					<% } else { %>
 						<%= op.item.staffname %> (<%= op.item.staff %>)
 					<% } %>
+					<% if(typeof op.item.confirmed !== 'undefined') { %>
+						&nbsp;(<%=(op.item.confirmed) ? 'Confirmed' : 'Unconfirmed' %>)
+					<% } %>
 				</td>
 				<td><%= Spec.formatAMPM(new Date(Date.parse(op.item.start))) %></td>
 				<td><%= Spec.formatAMPM(new Date(Date.parse(op.item.end))) %></td>

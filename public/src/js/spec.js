@@ -46,8 +46,13 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
             } else if (shiftNumber > event.staffNeeded) {
                 $("#popupTitleButton").addClass("btn-info");
             }
-
-            $('#popupStaffInfo').html(shiftNumber + '/' + event.staffNeeded);
+            var suffix = '';
+            event.shifts.forEach(function(shift) {
+                if(!_(shift.confirmed).isUndefined() && !shift.confirmed) {
+                    suffix = '?';
+                }
+            });
+            $('#popupStaffInfo').html(shiftNumber + suffix + '/' + event.staffNeeded);
         },
         resizeMap: function() {
             var height = $(window).height() - 30;
@@ -546,7 +551,15 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
                     element.contextmenu({
                         'target': '#context-menu'
                     });
-                    var shiftList = event.shifts.map(function(s){return s.staff;}).filter(function(n){return n;});
+                    var shiftList = event.shifts.map(function(s) {
+                        var suffix = '';
+                        if(!_(s.confirmed).isUndefined() && !s.confirmed) {
+                            suffix = '(?)';
+                        }
+                        return s.staff + suffix;
+                    }).filter(function(n) {
+                        return n;
+                    });
                     if (shiftList.length > 0) {
                         element.tooltip({
                             'title': 'Staff: ' + shiftList.join(', ')
