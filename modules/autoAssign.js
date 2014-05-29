@@ -5,6 +5,7 @@ var app            = require('./app.js'),
     fetchCalendars = require('./fetchCalendars.js');
 
 var _      = require('underscore'),
+    fs     = require('fs'),
     ejs    = require('ejs'),
     mongo  = require('mongojs'),
     moment = require('moment-range');
@@ -112,10 +113,10 @@ module.exports = function(cb) {
     eventsToAssign = events.filter(function(event) {
       return event.shifts.map(function(s){return s.staff;}).filter(function(n){return n;}).length < 1;
     });
-    return db.staff.find({ //pick candidates
-      task: 'events',      //who do events
-      professional: false  //are not professional
-      isWorking: true      //and currently on campus
+    return db.staff.find({    //pick candidates
+      task:        'events',  //who do events
+      professional: false,    //are not professional
+      isWorking:    true      //and currently on campus
     }).toArray();
   }).then(function(employees) {
     parallel = employees.map(function(employee) {

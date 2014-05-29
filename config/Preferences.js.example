@@ -14,7 +14,7 @@ module.exports = {
     casOptions: {
         casHost: 'sso.wesleyan.edu',
         ssl: true,
-        service: 'http://ims-dev.wesleyan.edu:8080/',
+        service: 'http://ims-dev.wesleyan.edu:8080/', //it should always end with slash
         redirectUrl: 'login'
     },
 
