@@ -27,48 +27,70 @@ var fetch = function(start, end, user, callback) {
   });
 };
 
-var isStaffAvailable = function(event, pointStaffObj) {
+var isStaffAvailable = function(start, end, pointStaffObj) {
   //check each event in the events key of the pointStaffObj
   // to determine if the staff has any conflicting thing
-  event.range = moment().range(event.start, event.end);
+  var range = moment().range(start, end);
 
   return pointStaffObj.gEvents.map(function(gEvent) {
     return moment().range(gEvent.start, gEvent.end);
   }).reduceRight(function(prev, current) {
-    return prev && (!event.range.overlaps(current));
+    return prev && (!range.overlaps(current));
   }, true);
 };
 
-var assignEventStaff = function(event, pointStaffObj) {
+var sendAssignmentNotification = function(event, shift) {
+  //send notification/confirmation e-mail to the staff
+  Utility.sendSingleMail({
+    to: shift.staff + '@wesleyan.edu',
+    subject: 'You are assigned to a new shift! : ' + event.title,
+    html: ejs.render(fs.readFileSync(__dirname + '/../views/mail/autoAssignConfirmation.ejs', 'utf8'), 
+                     {'app': app, 'event': event, 'shift': shift})
+  });
+};
+
+var assignEventStaff = function(event, pointStaffObj, shift) {
   //assigns the staff to the event
-  console.log('Assign ' + pointStaffObj.staff.username + ' to ' + event.title);
+  //console.log('Assign ' + pointStaffObj.staff.username + ' to ' + event.title);
 
-  var newShift = {
-    id:        new mongo.ObjectID(),
-    staff:     pointStaffObj.staff.username,
-    start:     event.start,
-    end:       event.end,
-    confirmed: false
-  };
+  if(shift === false) {
+    // assign to a new shift
+    var newShift = {
+      id:        new mongo.ObjectID(),
+      staff:     pointStaffObj.staff.username,
+      start:     event.start,
+      end:       event.end,
+      confirmed: false
+    };
 
-  //add shift to database.
-  db.events.update({
-    _id: new mongo.ObjectID(event._id)
-  }, {
-    $push: {
-      shifts: newShift
-    }
-  }).then(function() {
-    //send notification/confirmation e-mail to the staff
-    Utility.sendSingleMail({
-      to: pointStaffObj.staff.username + '@wesleyan.edu',
-      subject: 'You are assigned to a new shift! : ' + event.title,
-      html: ejs.render(fs.readFileSync(__dirname + '/../views/mail/autoAssignConfirmation.ejs', 'utf8'), 
-                       {'app': app, 'event': event, 'shift': newShift})
+    //add shift to database.
+    db.events.update({
+      _id: new mongo.ObjectID(event._id)
+    }, {
+      $push: {
+        shifts: newShift
+      }
+    }).then(function() {
+        sendAssignmentNotification(event, newShift);
     });
 
-    //mail sent, assignment finished.
-  });
+  } else if(_(shift).isObject()) { 
+    //assign to a specific shift
+    shift.staff = pointStaffObj.staff.username;
+    db.events.update({
+      '_id':       new mongo.ObjectID(event._id),
+      'shifts.id': new mongo.ObjectID(shift.id)
+    }, {
+      $set: {
+        'shifts.$.staff': shift.staff
+      }
+    }).then(function() {
+        sendAssignmentNotification(event, shift);
+    });
+  } else {
+    console.error('staff object passed to assignEventStaff is invalid.');
+  }
+
 };
 
 module.exports = function() {
@@ -172,16 +194,33 @@ module.exports = function() {
           // 2) assign staff to the first possible event
           // 3) remove the assigned staff from the candidate list
           // 4) Continue looping through the events
-          eventsToAssign.forEach(function(event) {
+
+          // lookForStaff: 
+          // precondition : pointListWithEvents have the staff 
+          //                who are not auto assigned yet
+          var lookForStaff = function(event, start, end, shift) {
             //using a for loop to be able to break it when a match is found
             for (var i = 0; i < pointListWithEvents.length; i++) {
-              if (isStaffAvailable(event, pointListWithEvents[i])) {
+              if (isStaffAvailable(start, end, pointListWithEvents[i])) {
                 //staff is available, assign
-                assignEventStaff(event, pointListWithEvents[i]);
+                assignEventStaff(event, pointListWithEvents[i], shift);
                 //remove the staff from the candidate list for next events
                 pointListWithEvents = _.without(pointListWithEvents, pointListWithEvents[i]);
                 break;
               }
+            }
+          };
+
+          eventsToAssign.forEach(function(event) {
+            if (event.shifts.length < 1) {
+              lookForStaff(event, event.start, event.end, false);
+            } else {
+              event.shifts.forEach(function(shift) {
+                if(shift.staff === '') {
+                  //look for staff if the shift is empty
+                  lookForStaff(event, shift.start, shift.end, shift);
+                }
+              });
             }
           });
         });
