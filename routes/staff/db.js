@@ -80,8 +80,8 @@ module.exports = {
         if(req.body.what.trainee) {
             req.body.what.trainee = JSON.parse(req.body.what.trainee);
         }
-        if(req.body.what.onCampus) {
-            req.body.what.onCampus = JSON.parse(req.body.what.trainee);
+        if(req.body.what.isWorking) {
+            req.body.what.isWorking = JSON.parse(req.body.what.isWorking);
         }
         if(req.body.what.strikes) {
           if(req.body.what.strikes === 'false') {

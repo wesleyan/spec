@@ -151,8 +151,8 @@ var columns = [{
   label: "Trainee",
   cell: "boolean",
 }, {
-  name: "onCampus",
-  label: "On Campus",
+  name: "isWorking",
+  label: "Is Working?",
   cell: "boolean",
 },{
   name: "refresh_token",
