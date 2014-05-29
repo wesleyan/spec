@@ -116,7 +116,8 @@ module.exports = function() {
       task: 'events',
       professional: {
         $exists: false //don't include professional staff
-      }
+      },
+      onCampus: true
     }).toArray();
   }).then(function(employees) {
     parallel = employees.map(function(employee) {

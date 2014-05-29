@@ -150,6 +150,10 @@ var columns = [{
   name: "trainee",
   label: "Trainee",
   cell: "boolean",
+}, {
+  name: "onCampus",
+  label: "On Campus",
+  cell: "boolean",
 },{
   name: "refresh_token",
   label: "GCal",

@@ -22,6 +22,7 @@ module.exports = {
         toAdd.trainee = !!parseInt(toAdd.trainee);
         toAdd.task = toAdd.task.split(',').map(function(x) {return x.trim();});
         toAdd.strikes = [];
+        toAdd.onCampus = true;
 
         db.staff.find({'username': toAdd.username}, function(err, data) {
             if (err || !data) {
@@ -78,6 +79,9 @@ module.exports = {
         }
         if(req.body.what.trainee) {
             req.body.what.trainee = JSON.parse(req.body.what.trainee);
+        }
+        if(req.body.what.onCampus) {
+            req.body.what.onCampus = JSON.parse(req.body.what.trainee);
         }
         if(req.body.what.strikes) {
           if(req.body.what.strikes === 'false') {
