@@ -912,7 +912,6 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
             }); //done function
         });
 
-
         // Solves Bootstrap typeahead dropdown overflow problem
         $('#collapseTwo').on('click shown keydown', function() {
             $(this).css('overflow', 'visible');

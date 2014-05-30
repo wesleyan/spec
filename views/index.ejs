@@ -52,8 +52,8 @@
 		    <li><a href="staff/db/"><i class="icon-briefcase"></i> Staff Database</a></li>
 		   	<li class="divider"></li>
 		    {{ } }}
-		    <li><a href="https://ims.wesleyan.edu/"><i class="icon-inbox"></i> Office Manager</a></li>
-		    <li><a href="http://github.com/wesleyan/spec/wiki/Help"><i class="icon-question-sign"></i> Help</a></li>
+		    <li><a href="https://ims.wesleyan.edu/" target="_blank"><i class="icon-inbox"></i> Office Manager</a></li>
+		    <li><a href="http://github.com/wesleyan/spec/wiki/Help" target="_blank"><i class="icon-question-sign"></i> Help</a></li>
 		    <li><a href="logout/"><i class="icon-thumbs-down"></i> Log out</a></li>
 		  </ul>
 		</span>
@@ -67,9 +67,6 @@
   	<span id="rightGroup">
 		  <a type="button" class="btn btn-primary" {{ if(gCalIsActive) { }}id="gCalButton"{{ } else { }}href="authorize/"{{ } }}>
 		  	<i class="icon-calendar icon-white"></i> G
-		  </a>
-		  <a type="button" class="btn btn-info" href="#onlyMine">
-		  	<i class="icon-filter icon-white"></i>
 		  </a>
 	</span>
 
