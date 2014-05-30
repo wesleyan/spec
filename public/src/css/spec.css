@@ -77,8 +77,18 @@ body {
   background-color: #7F5417;
 }
 
-.striped {
+.unconfirmed {
+  /* used to be called striped */
   background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.3) 35px, rgba(255,255,255,.3) 70px);
+}
+
+.setupAndBreakdown {
+  background: linear-gradient(135deg, #ECEDDC 25%, transparent 25%) -10px 0,
+              linear-gradient(225deg, #ECEDDC 25%, transparent 25%) -10px 0,
+              linear-gradient(315deg, #ECEDDC 25%, transparent 25%),
+              linear-gradient(45deg, #ECEDDC 25%, transparent 25%);   
+  background-size: 20px 20px;
+  background-color: gray;
 }
 /* End of event colors*/
 
