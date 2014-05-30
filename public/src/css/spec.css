@@ -82,7 +82,7 @@ body {
   background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.3) 35px, rgba(255,255,255,.3) 70px);
 }
 
-.setupAndBreakdown {
+.setupAndBreakdown .fc-event-bg div:not(.event-bg-section) {
   background: linear-gradient(135deg, #ECEDDC 25%, transparent 25%) -10px 0,
               linear-gradient(225deg, #ECEDDC 25%, transparent 25%) -10px 0,
               linear-gradient(315deg, #ECEDDC 25%, transparent 25%),
