@@ -374,6 +374,7 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
                     $('.combobox').combobox({
                         placeholder: 'Choose a staff'
                     });
+                    $('.coverStaff').tooltip({title:'Sent a tech from the office', placement: 'left'});
                     $('#staffSpinner').spinner();
                     $('#staffSpinner').on('changed', function(e, val) {
                         $.ajax({
