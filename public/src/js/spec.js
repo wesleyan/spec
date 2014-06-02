@@ -779,6 +779,24 @@ var Spec = {}; //the only global variable that is supposed to be used in this ap
             });
             return false;
         });
+        $('body').on('click','.coverStaff', function(e) {
+            var self = this;
+            var shiftid = $(this).attr('href');
+            var current = $(this).hasClass('active');
+            $.ajax({
+                type: "POST",
+                url: "staff/cover",
+                data: {
+                    'id': shiftid,
+                    'set': !current
+                }
+            }).done(function(msg) {
+                Spec.refetchEvents();
+                console.log('staff cover change for event ID ' + Spec.lastClickedEvent._id + ', ID: ' + shiftid);
+                $(self).toggleClass('active');
+            });
+            return false;
+        });
         $('body').on('click','#addNewStaff',function(e) {
             var chosenStaff = '';
             if($('.combobox').val() === '') {

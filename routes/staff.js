@@ -219,5 +219,24 @@ module.exports = {
                 //show a page
                 res.send("<h2>Your shift is confirmed!</h2>");
             });
+    },
+    cover: function(req, res) { //POST
+        if(User.permission(req) < 10) { //users other than the manager 
+            res.json(false);
+            return;
+        }
+
+        db.events.update({}, {}, function() {
+            db.events.update(
+                {'shifts.id': mongo.ObjectId(req.body.id)},
+                {$set: {'shifts.$.cover': JSON.parse(req.body.set)}}, 
+                function(err, updated) {
+                    if(err || !updated) {
+                        res.json(false);
+                        return;
+                    }
+                    res.json(true);
+                });
+        });
     }
 };

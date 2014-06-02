@@ -127,6 +127,8 @@
     app.route("/staff/shiftsignup").post(cas.blocker, routes.staff.shiftsignup);
     // Withdrawing from a shift for an event (POST)
     app.route("/staff/withdraw").post(cas.blocker, routes.staff.withdraw);
+    // Setting a shift as a cover shift (POST)
+    app.route("/staff/cover").post(cas.blocker, routes.staff.cover);
     // Staff available today (GET)
     app.route("/staff/available/today").get(cas.blocker, routes.staff.info.availableToday);
 

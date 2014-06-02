@@ -152,7 +152,11 @@ module.exports = function(cb) {
 
       var pointList = _(eventStaff.map(function(obj) {
         var p = obj.events.reduceRight(function(point, event) {
-          return point + categoryValue[event.category];
+          var add = categoryValue[event.category];
+          if(_(event.shifts).findWhere({staff: obj.staff.username}).cover) {
+            add = 0;
+          }
+          return point + add;
         }, 0);
 
         return {

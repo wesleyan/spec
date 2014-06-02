@@ -378,6 +378,10 @@
 					{{ if(permission != 10) { }}
 						<% if(Spec.username === op.item.staff) { %>
 					{{ } }}
+              <span class="btn btn-info btn-mini coverStaff <%=(op.item.cover?'active':'') %>" type="button" href="<%= op.item.id %>">
+								<i class="icon-flag icon-white"></i>
+							</span>
+              <br>
 							<span class="btn btn-danger btn-mini removeStaff" type="button" href="<%= op.item.id %>">
 								<i class="icon-remove icon-white"></i>
 							</span>
