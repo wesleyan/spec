@@ -107,6 +107,7 @@ module.exports = function(cb) {
       $gte: threeDaysLater.start,
       $lt: threeDaysLater.end
     },
+    cancelled: false
   }).toArray().then(function(events) {
     //events has all events of the next 3 days
     //eventsToAssign are the ones that have no full shifts.
