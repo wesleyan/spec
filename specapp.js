@@ -153,6 +153,10 @@
     //Shift confirmation for automatic assignment system (GET)
     app.route('/staff/confirm/:id').get(routes.staff.confirm);
 
+// REPORTING
+    // Show events of a date in a printer friendly way (GET)
+    app.route('/report').get(cas.blocker, routes.report.main);
+
 // GENERAL
     // Main Spec route (GET)
     app.route('/').get(cas.blocker, routes.general.main);

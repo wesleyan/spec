@@ -3,6 +3,7 @@ module.exports = {
     events:         require('./events.js'),
     api:            require('./api.js'),
     print:          require('./print.js'),
+    report:         require('./report.js'),
 
     staff:          require('./staff.js'),
     inventory:      require('./inventory.js'),

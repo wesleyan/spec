@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Spec: Reporting Interface</title>
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/backgrid.js/0.2.6/backgrid.min.css" rel="stylesheet">
+    <link href="{{=app.locals.path }}dist/css/db.min.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 30px;
+      }
+      .buttons {
+        margin-top: 20px;
+        float:left;
+      }
+    </style>
+    <!-- Just for debugging purposes. Don't actually copy this line! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+      <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="#">Spec: Reporting Interface</a>
+          <div class="nav-collapse collapse pull-right">
+            <ul class="nav">
+              <li><a href="{{=app.locals.path }}">Back to Spec</a></li>
+              <li><a data-toggle="modal" data-target="#helpModal">Help</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="buttons">
+        <!-- <button class="btn btn-primary" type="button" id="newStaff">New Staff</button>
+        <button class="btn btn-danger" type="button" id="deleteStaff">Delete Selected Staff</button> -->
+      </div>
+      <div class="stuff">
+      </div>
+    </div><!-- /.container -->
+    <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/backbone-pageable/1.4.5/backbone-pageable.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/backgrid.js/0.2.6/backgrid.js"></script>
+    <script src="{{=app.locals.path }}dist/js/db.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <script src="{{=app.locals.path }}dist/js/manager/reportingInterface.min.js"></script>
+  </body>
+</html>
