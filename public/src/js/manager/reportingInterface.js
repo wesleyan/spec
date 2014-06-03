@@ -5,20 +5,27 @@ var Event = Backbone.Model.extend({
 var PageableEventList = Backbone.PageableCollection.extend({
   model: Event,
   state: {
-    pageSize: 20
+    pageSize: 10
   },
-  mode: "client"
+  mode: "client",
+  overview: function() {
+    $('#overview').html(_.template($('#overview-template').html(), {events: this.fullCollection.toJSON()}));
+  }
 });
+
+var fullShiftNumber = function(event) {
+  return event.shifts.map(function(s){return s.staff;}).filter(function(n){return n;}).length;
+};
 
 var StaffNumberCell = Backgrid.Cell.extend({
     render: function() {
-      this.$el.html(this.model.get('shifts').map(function(s){return s.staff;}).filter(function(n){return n;}).length);
+      this.$el.html(fullShiftNumber(this.model.attributes));
       return this;
     }
 });
 var InventoryCell = Backgrid.Cell.extend({
     render: function() {
-      this.$el.html(this.model.get('inventory').reduce(function(prev, current) {return prev + current.amt;}, 0));
+      this.$el.html(this.model.get('inventory').reduce(function(prev, current) {return prev + parseInt(current.amt);}, 0));
       return this;
     }
 });
@@ -104,7 +111,13 @@ $(document).ready(function() {
                               '&end='   + ($('#d2').data('datepicker').date.getTime() / 1000);
       pageableEventList.fetch({
         reset: true,
-        success: function() {$( "a:contains('Date')" ).trigger('click').trigger('click');}
+        success: function() {
+          pageableEventList.overview();
+          if(typeof done === 'undefined') {
+            done=true;
+            $( "a:contains('Date')" ).trigger('click').trigger('click');
+          }
+        }
       });
     };
 
@@ -129,7 +142,8 @@ $(document).ready(function() {
       fields: ['title', 'loc']
     });
 
-    $stuff.before(filter.render().el);
+    //$stuff.before(filter.render().el);
+    $('.buttons').after(filter.render().el);
     $(filter.el).css({
       float: "right",
       margin: "20px"
