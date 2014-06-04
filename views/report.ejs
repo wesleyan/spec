@@ -101,32 +101,60 @@
                   <tr>
                       <td>Total Number of Fully Staffed Events</td>
                       <td>
-                        <%=events.reduce(function(prev, event){return prev + ((fullShiftNumber(event) === event.staffNeeded)?1:0);}, 0) %>
+                        <%=data.fullyStaffed %>
                       </td>
                   </tr>
                   <tr>
                       <td>Total Number of Partially Staffed Events</td>
                       <td>
-                        <%=events.reduce(function(prev, event){return prev + ((fullShiftNumber(event) < event.staffNeeded && fullShiftNumber(event) > 0)?1:0);}, 0) %>
+                        <%=data.partiallyStaffed %>
                       </td>
                   </tr>
                   <tr>
                       <td>Total Number of Unstaffed Events</td>
                       <td>
-                        <%=events.reduce(function(prev, event){return prev + ((fullShiftNumber(event) === 0)?1:0);}, 0) %>
+                        <%=data.unstaffedEvents %>
                       </td>
                   </tr>
                   <tr>
                       <td>Total Number of Hours</td>
                       <td>
-                        <%=events.reduce(function(prev, event){return prev + ((Date.parse(event.end)-Date.parse(event.start))/(60*60*1000));}, 0).toFixed(2) %>
+                        <%=data.totalHours %>
+                      </td>
+                  </tr>
+                  <tr>
+                      <td>Total Number of Shift Hours</td>
+                      <td>
+                        <%=data.totalShiftHours %>
                       </td>
                   </tr>
               </tbody>
           </table>
         </div>
         <div class="span4">
-       </div>
+          <table class="table table-striped table-bordered">
+            <tbody>
+              <tr>
+                  <td>Total Number of A Events</td>
+                  <td>
+                      <%=data.getCategoryNumber('A') %>
+                  </td>
+              </tr>
+              <tr>
+                  <td>Total Number of B Events</td>
+                  <td>
+                      <%=data.getCategoryNumber('B') %>
+                  </td>
+              </tr>
+              <tr>
+                  <td>Total Number of C Events</td>
+                  <td>
+                      <%=data.getCategoryNumber('C') %>
+                  </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <div class="span4">
         </div>
       </div>

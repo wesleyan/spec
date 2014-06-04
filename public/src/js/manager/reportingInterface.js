@@ -1,5 +1,12 @@
+var fullShiftNumber = function(event) {
+  return event.shifts.map(function(s){return s.staff;}).filter(function(n){return n;}).length;
+};
+
 var Event = Backbone.Model.extend({
-  initialize: function() {}
+  initialize: function() {
+    this.set('shiftHour', this.get('shifts').reduce(function(prev, shift){return prev + ((Date.parse(shift.end)-Date.parse(shift.start))/(60*60*1000));}, 0));
+    this.set('fullShiftNumber', fullShiftNumber(this.attributes));
+  }
 });
 
 var PageableEventList = Backbone.PageableCollection.extend({
@@ -9,20 +16,22 @@ var PageableEventList = Backbone.PageableCollection.extend({
   },
   mode: "client",
   overview: function() {
-    $('#overview').html(_.template($('#overview-template').html(), {events: this.fullCollection.toJSON()}));
+    var events = this.fullCollection.toJSON();
+    var data = {
+      fullyStaffed: events.reduce(function(prev, event){return prev + ((fullShiftNumber(event) === event.staffNeeded)?1:0);}, 0),
+      partiallyStaffed: events.reduce(function(prev, event){return prev + ((fullShiftNumber(event) < event.staffNeeded && fullShiftNumber(event) > 0)?1:0);}, 0),
+      unstaffedEvents: events.reduce(function(prev, event){return prev + ((fullShiftNumber(event) === 0)?1:0);}, 0),
+      totalHours: events.reduce(function(prev, event){return prev + ((Date.parse(event.end)-Date.parse(event.start))/(60*60*1000));}, 0).toFixed(2),
+      totalShiftHours: events.reduce(function(p, c){ return p + c.shiftHour; }, 0).toFixed(2),
+      getCategoryNumber: function(cat) {
+        return _.where(events, {category: cat}).length;
+      }
+    };
+    $('#overview').html(_.template($('#overview-template').html(), {events: events, data: data}));
   }
 });
 
-var fullShiftNumber = function(event) {
-  return event.shifts.map(function(s){return s.staff;}).filter(function(n){return n;}).length;
-};
 
-var StaffNumberCell = Backgrid.Cell.extend({
-    render: function() {
-      this.$el.html(fullShiftNumber(this.model.attributes));
-      return this;
-    }
-});
 var InventoryCell = Backgrid.Cell.extend({
     render: function() {
       this.$el.html(this.model.get('inventory').reduce(function(prev, current) {return prev + parseInt(current.amt);}, 0));
@@ -52,18 +61,24 @@ var columns = [{
   editable: false
 }, {
   name: "start",
+        
   label: "Date",
   cell: "date",
   editable: false
 }, {
-  name: "shifts",
+  name: "fullShiftNumber",
   label: "Staff Assigned",
-  cell: StaffNumberCell,
+  cell: 'integer',
   editable: false
 }, {
   name: "staffNeeded",
   label: "Staff Needed",
-  cell: "string",
+  cell: "integer",
+  editable: false
+}, {
+  name: "shiftHour",
+  label: "Shift Hour",
+  cell: 'number',
   editable: false
 }, {
   name: "inventory",
