@@ -22,6 +22,7 @@ var PageableEventList = Backbone.PageableCollection.extend({
   overview: function() {
     var events = this.fullCollection.toJSON();
     var data = {
+      all: events.length,
       cancelled: _.where(events, {cancelled: true}).length,
       fullyStaffed: events.reduce(function(prev, event){return prev + ((fullShiftNumber(event) === event.staffNeeded)?1:0);}, 0),
       partiallyStaffed: events.reduce(function(prev, event){return prev + ((fullShiftNumber(event) < event.staffNeeded && fullShiftNumber(event) > 0)?1:0);}, 0),
@@ -30,13 +31,17 @@ var PageableEventList = Backbone.PageableCollection.extend({
       totalShiftHours: events.reduce(function(p, c){ return p + c.shiftHour; }, 0).toFixed(2),
       getCategoryNumber: function(cat) {
         return _.where(events, {category: cat}).length;
-      }
+      },
+      techMustStay: _.where(events, {techMustStay: true}).length,
+      video: _.where(events, {video: true}).length,
+      audio: _.where(events, {audio: true}).length,
     };
     this.data = data;
     $('#overview').html(_.template($('#overview-template').html(), {events: events, data: data}));
   },
   graphs: function() {
-    $('#graphs').html(_.template($('#graphs-template').html(), {}));
+    var graphType = $('#graph-type').val();
+    $('.graphs').html(_.template($('#graphs-template').html(), {}));
 
     var options = {
         inGraphDataShow: true,
@@ -55,6 +60,16 @@ var PageableEventList = Backbone.PageableCollection.extend({
     };
 
     var self = this;
+    
+    var makeBarData = function() {
+      if(graphType === 'Bar') {
+        data = {
+          labels: data.map(function(x){return x.title;}),
+          datasets: [{data: data.map(function(x){return x.value;}), fillColor: randomColor()}],
+        };
+      }
+    };
+    
 
     var data = ['A', 'B', 'C'].map(function(cat) {
       return {
@@ -64,8 +79,10 @@ var PageableEventList = Backbone.PageableCollection.extend({
       };
     }); 
 
-    var chart1 = new Chart(document.getElementById("chart1").getContext("2d")).Pie(data, options);
-    
+    makeBarData();
+
+    var chart1 = new Chart(document.getElementById("chart1").getContext("2d"))[graphType](data, options);
+    options.graphTitle = "Events by Staffing";
     data = [{
       title: "Fully Staffed",
       value: self.data.fullyStaffed
@@ -82,9 +99,24 @@ var PageableEventList = Backbone.PageableCollection.extend({
       x.color = randomColor();
       return x;
     }); 
-    console.log(data);
+    makeBarData();
 
-    var chart2 = new Chart(document.getElementById("chart2").getContext("2d")).Pie(data, options);
+    var chart2 = new Chart(document.getElementById("chart2").getContext("2d"))[graphType](data, options);
+
+    options.graphTitle = "Events by Staying";
+    data = [{
+      title: "Stay",
+      value: self.data.techMustStay
+    }, {
+      title: "Setup and Breakdown",
+      value: self.data.all - self.data.techMustStay
+    }].map(function(x) {
+      x.color = randomColor();
+      return x;
+    }); 
+    makeBarData();
+
+    var chart3 = new Chart(document.getElementById("chart3").getContext("2d"))[graphType](data, options);
   }
 });
 
@@ -196,7 +228,7 @@ $(document).ready(function() {
 
     $('#filter').change(refreshEvents);
     $('.date').on('changeDate', refreshEvents);
-
+    $('#graph-type').change(function(){pageableEventList.graphs();});
     var paginator = new Backgrid.Extension.Paginator({
       collection: pageableEventList
     });
