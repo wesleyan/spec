@@ -6,6 +6,22 @@ var randomColor = function() {
   return '#'+Math.floor(Math.random()*16777215).toString(16);
 };
 
+var getDaysBetween = function() {
+  var start = new Date($('#d1').data('datepicker').date);
+  var end = $('#d2').data('datepicker').date;
+
+  if (start.getTime() > end.getTime()) {
+    return [];
+  }
+
+  var arr = [];
+  while (start.toDateString() !== end.toDateString()) {
+    arr.push(start.toDateString());
+    start.setDate(start.getDate() + 1);
+  }
+  return arr;
+};
+
 var Event = Backbone.Model.extend({
   initialize: function() {
     this.set('shiftHour', this.get('shifts').reduce(function(prev, shift){return prev + ((Date.parse(shift.end)-Date.parse(shift.start))/(60*60*1000));}, 0));
@@ -40,8 +56,17 @@ var PageableEventList = Backbone.PageableCollection.extend({
     $('#overview').html(_.template($('#overview-template').html(), {events: events, data: data}));
   },
   graphs: function() {
-    var graphType = $('#graph-type').val();
-    $('.graphs').html(_.template($('#graphs-template').html(), {}));
+    var graphType = $('#graph-type').val().split(' - ');
+    if(graphType[0] === 'Events') {
+      this.eventGraphs(graphType[1]);
+    } else if(graphType[0] === 'Time') {
+      this.timeGraphs(graphType[1], graphType[2]);
+    } else {
+      console.error('No such graph exists');
+    }
+  },
+  eventGraphs: function(graphType) {
+    $('.graphs').html(_.template($('#event-graphs-template').html(), {}));
 
     var options = {
         inGraphDataShow: true,
@@ -117,6 +142,106 @@ var PageableEventList = Backbone.PageableCollection.extend({
     makeBarData();
 
     var chart3 = new Chart(document.getElementById("chart3").getContext("2d"))[graphType](data, options);
+  },
+  timeGraphs: function(graphType, choice) {
+    console.log(arguments);
+    $('.graphs').html(_.template($('#time-graphs-template').html(), {}));
+
+    var events = this.fullCollection.toJSON();
+
+    var options = {
+        bezierCurve: false,
+        inGraphDataShow: true,
+        canvasBorders: true,
+        canvasBordersWidth: 2,
+        graphTitleFontSize: 16,
+        legend: true,
+        rotateLabels: "smart",
+        legendBordersSpaceBefore: 0,
+        legendBordersSpaceAfter: 0,
+        startAngle: 0,
+        animationSteps: 20,
+        animationEasing: "easeOutQuart",
+        //animation: false
+    };
+
+    var days = getDaysBetween().map(function(x){return new Date(x);});
+
+    var eventsAtDay = function(d) {
+        return events.filter(function(event) {
+            console.log(event);
+            return (new Date(event.start)).toDateString() === d.toDateString();
+        });
+    };
+
+
+    var data;
+    if(choice === 'Category') {
+
+      options.graphTitle = "Events by Category";
+
+      data = {
+          labels: days.map(function(d) {return (d.getMonth() + 1) + '/' + d.getDate();}),
+          datasets: ['A', 'B', 'C'].map(function(cat) {
+              return {
+                  title: cat,
+                  data: days.map(function(d) {return _(eventsAtDay(d)).where({category:cat}).length;})
+              };
+          }).map(function(x) {
+              x[(graphType === 'Line')?'strokeColor':'fillColor'] = randomColor();
+              x[(graphType === 'Bar')?'strokeColor':'fillColor'] = 'transparent';
+              return x;
+          })
+      };
+    } else if(choice === 'Staffing') {
+      options.graphTitle = "Events by Staffing";
+
+data = {
+  labels: days.map(function(d) {
+    return (d.getMonth() + 1) + '/' + d.getDate();
+  }),
+  datasets: [{
+    title: "Fully Staffed",
+    data: days.map(function(d) {
+      return eventsAtDay(d).reduce(function(prev, event) {
+        return prev + ((fullShiftNumber(event) === event.staffNeeded) ? 1 : 0);
+      }, 0);
+    })
+  }, {
+    title: "Partially Staffed",
+    data: days.map(function(d) {
+      return eventsAtDay(d).reduce(function(prev, event) {
+        return prev + ((fullShiftNumber(event) < event.staffNeeded && fullShiftNumber(event) > 0) ? 1 : 0);
+      }, 0);
+    })
+  }, {
+    title: "Unstaffed",
+    data: days.map(function(d) {
+      return eventsAtDay(d).reduce(function(prev, event) {
+        return prev + ((fullShiftNumber(event) === 0) ? 1 : 0);
+      }, 0);
+    })
+  }, {
+    title: "Cancelled",
+    data: days.map(function(d) {
+      return _.where(eventsAtDay(d), {
+        cancelled: true
+      }).length;
+    })
+  }].map(function(x) {
+    x[(graphType === 'Line') ? 'strokeColor' : 'fillColor'] = randomColor();
+    x[(graphType === 'Bar') ? 'strokeColor' : 'fillColor'] = 'transparent';
+    return x;
+  })
+};
+
+
+    } else {
+      console.error('No such graph choice exists');
+    }
+
+    var chart = new Chart(document.getElementById("chart").getContext("2d"))[graphType](data, options);
+
   }
 });
 

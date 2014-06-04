@@ -28,6 +28,9 @@
       #overview [class*="span"] {
         padding:10px;
       }
+      .graphs .row-fluid [class*="span"] {
+        text-align: center;
+      }
     </style>
     <!-- Just for debugging purposes. Don't actually copy this line! -->
     <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
@@ -86,10 +89,12 @@
         <div class="tab-pane" id="overview"></div>
         <div class="tab-pane" id="graphs">
           <select id="graph-type" class="form-control">
-              <option value="Pie">Events - Pie</option>
-              <option value="Bar">Events - Bar</option>
-              <option value="TimeBar">Time - Bar</option>
-              <option value="TimeLine">Time - Line</option>
+              <option>Events - Pie</option>
+              <option>Events - Bar</option>
+              <option>Time - Bar - Category</option>
+              <option>Time - Line - Category</option>
+              <option>Time - Bar - Staffing</option>
+              <option>Time - Line - Staffing</option>
           </select>`
           <div class="graphs">
           </div>
@@ -183,7 +188,7 @@
         </div>
       </div>
     </script>
-    <script type="text/template" id="graphs-template">
+    <script type="text/template" id="event-graphs-template">
       <div class="row-fluid">
         <div class="span4">
           <canvas id="chart1" height="450" width="450"></canvas>
@@ -193,6 +198,13 @@
         </div>
         <div class="span4">
           <canvas id="chart3" height="450" width="450"></canvas>
+        </div>
+      </div>
+    </script>
+    <script type="text/template" id="time-graphs-template">
+      <div class="row-fluid">
+        <div class="span12">
+          <canvas id="chart" height="500" width="1200"></canvas>
         </div>
       </div>
     </script>
