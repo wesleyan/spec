@@ -77,15 +77,14 @@
       <ul class="nav nav-tabs">
         <li class="active"><a href="#list" data-toggle="tab">List</a></li>
         <li><a href="#overview" data-toggle="tab">Overview</a></li>
+        <li><a href="#graphs" data-toggle="tab">Graphs</a></li>
       </ul>
       </div>
       <!-- Tab panes -->
       <div class="tab-content">
         <div class="tab-pane active" id="list"><div class="stuff"></div></div>
-        <div class="tab-pane" id="overview">
-
-
-        </div>
+        <div class="tab-pane" id="overview"></div>
+        <div class="tab-pane" id="graphs"></div>
       </div>
     <script type="text/template" id="overview-template">
       <div class="row-fluid">
@@ -116,19 +115,25 @@
                         <%=data.unstaffedEvents %>
                       </td>
                   </tr>
-                  <tr>
-                      <td>Total Number of Hours</td>
-                      <td>
-                        <%=data.totalHours %>
-                      </td>
-                  </tr>
-                  <tr>
-                      <td>Total Number of Shift Hours</td>
-                      <td>
-                        <%=data.totalShiftHours %>
-                      </td>
-                  </tr>
               </tbody>
+          </table>
+        </div>
+        <div class="span4">
+          <table class="table table-striped table-bordered">
+            <tbody>
+              <tr>
+                  <td>Total Number of Hours</td>
+                  <td>
+                    <%=data.totalHours %>
+                  </td>
+              </tr>
+              <tr>
+                  <td>Total Number of Shift Hours</td>
+                  <td>
+                    <%=data.totalShiftHours %>
+                  </td>
+              </tr>
+            </tbody>
           </table>
         </div>
         <div class="span4">
@@ -155,6 +160,16 @@
             </tbody>
           </table>
         </div>
+      </div>
+    </script>
+    <script type="text/template" id="graphs-template">
+      <div class="row-fluid">
+        <div class="span4">
+          <canvas id="chart1" height="450" width="450"></canvas>
+        </div>
+        <div class="span4">
+          <canvas id="chart2" height="450" width="450"></canvas>
+        </div>
         <div class="span4">
         </div>
       </div>
@@ -165,6 +180,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/backbone-pageable/1.4.5/backbone-pageable.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/backgrid.js/0.2.6/backgrid.js"></script>
     <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <script src="http://joom.im/code/ChartNew.js/ChartNew.min.js"></script>
     <script src="{{=app.locals.path }}dist/js/db.min.js"></script>
     <script src="{{=app.locals.path }}dist/js/plugins.min.js"></script>
     <script src="{{=app.locals.path }}dist/js/manager/reportingInterface.min.js"></script>

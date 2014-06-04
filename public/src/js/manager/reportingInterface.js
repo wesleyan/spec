@@ -2,6 +2,10 @@ var fullShiftNumber = function(event) {
   return event.shifts.map(function(s){return s.staff;}).filter(function(n){return n;}).length;
 };
 
+var randomColor = function() {
+  return '#'+Math.floor(Math.random()*16777215).toString(16);
+};
+
 var Event = Backbone.Model.extend({
   initialize: function() {
     this.set('shiftHour', this.get('shifts').reduce(function(prev, shift){return prev + ((Date.parse(shift.end)-Date.parse(shift.start))/(60*60*1000));}, 0));
@@ -18,6 +22,7 @@ var PageableEventList = Backbone.PageableCollection.extend({
   overview: function() {
     var events = this.fullCollection.toJSON();
     var data = {
+      cancelled: _.where(events, {cancelled: true}).length,
       fullyStaffed: events.reduce(function(prev, event){return prev + ((fullShiftNumber(event) === event.staffNeeded)?1:0);}, 0),
       partiallyStaffed: events.reduce(function(prev, event){return prev + ((fullShiftNumber(event) < event.staffNeeded && fullShiftNumber(event) > 0)?1:0);}, 0),
       unstaffedEvents: events.reduce(function(prev, event){return prev + ((fullShiftNumber(event) === 0)?1:0);}, 0),
@@ -27,7 +32,59 @@ var PageableEventList = Backbone.PageableCollection.extend({
         return _.where(events, {category: cat}).length;
       }
     };
+    this.data = data;
     $('#overview').html(_.template($('#overview-template').html(), {events: events, data: data}));
+  },
+  graphs: function() {
+    $('#graphs').html(_.template($('#graphs-template').html(), {}));
+
+    var options = {
+        inGraphDataShow: true,
+        canvasBorders: true,
+        canvasBordersWidth: 2,
+        graphTitle: "Events by Category",
+        graphTitleFontSize: 16,
+        legend: true,
+        rotateLabels: "smart",
+        legendBordersSpaceBefore: 0,
+        legendBordersSpaceAfter: 0,
+        startAngle: 0,
+        animationSteps : 20,
+        animationEasing : "easeOutQuart",
+        //animation: false
+    };
+
+    var self = this;
+
+    var data = ['A', 'B', 'C'].map(function(cat) {
+      return {
+        value: self.data.getCategoryNumber(cat),
+        title: cat,
+        color: randomColor() 
+      };
+    }); 
+
+    var chart1 = new Chart(document.getElementById("chart1").getContext("2d")).Pie(data, options);
+    
+    data = [{
+      title: "Fully Staffed",
+      value: self.data.fullyStaffed
+    }, {
+      title: "Partially Staffed",
+      value: self.data.partiallyStaffed
+    }, {
+      title: "Unstaffed",
+      value: self.data.unstaffedEvents
+    }, {
+      title: "Cancelled",
+      value: self.data.cancelled
+    }].map(function(x) {
+      x.color = randomColor();
+      return x;
+    }); 
+    console.log(data);
+
+    var chart2 = new Chart(document.getElementById("chart2").getContext("2d")).Pie(data, options);
   }
 });
 
@@ -128,6 +185,7 @@ $(document).ready(function() {
         reset: true,
         success: function() {
           pageableEventList.overview();
+          pageableEventList.graphs();
           if(typeof done === 'undefined') {
             done=true;
             $( "a:contains('Date')" ).trigger('click').trigger('click');
