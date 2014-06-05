@@ -96,6 +96,7 @@
         <li class="active"><a href="#list" data-toggle="tab">List</a></li>
         <li><a href="#overview" data-toggle="tab">Overview</a></li>
         <li><a href="#graphs" data-toggle="tab">Graphs</a></li>
+        <li><a href="#export" data-toggle="tab">Export</a></li>
       </ul>
       </div>
       <!-- Tab panes -->
@@ -122,6 +123,18 @@
               <option>Semesters</options>
           </select>
           <div class="graphs">
+          </div>
+        </div>
+        <div class="tab-pane" id="export">
+          <div class="container">
+            <div class="span12">
+              <div id="fields"></div>
+              <hr>
+              <button class="btn btn-primary" type="button">
+                <i class="icon-white icon-hdd"></i>
+                Export these fields as CSV
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -6,6 +6,14 @@ var randomColor = function() {
   return '#'+Math.floor(Math.random()*16777215).toString(16);
 };
 
+var exportCSV = function(text) {
+  //downloads a CSV file with the content `text`
+  var pom = document.createElement('a');
+  pom.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(text));
+  pom.setAttribute('download', '');
+  pom.click();
+};
+
 var ordinal = function(i) {
   var j = i % 10;
   if (j == 1 && i != 11) {
@@ -621,6 +629,65 @@ $(document).ready(function() {
     $(filter.el).css({
       float: "right",
       margin: "20px"
+    });
+
+    var fields = [{
+        "id": "title",
+        "text": "Title",
+    }, {
+        "id": "category",
+        "text": "Category",
+    }, {
+        "id": "loc",
+        "text": "Location",
+    }, {
+        "id": "start",
+        "text": "Reserved Start Time",
+    }, {
+        "id": "end",
+        "text": "Reserved End Time",
+    }, {
+        "id": "reservedHour",
+        "text": "Reserved Length in Hours",
+    }, {
+        "id": "eventStart",
+        "text": "Event Start Time",
+    }, {
+        "id": "eventEnd",
+        "text": "Event End Time",
+    }, {
+        "id": "eventHour",
+        "text": "Event Length in Hours",
+    }, {
+        "id": "fullShiftNumber",
+        "text": "# of Assigned Staff",
+    }, {
+        "id": "shiftHour",
+        "text": "Total Hours of Shifts",
+    }, {
+        "id": "staffNeeded",
+        "text": "# of Needed Staff",
+    }, {
+        "id": "inventory",
+        "text": "# of Inventory Used",
+    }, {
+        "id": "cancelled",
+        "text": "Cancelled?",
+    }, {
+        "id": "video",
+        "text": "Video Event?",
+    }, {
+        "id": "audio",
+        "text": "Audio Event?",
+    }, {
+        "id": "techMustStay",
+        "text": "Tech Must Stay?",
+    }];
+
+    $('#fields').tags({
+      only_suggestions: true,
+      suggestions: fields,
+      values: fields
     });
     
     refreshEvents();
