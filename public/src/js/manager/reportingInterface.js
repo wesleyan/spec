@@ -148,7 +148,7 @@ var increaseSemester = function(d) {
   if(d.getTime() < fallThreshold.getTime()) {
     return fallThreshold;
   } else {
-    return new Date('January 1' + y);
+    return new Date('January 1 ' + (y+1));
   }
 };
 
@@ -318,9 +318,7 @@ var PageableEventList = Backbone.PageableCollection.extend({
         animationEasing: "easeOutQuart",
         //animation: false
     };
-
     var days = getDaysBetween().map(function(x){return new Date(x);});
-
     var eventsAtDay = function(d) {
         return events.filter(function(event) {
             return (new Date(event.start)).toDateString() === d.toDateString();
@@ -351,7 +349,6 @@ var PageableEventList = Backbone.PageableCollection.extend({
     var fiscalYears = getFiscalYearsBetween();
     var eventsAtFiscalYear = function(fiscalYear) {
       return events.filter(function(event) {
-        console.log(event);
         return _.isEqual(fiscalYear, getFiscalYear(new Date(event.start)));
       });
     };
@@ -359,7 +356,6 @@ var PageableEventList = Backbone.PageableCollection.extend({
     var semesters = getSemestersBetween();
     var eventsAtSemester = function(semester) {
       return events.filter(function(event) {
-        console.log(event);
         return _.isEqual(semester, getSemester(new Date(event.start)));
       });
     };
@@ -418,7 +414,7 @@ var PageableEventList = Backbone.PageableCollection.extend({
               };
           }).map(function(x) {
               x[(graphType === 'Line')?'strokeColor':'fillColor'] = randomColor();
-              x[(graphType === 'Bar')?'strokeColor':'fillColor'] = 'transparent';
+              x[(graphType === 'Bar' || graphType === 'StackedBar')?'strokeColor':'fillColor'] = 'transparent';
               return x;
           })
       };
@@ -457,7 +453,7 @@ var PageableEventList = Backbone.PageableCollection.extend({
           })
         }].map(function(x) {
           x[(graphType === 'Line') ? 'strokeColor' : 'fillColor'] = randomColor();
-          x[(graphType === 'Bar') ? 'strokeColor' : 'fillColor'] = 'transparent';
+          x[(graphType === 'Bar' || graphType === 'StackedBar')?'strokeColor':'fillColor'] = 'transparent';
           return x;
         })
       };
