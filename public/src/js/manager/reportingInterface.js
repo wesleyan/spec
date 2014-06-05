@@ -83,6 +83,94 @@ var getMonthsBetween = function() {
   return arr;
 };
 
+var getYearsBetween = function() {
+  var start = new Date($('#d1').data('datepicker').date);
+  var end = $('#d2').data('datepicker').date;
+
+  if (start.getTime() > end.getTime()) {
+    return [];
+  }
+
+  var endYear = end.getFullYear();
+  var arr = [];
+  while (!_.isEqual(start.getFullYear(), endYear)) {
+    arr.push(start.getFullYear());
+    start.setFullYear(start.getFullYear() + 1);
+  }
+  arr.push(endYear);
+  return arr;
+};
+
+var getFiscalYear = function(d) {
+  var y = d.getFullYear();
+  var threshold = new Date('July 1 ' + y);
+  return (d.getTime() >= threshold.getTime())?(y):(y-1);
+};
+
+var getFiscalYearsBetween = function() {
+  var start = new Date($('#d1').data('datepicker').date);
+  var end = $('#d2').data('datepicker').date;
+
+  if (start.getTime() > end.getTime()) {
+    return [];
+  }
+
+  var endFiscalYear = getFiscalYear(end);
+  var arr = [];
+  while (!_.isEqual(getFiscalYear(start), endFiscalYear)) {
+    arr.push(getFiscalYear(start));
+    start.setFullYear(start.getFullYear() + 1);
+  }
+  arr.push(endFiscalYear);
+  return arr;
+};
+
+var getSemester = function(d) {
+  var y = d.getFullYear();
+  var summerThreshold = new Date('May 28 ' + y);
+  if(d.getTime() < summerThreshold.getTime()) {
+    return ['Spring', y];
+  }
+  var fallThreshold = new Date('August 25 ' + y);
+  if(d.getTime() < fallThreshold.getTime()) {
+    return ['Summer', y];
+  } else {
+    return ['Fall', y];
+  }
+};
+var increaseSemester = function(d) {
+  var y = d.getFullYear();
+  var summerThreshold = new Date('May 28 ' + y);
+  if(d.getTime() < summerThreshold.getTime()) {
+    return summerThreshold;
+  }
+  var fallThreshold = new Date('August 25 ' + y);
+  if(d.getTime() < fallThreshold.getTime()) {
+    return fallThreshold;
+  } else {
+    return new Date('January 1' + y);
+  }
+};
+
+var getSemestersBetween = function() {
+  var start = new Date($('#d1').data('datepicker').date);
+  var end = $('#d2').data('datepicker').date;
+
+  if (start.getTime() > end.getTime()) {
+    return [];
+  }
+
+  var endSemester = getSemester(end);
+  var arr = [];
+  while (!_.isEqual(getSemester(start), endSemester)) {
+    arr.push(getSemester(start));
+    start = increaseSemester(start);
+  }
+  arr.push(endSemester);
+  return arr;
+};
+
+
 var Event = Backbone.Model.extend({
   initialize: function() {
     this.set('reservedHour', (Date.parse(this.get('end'))-Date.parse(this.get('start')))/(60*60*1000));
@@ -253,6 +341,29 @@ var PageableEventList = Backbone.PageableCollection.extend({
       });
     };
 
+    var years = getYearsBetween();
+    var eventsAtYear = function(year) {
+      return events.filter(function(event) {
+        return _.isEqual(year, (new Date(event.start)).getFullYear());
+      });
+    };
+
+    var fiscalYears = getFiscalYearsBetween();
+    var eventsAtFiscalYear = function(fiscalYear) {
+      return events.filter(function(event) {
+        console.log(event);
+        return _.isEqual(fiscalYear, getFiscalYear(new Date(event.start)));
+      });
+    };
+
+    var semesters = getSemestersBetween();
+    var eventsAtSemester = function(semester) {
+      return events.filter(function(event) {
+        console.log(event);
+        return _.isEqual(semester, getSemester(new Date(event.start)));
+      });
+    };
+
     var graphTime = $('#graph-time').val();
 
     var time, eventsAtTime, labels;
@@ -273,7 +384,23 @@ var PageableEventList = Backbone.PageableCollection.extend({
         eventsAtTime = eventsAtMonth;
         var n = ['January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'];
-        labels = months.map(function(o){return n[o[0]-1] + o[1];}); 
+        labels = months.map(function(o){return n[o[0]-1] + ' ' + o[1];}); 
+        break;
+      case 'Years':
+        time = years;
+        eventsAtTime = eventsAtYear;
+        labels = years.map(String);
+        break;
+      case 'Fiscal Years':
+        time = fiscalYears;
+        eventsAtTime = eventsAtFiscalYear;
+        labels = fiscalYears.map(String);
+        break;
+      case 'Semesters':
+        time = semesters;
+        eventsAtTime = eventsAtSemester;
+        labels = semesters.map(function(o){return o.join(' ');});
+        break;
     }
 
     var data;
