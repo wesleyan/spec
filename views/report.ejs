@@ -31,6 +31,12 @@
       .graphs .row-fluid [class*="span"] {
         text-align: center;
       }
+      .loading {
+        position: absolute;
+        left: 46%;
+        top: 50%;
+        font-size: 1.5em;
+      }
     </style>
     <!-- Just for debugging purposes. Don't actually copy this line! -->
     <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
@@ -42,6 +48,7 @@
     <![endif]-->
   </head>
   <body>
+      <div class="well loading">Loading</div>
       <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -75,6 +82,14 @@
           <input class="input-small" size="16" type="text">
           <span class="add-on"><i class="icon-th"></i></span>
         </div>
+        <select id="pagination" class="form-control input-small">
+          <option>5</option>
+          <option selected>10</option>
+          <option>15</option>
+          <option>20</option>
+          <option>50</option>
+          <option>100</option>
+        </select>
       </div>
       <div class="main-tabs">
       <ul class="nav nav-tabs">
@@ -95,7 +110,12 @@
               <option>Time - Line - Category</option>
               <option>Time - Bar - Staffing</option>
               <option>Time - Line - Staffing</option>
-          </select>`
+          </select>
+          <select id="graph-time" class="form-control">
+              <option>Days</option>
+              <option>Weeks</option>
+              <option>Months</options>
+          </select>
           <div class="graphs">
           </div>
         </div>

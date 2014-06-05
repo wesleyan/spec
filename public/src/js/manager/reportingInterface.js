@@ -6,6 +6,26 @@ var randomColor = function() {
   return '#'+Math.floor(Math.random()*16777215).toString(16);
 };
 
+var ordinal = function(i) {
+  var j = i % 10;
+  if (j == 1 && i != 11) {
+    return i + "st";
+  }
+  if (j == 2 && i != 12) {
+    return i + "nd";
+  }
+  if (j == 3 && i != 13) {
+    return i + "rd";
+  }
+  return i + "th";
+};
+
+var getWeek = function(d) {
+  //returns [week number, year]
+  var j1 = new Date(d.getFullYear(),0,1);
+  return [Math.ceil((((d - j1) / 86400000) + j1.getDay()+1)/7), d.getFullYear()];
+};
+
 var getDaysBetween = function() {
   var start = new Date($('#d1').data('datepicker').date);
   var end = $('#d2').data('datepicker').date;
@@ -19,11 +39,54 @@ var getDaysBetween = function() {
     arr.push(start.toDateString());
     start.setDate(start.getDate() + 1);
   }
+  arr.push(end.toDateString());
+  return arr;
+};
+
+var getWeeksBetween = function() {
+  var start = new Date($('#d1').data('datepicker').date);
+  var end = $('#d2').data('datepicker').date;
+
+  if (start.getTime() > end.getTime()) {
+    return [];
+  }
+
+  var endWeek = getWeek(end);
+  var arr = [];
+  while (!_.isEqual(getWeek(start), endWeek)) {
+    arr.push(getWeek(start));
+    start.setDate(start.getDate() + 7);
+  }
+  arr.push(getWeek(end));
+  return arr;
+};
+
+var getMonth = function(d) {
+  return [d.getMonth() + 1, d.getFullYear()];
+};
+
+var getMonthsBetween = function() {
+  var start = new Date($('#d1').data('datepicker').date);
+  var end = $('#d2').data('datepicker').date;
+
+  if (start.getTime() > end.getTime()) {
+    return [];
+  }
+
+  var endMonth = getMonth(end);
+  var arr = [];
+  while (!_.isEqual(getMonth(start), endMonth)) {
+    arr.push(getMonth(start));
+    start.setDate(start.getDate() + 30);
+  }
+  arr.push(getMonth(end));
   return arr;
 };
 
 var Event = Backbone.Model.extend({
   initialize: function() {
+    this.set('reservedHour', (Date.parse(this.get('end'))-Date.parse(this.get('start')))/(60*60*1000));
+    this.set('eventHour', (Date.parse(this.get('eventEnd'))-Date.parse(this.get('eventStart')))/(60*60*1000));
     this.set('shiftHour', this.get('shifts').reduce(function(prev, shift){return prev + ((Date.parse(shift.end)-Date.parse(shift.start))/(60*60*1000));}, 0));
     this.set('fullShiftNumber', fullShiftNumber(this.attributes));
   }
@@ -33,6 +96,9 @@ var PageableEventList = Backbone.PageableCollection.extend({
   model: Event,
   state: {
     pageSize: 10
+  },
+  updatePageSize: function() {
+    this.state.pageSize = parseInt($('#pagination').val());
   },
   mode: "client",
   overview: function() {
@@ -64,6 +130,7 @@ var PageableEventList = Backbone.PageableCollection.extend({
     } else {
       console.error('No such graph exists');
     }
+    $('.loading').hide();
   },
   eventGraphs: function(graphType) {
     $('.graphs').html(_.template($('#event-graphs-template').html(), {}));
@@ -144,7 +211,6 @@ var PageableEventList = Backbone.PageableCollection.extend({
     var chart3 = new Chart(document.getElementById("chart3").getContext("2d"))[graphType](data, options);
   },
   timeGraphs: function(graphType, choice) {
-    console.log(arguments);
     $('.graphs').html(_.template($('#time-graphs-template').html(), {}));
 
     var events = this.fullCollection.toJSON();
@@ -169,23 +235,59 @@ var PageableEventList = Backbone.PageableCollection.extend({
 
     var eventsAtDay = function(d) {
         return events.filter(function(event) {
-            console.log(event);
             return (new Date(event.start)).toDateString() === d.toDateString();
         });
     };
 
+    var weeks = getWeeksBetween();
+    var eventsAtWeek = function(weekObj) {
+      return events.filter(function(event) {
+        return _.isEqual(weekObj, getWeek(new Date(event.start)));
+      });
+    };
+
+    var months = getMonthsBetween();
+    var eventsAtMonth = function(monthObj) {
+      return events.filter(function(event) {
+        return _.isEqual(monthObj, getMonth(new Date(event.start)));
+      });
+    };
+
+    var graphTime = $('#graph-time').val();
+
+    var time, eventsAtTime, labels;
+
+    switch (graphTime) {
+      case 'Days':
+        time = days;
+        eventsAtTime = eventsAtDay;
+        labels = days.map(function(d) {return (d.getMonth() + 1) + '/' + d.getDate();});
+        break;
+      case 'Weeks':
+        time = weeks;
+        eventsAtTime = eventsAtWeek;
+        labels = weeks.map(function(o) {return ordinal(o[0]) + ' week, ' + o[1];});
+        break;
+      case 'Months':
+        time = months;
+        eventsAtTime = eventsAtMonth;
+        var n = ['January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'];
+        labels = months.map(function(o){return n[o[0]-1] + o[1];}); 
+    }
 
     var data;
+
     if(choice === 'Category') {
 
       options.graphTitle = "Events by Category";
 
       data = {
-          labels: days.map(function(d) {return (d.getMonth() + 1) + '/' + d.getDate();}),
+          labels: labels,
           datasets: ['A', 'B', 'C'].map(function(cat) {
               return {
                   title: cat,
-                  data: days.map(function(d) {return _(eventsAtDay(d)).where({category:cat}).length;})
+                  data: time.map(function(d) {return _(eventsAtTime(d)).where({category:cat}).length;})
               };
           }).map(function(x) {
               x[(graphType === 'Line')?'strokeColor':'fillColor'] = randomColor();
@@ -196,44 +298,42 @@ var PageableEventList = Backbone.PageableCollection.extend({
     } else if(choice === 'Staffing') {
       options.graphTitle = "Events by Staffing";
 
-data = {
-  labels: days.map(function(d) {
-    return (d.getMonth() + 1) + '/' + d.getDate();
-  }),
-  datasets: [{
-    title: "Fully Staffed",
-    data: days.map(function(d) {
-      return eventsAtDay(d).reduce(function(prev, event) {
-        return prev + ((fullShiftNumber(event) === event.staffNeeded) ? 1 : 0);
-      }, 0);
-    })
-  }, {
-    title: "Partially Staffed",
-    data: days.map(function(d) {
-      return eventsAtDay(d).reduce(function(prev, event) {
-        return prev + ((fullShiftNumber(event) < event.staffNeeded && fullShiftNumber(event) > 0) ? 1 : 0);
-      }, 0);
-    })
-  }, {
-    title: "Unstaffed",
-    data: days.map(function(d) {
-      return eventsAtDay(d).reduce(function(prev, event) {
-        return prev + ((fullShiftNumber(event) === 0) ? 1 : 0);
-      }, 0);
-    })
-  }, {
-    title: "Cancelled",
-    data: days.map(function(d) {
-      return _.where(eventsAtDay(d), {
-        cancelled: true
-      }).length;
-    })
-  }].map(function(x) {
-    x[(graphType === 'Line') ? 'strokeColor' : 'fillColor'] = randomColor();
-    x[(graphType === 'Bar') ? 'strokeColor' : 'fillColor'] = 'transparent';
-    return x;
-  })
-};
+      data = {
+        labels: labels,
+        datasets: [{
+          title: "Fully Staffed",
+          data: time.map(function(d) {
+            return eventsAtTime(d).reduce(function(prev, event) {
+              return prev + ((fullShiftNumber(event) === event.staffNeeded) ? 1 : 0);
+            }, 0);
+          })
+        }, {
+          title: "Partially Staffed",
+          data: time.map(function(d) {
+            return eventsAtTime(d).reduce(function(prev, event) {
+              return prev + ((fullShiftNumber(event) < event.staffNeeded && fullShiftNumber(event) > 0) ? 1 : 0);
+            }, 0);
+          })
+        }, {
+          title: "Unstaffed",
+          data: time.map(function(d) {
+            return eventsAtTime(d).reduce(function(prev, event) {
+              return prev + ((fullShiftNumber(event) === 0) ? 1 : 0);
+            }, 0);
+          })
+        }, {
+          title: "Cancelled",
+          data: time.map(function(d) {
+            return _.where(eventsAtTime(d), {
+              cancelled: true
+            }).length;
+          })
+        }].map(function(x) {
+          x[(graphType === 'Line') ? 'strokeColor' : 'fillColor'] = randomColor();
+          x[(graphType === 'Bar') ? 'strokeColor' : 'fillColor'] = 'transparent';
+          return x;
+        })
+      };
 
 
     } else {
@@ -281,17 +381,27 @@ var columns = [{
   editable: false
 }, {
   name: "fullShiftNumber",
-  label: "Staff Assigned",
+  label: "St. Assigned",
   cell: 'integer',
   editable: false
 }, {
   name: "staffNeeded",
-  label: "Staff Needed",
+  label: "St. Needed",
   cell: "integer",
   editable: false
 }, {
+  name: "reservedHour",
+  label: "Reserved hr",
+  cell: 'number',
+  editable: false
+}, {
+  name: "eventHour",
+  label: "Event hr",
+  cell: 'number',
+  editable: false
+}, {
   name: "shiftHour",
-  label: "Shift Hour",
+  label: "Shift hr",
   cell: 'number',
   editable: false
 }, {
@@ -306,7 +416,7 @@ var columns = [{
   editable: false
 }, {
   name: "techMustStay",
-  label: "Tech Must Stay",
+  label: "Tech Stay",
   cell: "boolean",
   editable: false
 }, {
@@ -333,8 +443,9 @@ $(document).ready(function() {
     $('#d2').datepicker('setValue', today);
 
     pageableEventList = new PageableEventList();
-
+    
     var refreshEvents = function() {
+      $('.loading').show();
       pageableEventList.url = '/events?filter=' + $('#filter').val() + 
                               '&start=' + ($('#d1').data('datepicker').date.getTime() / 1000) + 
                               '&end='   + ($('#d2').data('datepicker').date.getTime() / 1000);
@@ -353,7 +464,17 @@ $(document).ready(function() {
 
     $('#filter').change(refreshEvents);
     $('.date').on('changeDate', refreshEvents);
-    $('#graph-type').change(function(){pageableEventList.graphs();});
+    $('#graph-type').change(function(){
+        $('.loading').show({done: function(){
+          pageableEventList.graphs();
+        }});
+    });
+    $('#graph-time').change(function(){
+        $('.loading').show({done: function(){
+          pageableEventList.graphs();
+        }});
+    });
+    $('#pagination').change(function(){pageableEventList.updatePageSize();refreshEvents();});
     var paginator = new Backgrid.Extension.Paginator({
       collection: pageableEventList
     });
