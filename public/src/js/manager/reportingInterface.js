@@ -221,8 +221,10 @@ var PageableEventList = Backbone.PageableCollection.extend({
   graphs: function() {
     var graphType = $('#graph-type').val().split(' - ');
     if(graphType[0] === 'Events') {
+      $('#graph-time').hide();
       this.eventGraphs(graphType[1]);
     } else if(graphType[0] === 'Time') {
+      $('#graph-time').show();
       this.timeGraphs(graphType[1], graphType[2]);
     } else {
       console.error('No such graph exists');
