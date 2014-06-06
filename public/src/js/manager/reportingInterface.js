@@ -185,6 +185,7 @@ var Event = Backbone.Model.extend({
     this.set('eventHour', (Date.parse(this.get('eventEnd'))-Date.parse(this.get('eventStart')))/(60*60*1000));
     this.set('shiftHour', this.get('shifts').reduce(function(prev, shift){return prev + ((Date.parse(shift.end)-Date.parse(shift.start))/(60*60*1000));}, 0));
     this.set('fullShiftNumber', fullShiftNumber(this.attributes));
+    this.set('inventoryNumber', this.get('inventory').reduce(function(prev, current) {return prev + parseInt(current.amt);}, 0));
   }
 });
 
@@ -476,14 +477,6 @@ var PageableEventList = Backbone.PageableCollection.extend({
   }
 });
 
-
-var InventoryCell = Backgrid.Cell.extend({
-    render: function() {
-      this.$el.html(this.model.get('inventory').reduce(function(prev, current) {return prev + parseInt(current.amt);}, 0));
-      return this;
-    }
-});
-
 var columns = [{
   name: "",
   cell: "select-row",
@@ -536,9 +529,9 @@ var columns = [{
   cell: 'number',
   editable: false
 }, {
-  name: "inventory",
+  name: "inventoryNumber",
   label: "Inventory",
-  cell: InventoryCell,
+  cell: 'integer',
   editable: false
 }, {
   name: "cancelled",
@@ -668,7 +661,7 @@ $(document).ready(function() {
         "id": "staffNeeded",
         "text": "# of Needed Staff",
     }, {
-        "id": "inventory",
+        "id": "inventoryNumber",
         "text": "# of Inventory Used",
     }, {
         "id": "cancelled",
@@ -690,6 +683,38 @@ $(document).ready(function() {
       values: fields
     });
     
+    $('#export button').click(function() {
+      var fields = $.makeArray($('#fields .pills-list .badge').map(function() {
+        return $(this).data('tag-id');
+      }));
+
+      var col = pageableEventList.fullCollection.toJSON();
+
+      var csvLines = col.map(function(event) {
+        return fields.map(function(field) {
+          var f = event[field];
+          if(_(f).isUndefined()) {
+            f = false;
+          }
+          if(_(f).isNumber()) {
+            return f;
+          }
+          if(_.contains(['start','end','eventStart','eventEnd'], field)){
+            f = (new Date(f)).toLocaleString();
+          }
+          return ('"' + f.toString().replace(/"/g, '""') + '"');
+        }).join(',');
+      });
+
+      var fieldNames = $.makeArray($('#fields .pills-list .badge').map(function() {
+        return $(this).text();
+      }));
+
+      var csv = [fieldNames.map(function(x){return '"' + x.replace(/"/g, '""') + '"';}).join(',')].concat(csvLines).join('\n');
+
+      exportCSV(csv);
+    });
+
     refreshEvents();
 });
 $(document).keydown(function(e) {
