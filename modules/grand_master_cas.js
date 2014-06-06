@@ -65,6 +65,9 @@ GrandMasterCas.prototype.handler = function(req, res, next, redirectUrl){
     this.handleTicket(req, res, next);
   }
   else {
+    if (req.originalUrl !== this.redirectUrl) {
+      req.session.savedUrl = req.originalUrl;
+    }
     res.redirect(redirectUrl);
   }
 };

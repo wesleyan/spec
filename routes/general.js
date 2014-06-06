@@ -6,8 +6,12 @@ var _         = require('underscore'),
 
 module.exports = {
     main: function (req, res) {
-        if(req.query.ticket) {
-            res.redirect(Preferences.path_on_server); //redirect to the base if there is a ticket in the URL
+        if(req.query.ticket) { //if there is a ticket in the URL
+            if(req.session.savedUrl) {
+                res.redirect(req.session.savedUrl);
+            } else {
+                res.redirect(Preferences.path_on_server); //redirect to the base 
+            }
         }
         var currentUser = _.findWhere(cache.get('storeStaff'), { 'username': User.getUser(req) });
         if(_.isUndefined(currentUser)) { //the user is not in the staff database
