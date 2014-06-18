@@ -7,7 +7,8 @@ var fs            = require('fs'),
     _             = require('underscore'),
     request       = require('request'),
     cache         = require('memory-cache'),
-    googleapis    = require('googleapis');
+    googleapis    = require('googleapis'),
+    moment        = require('moment');
 
 var OAuth2Client = googleapis.OAuth2Client,
     oauth_cache  = {};
@@ -210,13 +211,18 @@ module.exports = {
         });            
     },
     events: function(req, res) {
-        var start = new Date(req.query.start * 1000),
-            end = new Date(req.query.end * 1000);
-
+      try {
+        var start = moment(req.query.start).toDate().toISOString(),
+            end   = moment(req.query.end).toDate().toISOString();
+      } catch(e) {
+        console.error(e);
+        res.json(false);
+        return;
+      }
         var all = function() {
             read_models(req, {
-                timeMin: start.toISOString(),
-                timeMax: end.toISOString(),
+                timeMin: start,
+                timeMax: end,
                 success: function(items) {
                     res.json(gCalToFullCalendar(items));
                 },

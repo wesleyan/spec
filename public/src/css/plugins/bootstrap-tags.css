@@ -32,9 +32,9 @@ input.tag-input {
 .tag-amt {
   width: 35px;
   margin-right: 5px;
-  margin-bottom: 0;
+  margin-bottom: 0 !important;
   text-align: right;
-  border: 0;
-  background: transparent;
-  color: white;
+  border: 0 !important;
+  background: inherit !important;
+  color: white !important;
 }

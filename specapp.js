@@ -17,6 +17,7 @@
     var express        = require('express'),
         app            = require('./modules/app.js'),
         _              = require('underscore'),
+        mongo          = require('mongojs'),
         cas            = require('./modules/grand_master_cas.js'),
         cache          = require('memory-cache'),
         bodyParser     = require('body-parser'),
@@ -72,6 +73,69 @@
 // EVENTS
     // Returns the events in the given time period (GET)
     app.route("/events").get(cas.blocker, routes.events.events);
+
+    app.route("/events/:id").patch(cas.blocker, function(req,res){
+      var query = req.body;
+
+      if(!_.isEmpty(_.difference(_.keys(query), ['shifts', 'notes', 'inventory'])) && User.permission(req) < 10) {
+        res.status(400).json({ok: false});
+        return false;
+      }
+
+      if(_.has(query, "shifts")) {
+        query.shifts = query.shifts.map(function(shift) {
+          if(!_.has(shift, "id")) {
+            shift.id = mongo.ObjectId();
+          } else {
+            shift.id = mongo.ObjectId(shift.id);
+          }
+          return shift;
+        });
+      }
+      if(_.has(query, "notes")) {
+        query.notes = query.notes.map(function(note) {
+          if(!_.has(note, "id")) {
+            note.id = mongo.ObjectId();
+          } else {
+            note.id = mongo.ObjectId(note.id);
+          }
+          return note;
+        });
+      }
+
+      if(_.has(query, "start")) {
+        query.start = new Date(query.start);
+      }
+      if(_.has(query, "end")) {
+        query.end = new Date(query.end);
+      }
+      if(_.has(query, "eventStart")) {
+        query.eventStart = new Date(query.eventStart);
+      }
+      if(_.has(query, "eventEnd")) {
+        query.eventEnd = new Date(query.eventEnd);
+      }
+
+      console.log(JSON.stringify(query));
+
+      db.events.update({_id: mongo.ObjectId(req.params.id)}, {$set: query}, function(err, updated) {
+        if(err || !updated) {
+          return;
+        }
+        res.json(query);
+      });
+    });
+    
+    app.route("/events/:id").delete(cas.blocker, function(req,res){
+      db.events.remove({_id: mongo.ObjectId(req.params.id)}, function(err, removed) {
+        if(err || !removed) {
+          res.status(400).json({ok: false});
+          return;
+        }
+        res.json({ok: true});
+      });
+    });
+
     // Toggle techMustStay to change if staff stays at the duration of the event (POST)
     app.route("/event/techMustStay").post(cas.blocker, routes.events.techMustStay);
     // Toggle if it's a video event (POST)

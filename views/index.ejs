@@ -1,407 +1,460 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>
-      Spec
-    </title>
-    <script>
-	    if (screen.width <= 699) {
-			document.location = "m/";
-		}
-	</script>
-	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
-    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
-  	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min.js"></script>
-  	<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.4.6/bootstrap-editable/js/bootstrap-editable.min.js"></script>
-    <script src="dist/js/plugins.min.js"></script>
-    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
-    <link href="dist/css/plugins.min.css" rel="stylesheet">
-    <link href="dist/css/spec.min.css" rel="stylesheet">
-    {{ if(permission == 10) { }}
-    <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.4.6/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet"/>
-    {{ } }}
-  </head>
-  <body>
-  	<span id="leftGroup">
-		<span class="btn-group">
-		  <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
-		   <i class="icon-eye-open"></i> <span class="caret"></span>
-		  </button>
-		  <ul class="dropdown-menu front">
-		    <li><a href="#all"><i class="icon-calendar"></i> All Events</a></li>
-		    <li><a href="#hideCancelled"><i class="icon-tasks"></i> Hide Cancelled Events</a></li>
-		    <li><a href="#unstaffed"><i class="icon-list-alt"></i> Unstaffed Events</a></li>
-		    <li><a href="#onlyMine"><i class="icon-filter"></i> Only Mine</a></li>
-		    <li class="divider"></li>
-		    <li><a href="#recentVideo"><i class="icon-film"></i> Recent video events</a></li>
-		  </ul>
-		</span>
-		<span class="btn-group">
-		  <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
-		   <i class="icon-folder-open"></i> <span class="caret"></span>
-		  </button>
-		  <ul class="dropdown-menu front">
-		    <li><a href="print/"><i class="icon-print"></i> Printer Friendly</a></li>
-		    <li class="divider"></li>
-		    {{ if(permission == 10) { }}
-		    <li><a href="update/"><i class="icon-upload"></i> Force EMS Update</a></li>
-		    <li><a href="staffCheck/"><i class="icon-user"></i> Single Staff Check</a></li>
-		    <li><a href="staffTable/"><i class="icon-th-list"></i> Staff Table</a></li>
-		    <li><a href="staff/db/"><i class="icon-th-large"></i> Staff Database</a></li>
-		    <li><a href="report/"><i class="icon-briefcase"></i> Report/Overview</a></li>
-		   	<li class="divider"></li>
-		    {{ } }}
-		    <li><a href="https://ims.wesleyan.edu/" target="_blank"><i class="icon-inbox"></i> Office Manager</a></li>
-		    <li><a href="http://github.com/wesleyan/spec/wiki/Help" target="_blank"><i class="icon-question-sign"></i> Help</a></li>
-		    <li><a href="logout/"><i class="icon-thumbs-down"></i> Log out</a></li>
-		  </ul>
-		</span>
-		<span class="btn-group">
-		  <button type="button" class="btn btn-danger disabled" id="eventButton">
-		  	<i class="icon-book icon-white"></i>
-		  </button>
-		</span>
-		
-	</span>
-  	<span id="rightGroup">
-		  <a type="button" class="btn btn-primary" {{ if(gCalIsActive) { }}id="gCalButton"{{ } else { }}href="authorize/"{{ } }}>
-		  	<i class="icon-calendar icon-white"></i> G
-		  </a>
-	</span>
 
-    <div id="newHeader">
-    </div>
-    <div id="calendar">
-    </div>
-    {{ if(permission == 10) { }}
- 	<div id="context-menu" class="front">
- 		<ul class="dropdown-menu">
- 			<li><a href="#staffEvent" data-toggle="modal"><i class="icon-plus"></i> Staff this event</a></li>
- 			<li><a href="#toggleDurationEvent" data-toggle="modal" class="toggleDuration"><i class="icon-flag"></i> Toggle duration</a></li>
- 			<li><a href="#toggleVideoEvent" data-toggle="modal" class="toggleVideo"><i class="icon-facetime-video"></i> Toggle video</a></li>
- 			<li><a href="#toggleAudioEvent" data-toggle="modal" class="toggleAudio"><i class="icon-volume-up"></i> Toggle audio</a></li>
- 			<li class="divider"></li>
- 			<li><a href="#editEvent" data-toggle="modal"><i class="icon-pencil"></i> Edit this event</a></li>
- 			<li><a href="#cancelEvent" data-toggle="modal"><i class="icon-off"></i> <span>Cancel this event</span></a></li>
- 			<li class="divider"></li>
- 			<li><a href="#removeEvent" data-toggle="modal"><i class="icon-remove"></i> Remove this event</a></li>
-	  	</ul>
- 	</div>
- 	{{ } }}
-	<div id="staffEvent" class="modal front hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	  <div class="modal-header">
-	    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-	    <h3 id="myModalLabel">Staff this event</h3>
-	  </div>
-	  <div class="modal-body">
-	  </div>
-	  <div class="modal-footer">
-	    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-	  </div>
-	</div>
+<head>
+  <meta charset='utf-8' />
+  <title>Spec 0.2</title>
+  <script type="text/javascript">
+    if (screen.width <= 699) {
+      document.location = "m/";
+    }
+  </script>
+  <link href='//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.0.0/fullcalendar.css' rel='stylesheet' />
+  <link href='//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.0.0/fullcalendar.print.css' rel='stylesheet' media='print' />
+  <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+  <link href="dist/css/plugins.min.css" rel="stylesheet">
+  <link href="dist/css/spec.min.css" rel="stylesheet">
+  {{ if(permission == 10) { }}
+  <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.4.6/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet"/>
+  {{ } }}
+  <style id="modifyCSSRule"></style>
+</head>
 
-	<div id="newNote" class="modal front hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	  <div class="modal-header">
-	    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-	    <h3 id="myModalLabel">Type your note below:</h3>
-	  </div>
-	  <div class="modal-body">
-	    <p>
-	    	<textarea rows="3"></textarea>
-	    </p>
-	  </div>
-	  <div class="modal-footer">
-	    <button class="btn btn-primary" id="noteSubmit">Add note</button>
-	    <button class="btn" aria-hidden="true" data-dismiss="modal">Cancel</button>
-	  </div>
-	</div>
-	{{ if(permission == 10) { }}
+<body>
+<div id="leftGroup" class="btn-group">
+  <span class="btn-group">
+    <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+      <i class="icon-eye-open"></i> <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu front">
+      <li><a href="#all"><i class="icon-calendar"></i> All Events</a></li>
+      <li><a href="#hideCancelled"><i class="icon-tasks"></i> Hide Cancelled Events</a></li>
+      <li><a href="#unstaffed"><i class="icon-list-alt"></i> Unstaffed Events</a></li>
+      <li><a href="#onlyMine"><i class="icon-filter"></i> Only Mine</a></li>
+      <li class="divider"></li>
+      <li><a href="#recentVideo"><i class="icon-film"></i> Recent video events</a></li>
+    </ul>
+  </span>
+  <span class="btn-group">
+    <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+      <i class="icon-folder-open"></i> <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu front">
+      <li><a href="print/"><i class="icon-print"></i> Printer Friendly</a></li>
+      <li class="divider"></li>
+      {{ if(permission == 10) { }}
+      <li><a href="update/"><i class="icon-upload"></i> Force EMS Update</a></li>
+      <li><a href="staffCheck/"><i class="icon-user"></i> Single Staff Check</a></li>
+      <li><a href="staffTable/"><i class="icon-th-list"></i> Staff Table</a></li>
+      <li><a href="staff/db/"><i class="icon-th-large"></i> Staff Database</a></li>
+      <li><a href="report/"><i class="icon-briefcase"></i> Report/Overview</a></li>
+      <li class="divider"></li>
+      {{ } }}
+      <li><a href="https://ims.wesleyan.edu/" target="_blank"><i class="icon-inbox"></i> Office Manager</a></li>
+      <li><a href="http://github.com/wesleyan/spec/wiki/Help" target="_blank"><i class="icon-question-sign"></i> Help</a></li>
+      <li><a href="logout/"><i class="icon-thumbs-down"></i> Log out</a></li>
+    </ul>
+  </span>
+  <span class="btn-group">
+    <button type="button" class="btn btn-danger disabled" id="eventButton">
+      <i class="icon-book icon-white"></i>
+    </button>
+  </span>
+</div>
+<div id="rightGroup" class="btn-group">
+  <span class="btn-group">
+    <button id="gCalButton" class="btn btn-primary">
+      <i class="icon-calendar icon-white"></i> G
+    </button>
+  </span>
+</div>
+<div id='calendar'></div>
+<div id="context-menu" class="front">
+    <ul class="dropdown-menu">
+    </ul>
+</div>
+<div id="popup" class="popover">
+</div>
+<div id="staff-modal" class="modal front hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Staff this event</h3>
+  </div>
+  <div class="modal-body">
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+  </div>
+</div>
+<script type="text/template" id="staff-template">
+  <span class="pull-right">
+    <%=event.start.format('h:mm A') %> -
+    <%=event.end.format('h:mm A') %>
+  </span>
+  <b>
+    <%=event.title %>
+  </b>
+  <div>
+    Technician needed for 
+    <%=event.techMustStay ? 'the duration of the event' : 'setup and breakdown' %>
 
-	<div id="editEvent" class="modal front hide fade" tabindex="-1" role="dialog" aria-hidden="true">
-	  <div class="modal-header">
-	    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-	    <h3 id="myModalLabel">Edit this event</h3>
-	  </div>
-	  <div class="modal-body">
-	  </div>
-	  <div class="modal-footer">
-	    <button class="btn btn-primary">Save changes</button>
-	    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-	  </div>
-	</div>
-	<div id="removeEvent" class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
-{{ } }}
-	<div id="popup" class="popover">
-	    <div class="arrow"></div>
-	    <h3 class="popover-title">
-
-		    <span id="popupTitle">Event Title</span> 
-
-		    <span class="pull-right">
-		    <a id="popupTitleButton" class="btn btn-small" type="button" href="#staffEvent" data-toggle="modal"><i class="icon-plus icon-white"></i> <span id="popupStaffInfo"></span></a>
-		    </span>
-	    </h3>
-	    <div class="popover-content">
-   	        <p id="popupContentHeader">
-	        </p>
-	        <div id="popupContentInside">
-	        </div>
-
-	        <div class="accordion" id="popoverAccordion">
-			  <div class="accordion-group">
-			    <div class="accordion-heading drop-active">
-			      <a class="accordion-toggle" data-toggle="collapse" href="#collapseOne">
-			         <i class="icon-comment"></i> &nbsp;Notes (<span id="noNote">0</span>)
-			         <span class="pull-right"><button class="btn btn-mini btn-inverse" id="addNote"><i class="icon-plus icon-white"></i></button></span>
-			      </a>
-			      
-			    </div>
-			    <div id="collapseOne" class="accordion-body collapse">
-			      <div class="accordion-inner" id="notes">
-			        
-			      </div>
-			    </div>
-			  </div>
-			  <div class="accordion-group">
-			    <div class="accordion-heading drop-active">
-			      <a class="accordion-toggle" data-toggle="collapse" href="#collapseTwo">
-			        <i class="icon-wrench"></i> &nbsp;Inventory (<span id="noInventory">0</span>)
-			      </a>
-			    </div>
-			    <div id="collapseTwo" class="accordion-body collapse">
-			      <div class="accordion-inner" id="inventory">
-			        
-			      </div>
-			    </div>
-			  </div>
-			</div>         
-	    </div>
-	</div>
-    <script src="dist/js/spec.min.js"></script>
-    </script>
-    {{ if(permission == 10) { }}
-	<script type="text/template" id="edit_template">
-	    <p>	      
-	       <table class="table table-bordered table-striped" style="clear: both">
-                <tbody> 
-                    <tr>         
-                        <td width="35%">Event Name</td>
-                        <td width="65%" colspan="2"><a href="#" class="x-edit-event" id="title" data-type="text" data-placement="right" data-title="Enter title"><%= op.event.title %></a></td>
-                    </tr>
-                     <tr>         
-                        <td>Description</td>
-                        <td colspan="2"><a href="#" class="x-edit-event" id="desc" data-type="textarea" data-pk="1"><small><%= op.event.desc %></small></a></td>
-                    </tr>
-                    <tr>         
-                        <td>Location</td>
-                        <td colspan="2"><a href="#" class="x-edit-event" id="loc" data-type="text" data-placement="right" data-title="Enter location"><%= Spec.decodeEntities(op.event.loc) %></a></td>
-                    </tr>
-                    <tr>         
-                        <td>Date</td>
-                        <td colspan="2"><a href="#" id="startDate" data-type="date" data-pk="1" data-title="Select date">
-                        <%= Spec.getFormattedDate(new Date(Date.parse(op.event.start)))  %>
-                        </a>
-                        </td>
-                    </tr>
-                    <tr>         
-                        <td>Reserved</td>
-                        <td style="width:30%"> 
-
-                        	<div class="input-append bootstrap-timepicker">
-					            <input id="timepickerResStart" type="text" class="input-small" value="<%= Spec.formatAMPM(new Date(Date.parse(op.event.start))) %>">
-					             <span class="add-on"><i class="icon-time"></i></span>
-					        </div>
-					    </td>
-					    <td>
-                        	<div class="input-append bootstrap-timepicker">
-					            <input id="timepickerResEnd" type="text" class="input-small" value="<%= Spec.formatAMPM(new Date(Date.parse(op.event.end))) %>">
-					             <span class="add-on"><i class="icon-time"></i></span>
-					        </div>
-			        	</td>
-                    </tr>
-                    <tr>         
-                        <td>Event Starting</td>
-                        <td> 
-                        	<div class="input-append bootstrap-timepicker">
-					            <input id="timepickerEventStart" type="text" class="input-small" value="<%= Spec.formatAMPM(new Date(Date.parse(op.event.eventStart))) %>">
-					             <span class="add-on"><i class="icon-time"></i></span>
-					        </div>
-					    </td>
-					    <td>
-					        <div class="input-append bootstrap-timepicker">
-					            <input id="timepickerEventEnd" type="text" class="input-small" value="<%= Spec.formatAMPM(new Date(Date.parse(op.event.eventEnd))) %>">
-					             <span class="add-on"><i class="icon-time"></i></span>
-					        </div>
-			        	</td>
-                    </tr>                   
-                    <tr>         
-                        <td>Needed staff</td>
-                        <td colspan="2">
-                        	<div id="editSpinner" class="spinner">
-								<input type="text" class="input-mini spinner-input" value="<%= op.event.staffNeeded %>">
-								<div class="spinner-buttons	btn-group btn-group-vertical">
-									<button type="button" class="btn spinner-up">
-										<i class="icon-chevron-up"></i>
-									</button>
-									<button type="button" class="btn spinner-down">
-										<i class="icon-chevron-down"></i>
-									</button>
-								</div>
-							</div>
-                        </td>
-                    </tr>
-                </tbody> 
-            </table>
-            The changes you have made will be ignored unless you save them.
-	      </p>
-	</script>
-	<script type="text/template" id="remove_template">
-		  <div class="modal-header">
-		    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-		    <h3 id="myModalLabel">Removing this event</h3>
-		  </div>
-		  <div class="modal-body">
-		  	 <p>Are you sure that you want to remove the event <b><%= op.event.title %></b> ?</p>
-		  </div>
-		  <div class="modal-footer">
-		  	<button class="btn btn-danger">Remove</button>
-		    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-		  </div>
-	</script>
-	{{ } }}
-	<script type="text/template" id="notes_template">
-	    <table class="table table-hover table-condensed">
-		    <tbody id="notesBody">
-			    
-		    </tbody>
-	    </table>
-	</script>
-	<script type="text/template" id="each_note_template">
-	     	<% op.note.date = new Date(Date.parse(op.note.date));	%>
-	     	<tr>
-	     		<td class="notesTable">
-	     			<%= op.note.text %>
-	     			<br>
-	     			<span class="label"><%= op.note.user %> | <%= defaults.monthNamesShort[op.note.date.getMonth()] %> <%= op.note.date.getDate() %></span>
-	     			{{ if(permission != 10) { }}
-						<% if(op.note.user == Spec.username) { %>
-					{{ } }}
-	     					<span class="pull-right btn btn-mini btn-danger removeNote" href="<%= op.note.id %>"><i class="icon-remove icon-white"></i></span>
-	     			{{ if(permission != 10) { }}
-	     				<% } %>
-	     			{{ } }}
-	     		</td>
-		   	</tr>
-	</script>
-	<script type="text/template" id="staff_template">
-		<p><b><%= Spec.lastClickedEvent.title %></b>
-	    <span class="pull-right"><%= Spec.formatAMPM(new Date(Date.parse(Spec.lastClickedEvent.start))) %> - <%= Spec.formatAMPM(new Date(Date.parse(Spec.lastClickedEvent.end))) %></span>
-	  	<div>
-	   Technician needed for <span id="technician"> </span>
-	     {{ if(permission == 10) { }}
-	     	<a class="badge toggleDuration"><i class="icon-adjust icon-white"></i> </a>
-	      {{ } }}
-			<span class="pull-right">
-			{{ if(permission == 10) { }}
-	            <div id="staffSpinner" class="spinner">
-					<input type="text" class="input-mini spinner-input" value="<%= Spec.lastClickedEvent.staffNeeded %>">
-					<div class="spinner-buttons	btn-group btn-group-vertical">
-						<button type="button" class="btn spinner-up">
-							<i class="icon-chevron-up"></i>
-						</button>
-						<button type="button" class="btn spinner-down">
-							<i class="icon-chevron-down"></i>
-						</button>
-					</div>
-				</div>
-				{{ } else { }}
-				<%= Spec.lastClickedEvent.staffNeeded %> staff needed
-				{{ } }}
-			</span>
-		</div>
-	    <table class="table table-bordered table-hover table-condensed">
-		<thead><th><i class="icon-user"></i>  Staff</th><th><i class="icon-time"></i> From</th><th><i class="icon-time"></i> To</th>
-		<th><i class="icon-edit"></i></th></thead>
-		<tbody>
-			<% if(!(Spec.permission <3 && op.shifts.length > 0)) { %>
-				<tr>
-					<td>
-						{{ if(permission == 10) { }}
-							<select class="combobox input-medium" name="normal" id="staffInput">
-							</select>
-						{{ } else { }}
-							<input id="staffInput" class="input-medium" id="disabledInput" type="text" value="{{=staffname}} ({{=username}})" disabled>
-						{{ } }}
-					</td>
-					<td>
-						<div class="input-append bootstrap-timepicker">
-				            <input id="timepicker5" type="text" class="input-small">
-				            <span class="add-on"><i class="icon-time"></i></span>
-				        </div>
-				    </td>
-				    <td>
-		    		    <div class="input-append bootstrap-timepicker">
-				            <input id="timepicker6" type="text" class="input-small">
-				            <span class="add-on"><i class="icon-time"></i></span>
-				        </div>
-				    </td>
-				    <td><button class="btn btn-primary btn-mini" type="button" id="addNewStaff"><i class="icon-plus icon-white"></i></button></td>
-			    </tr>
-			<% } %>
-		</tbody>
-		</table>
-
-	    </p>
-	</script>
-	<script type="text/template" id="each_staff_template">
-			<tr>
-				<td>
-					<% if(op.item.staff == Spec.username) { %>
-						<span class="btn btn-danger btn-mini shiftWithdraw" type="button" href="<%= op.item.id %>">
-							<i class="icon-remove-sign icon-white"></i> Withdraw
-						</span>
-					<% } else if(op.item.staff == '') { %>
-						<span class="btn btn-primary btn-mini shiftSignUp" type="button" href="<%= op.item.id %>">
-							<i class="icon-plus-sign icon-white"></i> Sign up
-						</span>
-					<% } else { %>
-						<%= op.item.staffname %> (<%= op.item.staff %>)
-					<% } %>
-					<% if(typeof op.item.confirmed !== 'undefined') { %>
-						&nbsp;(<%=(op.item.confirmed) ? 'Confirmed' : 'Unconfirmed' %>)
-					<% } %>
-				</td>
-				<td><%= Spec.formatAMPM(new Date(Date.parse(op.item.start))) %></td>
-				<td><%= Spec.formatAMPM(new Date(Date.parse(op.item.end))) %></td>
-				<td>
-					{{ if(permission != 10) { }}
-						<% if(Spec.username === op.item.staff) { %>
-					{{ } }}
-              <span class="btn btn-info btn-mini coverStaff <%=(op.item.cover?'active':'') %>" type="button" href="<%= op.item.id %>">
-								<i class="icon-flag icon-white"></i>
-							</span>
+    <span class="pull-right">
+      <div class="spinner">
+        <input type="text" class="input-mini spinner-input" value="<%=event.staffNeeded %>">
+        <div class="spinner-buttons btn-group btn-group-vertical">
+          <button type="button" class="btn spinner-up">
+            <i class="icon-chevron-up"></i>
+          </button>
+          <button type="button" class="btn spinner-down">
+            <i class="icon-chevron-down"></i>
+          </button>
+        </div>
+      </div>
+    </span>
+  </div>
+  <table class="table table-bordered table-hover table-condensed">
+      <thead>
+          <th><i class="icon-user"></i> Staff</th>
+          <th><i class="icon-time"></i> From</th>
+          <th><i class="icon-time"></i> To</th>
+          <th><i class="icon-edit"></i>
+          </th>
+      </thead>
+      <tbody>
+      <% event.shifts.forEach(function(shift) { %>
+        <tr>
+          <td>
+            <% if(shift.staff === '{{=username}}') { %>
+              <span class="btn btn-danger btn-mini shiftWithdraw" type="button" data-id="<%= shift.id %>">
+                <i class="icon-remove-sign icon-white"></i> Withdraw
+              </span>
+            <% } else if(shift.staff === '') { %>
+              <span class="btn btn-primary btn-mini shiftSignUp" type="button" data-id="<%= shift.id %>">
+                <i class="icon-plus-sign icon-white"></i> Sign up
+              </span>
+            <% } else { %>
+              <%= shift.staffname %> (<%= shift.staff %>)
+            <% } %>
+            <% if(!_(shift.confirmed).isUndefined()) { %>
+              &nbsp;(<%=(shift.confirmed) ? 'Confirmed' : 'Unconfirmed' %>)
+            <% } %>
+          </td>
+          <td>
+            <%=moment(shift.start).format('h:mm A') %>
+          </td>
+          <td>
+            <%=moment(shift.end).format('h:mm A') %>
+          </td>
+          <td>
+          {{ if(permission != 10) { }}
+            <% if('{{=username}}' === shift.staff) { %>
+          {{ } }}
+              <span class="btn btn-info btn-mini coverShift <%=(shift.cover?'active':'') %>" type="button" data-id="<%= shift.id %>">
+                <i class="icon-flag icon-white"></i>
+              </span>
               <br>
-							<span class="btn btn-danger btn-mini removeStaff" type="button" href="<%= op.item.id %>">
-								<i class="icon-remove icon-white"></i>
-							</span>
-					{{ if(permission != 10) { }}
-						<% } %>
-					{{ } }}
-				</td>
-			</tr>
-	</script>
-	<script>
-		//this is just for convenience, back end will validate these for every single request
-		Spec.username = '{{=username}}';
-		Spec.permission = '{{=permission}}';
-		{{ if(permission != 10) { }}
-			//These are jQuery plugins that managers need, however other users get JS error because they are lacked.
-			$.fn.spinner = function() {};
-		{{ } }}
-	</script>
-	<style id="modifyCSSRule">
-	</style>
-  </body>
+              <span class="btn btn-danger btn-mini removeShift" type="button" data-id="<%= shift.id %>">
+                <i class="icon-remove icon-white"></i>
+              </span>
+          {{ if(permission != 10) { }}
+            <% } %>
+          {{ } }}
+          </td>
+        </tr>
+      <% }); %>
+      <tr>
+        <td>
+        {{ if(permission == 10) { }}
+          <select class="combobox input-medium" name="normal" id="staffInput">
+          </select>
+        {{ } else { }}
+          <input id="staffInput" class="input-medium" id="disabledInput" type="text" value="{{=username}}" disabled>
+        {{ } }}
+        </td>
+        <td>
+          <div class="input-append bootstrap-timepicker">
+            <input id="shift-start" type="text" class="input-small">
+            <span class="add-on"><i class="icon-time"></i></span>
+          </div>
+        </td>
+        <td>
+          <div class="input-append bootstrap-timepicker">
+            <input id="shift-end" type="text" class="input-small">
+            <span class="add-on"><i class="icon-time"></i></span>
+          </div>
+        </td>
+        <td>
+          <button class="btn btn-primary btn-mini" type="button" id="addNewShift">
+            <i class="icon-plus icon-white"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</script>
+
+<div id="add-note-modal" class="modal front hide fade" tabindex="-1" roleole="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+</div>
+<script type="text/template" id="add-note-template">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Type your note below:</h3>
+  </div>
+  <div class="modal-body">
+    <p>
+      <textarea rows="3"></textarea>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary"> Add note</button>
+    <button class="btn" aria-hidden="true" data-dismiss="modal">Cancel</button>
+  </div>
+</script>
+
+<div id="edit-modal" class="modal front hide fade" tabindex="-1" roleole="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+</div>
+<script type="text/template" id="edit-template">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Edit event</h3>
+  </div>
+  <div class="modal-body">
+    <p>
+      <table class="table table-bordered table-striped" style="clear: both">
+        <tbody>
+          <tr>
+            <td width="35%">Event Name</td>
+            <td width="65%" colspan="2">
+              <a href="#" class="x-edit-event" id="title" data-type="text" data-placement="right" data-title="Enter title">
+                <%=event.title %>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td>Description</td>
+            <td colspan="2"><a href="#" class="x-edit-event" id="desc" data-type="textarea" data-pk="1"><small><%= event.desc %></small></a>
+            </td>
+          </tr>
+          <tr>
+            <td>Location</td>
+            <td colspan="2">
+              <a href="#" class="x-edit-event" id="loc" data-type="text" data-placement="right" data-title="Enter location">
+                <%=event.loc %>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td>Date</td>
+            <td colspan="2">
+              <a href="#" id="startDate" data-type="date" data-pk="1" data-title="Select date">
+                <%=moment(event.start).format('MM/DD/YYYY') %>
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td>Reserved</td>
+            <td style="width:30%">
+              <div class="input-append bootstrap-timepicker">
+                <input id="timepickerResStart" type="text" class="input-small" value="<%=moment(event.start).format('h:mm A') %>">
+                <span class="add-on"><i class="icon-time"></i></span>
+              </div>
+            </td>
+            <td>
+              <div class="input-append bootstrap-timepicker">
+                <input id="timepickerResEnd" type="text" class="input-small" value="<%=moment(event.end).format('h:mm A') %>">
+                <span class="add-on"><i class="icon-time"></i></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Event Starting</td>
+            <td>
+              <div class="input-append bootstrap-timepicker">
+                <input id="timepickerEventStart" type="text" class="input-small" value="<%=moment(event.eventStart).format('h:mm A') %>">
+                <span class="add-on"><i class="icon-time"></i></span>
+              </div>
+            </td>
+            <td>
+              <div class="input-append bootstrap-timepicker">
+                <input id="timepickerEventEnd" type="text" class="input-small" value="<%=moment(event.eventEnd).format('h:mm A') %>">
+                <span class="add-on"><i class="icon-time"></i></span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Needed staff</td>
+            <td colspan="2">
+              <div id="editSpinner" class="spinner">
+                <input type="text" class="input-mini spinner-input" value="<%=event.staffNeeded %>">
+                <div class="spinner-buttons btn-group btn-group-vertical">
+                  <button type="button" class="btn spinner-up">
+                    <i class="icon-chevron-up"></i>
+                  </button>
+                  <button type="button" class="btn spinner-down">
+                    <i class="icon-chevron-down"></i>
+                  </button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      The changes you have made will be ignored unless you save them.
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary"> Save changes</button>
+    <button class="btn" aria-hidden="true" data-dismiss="modal">Cancel</button>
+  </div>
+</script>
+
+<div id="remove-modal" class="modal front hide fade" tabindex="-1" roleole="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+</div>
+<script type="text/template" id="remove-template">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3 id="myModalLabel">Removing this event</h3>
+    </div>
+    <div class="modal-body">
+        <p>Are you sure that you want to remove the event <b><%=event.title %></b> ?</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger">Remove</button>
+      <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+    </div>
+</script>
+<script type="text/template" id="modal-popover-template">
+  <div class="arrow"></div>
+  <h3 class="popover-title">
+    <%=icons %> <%=event.title %>
+    <span class="pull-right">
+      <a class="btn btn-small <%=staffColor %>" data-task="staff">
+        <i class="icon-plus icon-white"></i> <%=shiftNumber %>/<%=event.staffNeeded %>
+      </a>
+    </span>
+  </h3>
+  <div class="popover-content">
+    <p>
+      <b><%=moment(event.start).format('dddd') %> | <%=event.loc %></b><br>
+      <i class="icon-time"></i> 
+      <b><%=moment(event.start).format('h:mm A') %></b>
+      <i><%=moment(event.eventStart).format('h:mm A') %></i>
+      <i class="icon-arrow-right"></i>
+      <i><%=moment(event.eventEnd).format('h:mm A') %></i>
+      <b><%=moment(event.end).format('h:mm A') %></b>
+      <% if(event.customer.name.length > 2) { %>
+        <br><%=event.customer.name %>
+      <% } %>
+    </p>
+    <div id="popupContentInside">
+      <%=event.desc %>
+    </div>
+    <div class="accordion" id="popoverAccordion">
+      <div class="accordion-group">
+        <div class="accordion-heading drop-active">
+          <a class="accordion-toggle" data-toggle="collapse" href="#collapseOne">
+            <i class="icon-comment"></i> Notes (<%=event.notes.length %>)
+            <span class="pull-right">
+              <button class="btn btn-mini btn-inverse" data-task="addNote"><i class="icon-plus icon-white"></i>
+              </button>
+            </span>
+          </a>
+        </div>
+        <div id="collapseOne" class="accordion-body collapse <%=collapse[0] ? 'in' : '' %>">
+          <div class="accordion-inner" id="notes">
+      <table class="table table-hover table-condensed">
+        <tbody id="notesBody">
+      <% event.notes.forEach(function(note) { %>  
+        <tr>
+          <td class="notesTable">
+            <%= note.text %>
+            <br>
+            <span class="label"><%= note.user %> | <%=moment(note.date).format('MMM D') %></span>
+            {{ if(permission != 10) { }}
+            <% if(note.user == Spec.username) { %>
+            {{ } }}
+            <span class="pull-right btn btn-mini btn-danger removeNote" data-id="<%= note.id %>">
+              <i class="icon-remove icon-white"></i></span>
+            {{ if(permission != 10) { }}
+              <% } %>
+            {{ } }}
+          </td>
+        </tr>
+      <% }) %>
+          
+        </tbody>
+      </table>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-group">
+        <div class="accordion-heading drop-active">
+          <a class="accordion-toggle" data-toggle="collapse" href="#collapseTwo">
+            <i class="icon-wrench"></i> Inventory (<%=event.inventory.length %>)
+          </a>
+        </div>
+        <div id="collapseTwo" class="accordion-body collapse <%=collapse[1] ? 'in' : '' %>">
+          <div class="accordion-inner" id="inventory">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+<script type="text/template" id="context-menu-template">
+  <li>
+    <a data-task="staff">
+      <i class="icon-plus"></i> Staff this event
+    </a>
+  </li>
+  <li>
+    <a data-task="duration">
+      <i class="icon-flag"></i>
+      <%=event.techMustStay ? 'Set setup&breakdown' : 'Set tech must stay' %>
+    </a>
+  </li>
+  <li>
+    <a data-task="video">
+      <i class="icon-facetime-video"></i>
+      <%=event.video ? 'Unset video event' : 'Set video event' %>
+    </a>
+  </li>
+  <li>
+    <a data-task="audio">
+      <i class="icon-volume-up"></i>
+      <%=event.audio ? 'Unset audio event' : 'Set audio event' %>
+    </a>
+  </li>
+  <li class="divider"></li>
+  <li>
+    <a data-task="edit">
+      <i class="icon-pencil"></i> Edit this event
+    </a>
+  </li>
+  <li>
+    <a data-task="cancel">
+      <i class="icon-off"></i>
+      <%=event.cancelled ? 'Uncancel event' : 'Cancel event' %>
+    </a>
+  </li>
+  <li class="divider"></li>
+  <li>
+    <a data-task="remove">
+      <i class="icon-remove"></i> Remove this event
+    </a>
+  </li>
+</script>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.6.0/moment.min.js"></script>
+<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.0.0/fullcalendar.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.4.6/bootstrap-editable/js/bootstrap-editable.min.js"></script>
+<script src="dist/js/plugins.min.js"></script>
+<script src="dist/js/spec.min.js"></script>
+</body>
+
 </html>
+

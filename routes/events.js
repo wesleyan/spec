@@ -45,7 +45,7 @@ module.exports = {
                         return Utility.fullShiftNumber(event) < event.staffNeeded;
                     });
                 }
-                events = Utility.addBackgroundColor(events);
+                // events = Utility.addBackgroundColor(events);
                 res.json(events);
             }
         });

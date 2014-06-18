@@ -231,3 +231,11 @@ textarea {
   bottom: 0;
   overflow-y: scroll;
 }
+
+#leftGroup {
+  margin-right: 5px;
+}
+
+#rightGroup {
+  margin-left: 5px;
+}

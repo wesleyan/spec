@@ -1,6 +1,6 @@
 ;
 (function($) {
-    "use strict";
+    // "use strict";
     var afterInitial = false;
     var defaults = {
         values: [],
