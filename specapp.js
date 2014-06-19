@@ -73,83 +73,10 @@
 // EVENTS
     // Returns the events in the given time period (GET)
     app.route("/events").get(cas.blocker, routes.events.events);
-
-    app.route("/events/:id").patch(cas.blocker, function(req,res){
-      var query = req.body;
-
-      if(!_.isEmpty(_.difference(_.keys(query), ['shifts', 'notes', 'inventory'])) && User.permission(req) < 10) {
-        res.status(400).json({ok: false});
-        return false;
-      }
-
-      if(_.has(query, "shifts")) {
-        query.shifts = query.shifts.map(function(shift) {
-          if(!_.has(shift, "id")) {
-            shift.id = mongo.ObjectId();
-          } else {
-            shift.id = mongo.ObjectId(shift.id);
-          }
-          return shift;
-        });
-      }
-      if(_.has(query, "notes")) {
-        query.notes = query.notes.map(function(note) {
-          if(!_.has(note, "id")) {
-            note.id = mongo.ObjectId();
-          } else {
-            note.id = mongo.ObjectId(note.id);
-          }
-          return note;
-        });
-      }
-
-      if(_.has(query, "start")) {
-        query.start = new Date(query.start);
-      }
-      if(_.has(query, "end")) {
-        query.end = new Date(query.end);
-      }
-      if(_.has(query, "eventStart")) {
-        query.eventStart = new Date(query.eventStart);
-      }
-      if(_.has(query, "eventEnd")) {
-        query.eventEnd = new Date(query.eventEnd);
-      }
-
-      console.log(JSON.stringify(query));
-
-      db.events.update({_id: mongo.ObjectId(req.params.id)}, {$set: query}, function(err, updated) {
-        if(err || !updated) {
-          return;
-        }
-        res.json(query);
-      });
-    });
-    
-    app.route("/events/:id").delete(cas.blocker, function(req,res){
-      db.events.remove({_id: mongo.ObjectId(req.params.id)}, function(err, removed) {
-        if(err || !removed) {
-          res.status(400).json({ok: false});
-          return;
-        }
-        res.json({ok: true});
-      });
-    });
-
-    // Toggle techMustStay to change if staff stays at the duration of the event (POST)
-    app.route("/event/techMustStay").post(cas.blocker, routes.events.techMustStay);
-    // Toggle if it's a video event (POST)
-    app.route("/event/video").post(cas.blocker, routes.events.video);
-    // Toggle if it's a audio event (POST)
-    app.route("/event/audio").post(cas.blocker, routes.events.audio);
-    // Edit event (POST)
-    app.route("/event/edit").post(cas.blocker, routes.events.edit);
-    // Change needed staff number (POST)
-    app.route("/event/spinner").post(cas.blocker, routes.events.spinner);
-    // Toggle event cancel (POST)
-    app.route("/event/cancel").post(cas.blocker, routes.events.cancel);
-    // Remove event (POST)
-    app.route("/event/remove").post(cas.blocker, routes.events.remove);
+    // Updates the event with the given request body, does some permission checks (PATCH)
+    app.route("/events/:id").patch(cas.blocker, routes.events.patch);
+    // Remove event (DELETE) 
+    app.route("/events/:id").delete(cas.blocker, routes.events.delete);
 
 // API
     // To be used by other IMS applications like PullEffect. (GET)
@@ -181,18 +108,6 @@
     // STAFF
     // All event staff in IMS (GET)
     app.route("/staff/all").get(cas.blocker, routes.staff.all);
-    // Get the existing staff of an event (GET)
-    app.route("/staff/get/:id").get(cas.blocker, routes.staff.get);
-    // Add staff/shift to an event (POST)
-    app.route("/staff/add").post(cas.blocker, routes.staff.add);
-    // Remove staff/shift from an event (POST)
-    app.route("/staff/remove").post(cas.blocker, routes.staff.remove);
-    // Sign up for an empty shift for an event (POST)
-    app.route("/staff/shiftsignup").post(cas.blocker, routes.staff.shiftsignup);
-    // Withdrawing from a shift for an event (POST)
-    app.route("/staff/withdraw").post(cas.blocker, routes.staff.withdraw);
-    // Setting a shift as a cover shift (POST)
-    app.route("/staff/cover").post(cas.blocker, routes.staff.cover);
     // Staff available today (GET)
     app.route("/staff/available/today").get(cas.blocker, routes.staff.info.availableToday);
 

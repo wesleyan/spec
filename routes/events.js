@@ -1,12 +1,12 @@
 var Preferences = require('./../config/Preferences.js');
 
-var Utility   = require('./../modules/Utility.js'),
-    User      = require('./../modules/user.js'),
-    db        = require('./../modules/db.js');
-    
-var fs         = require('fs'),
-    _          = require('underscore'),
-    mongo      = require('mongojs');
+var Utility = require('./../modules/Utility.js'),
+    User    = require('./../modules/user.js'),
+    db      = require('./../modules/db.js');
+
+var fs      = require('fs'),
+    _       = require('underscore'),
+    mongo   = require('mongojs');
 
 module.exports = {
     events: function(req, res) {
@@ -45,101 +45,99 @@ module.exports = {
                         return Utility.fullShiftNumber(event) < event.staffNeeded;
                     });
                 }
-                // events = Utility.addBackgroundColor(events);
                 res.json(events);
             }
         });
         //console.log("Req for events starting at " + start.toDateString() + " and ending before " + end.toDateString());    
     },
-    techMustStay: function(req, res) { //post
-        User.permissionControl(req, res, 10);
+    patch: function(req, res) {
+        var query = req.body;
 
-        
-        //console.log("Req for techMustStay toggle Event ID " + req.body.eventid);
-        db.events.update(
-            {_id: mongo.ObjectId(req.body.eventid)},
-            { $set: {'techMustStay': JSON.parse(req.body.make) } }, 
-            function(err, updated) {
-                if (err || !updated) {
-                    console.log(req.url);
-                    console.log("Event not techMustStay toggled:" + err);
-                } else {
-                    //console.log("Event techMustStay toggled");
-                    res.json(true);
-                }
+        //eventEdited = true, if the event was actually edited except regular stuff
+        var eventEdited = !_.isEmpty(_.difference(_.keys(query), ['shifts', 'notes', 'inventory', 'staffNeeded']));
+
+        if (!_.isEmpty(_.difference(_.keys(query), ['shifts', 'notes', 'inventory'])) && User.permission(req) < 10) {
+            res.status(400).json({
+                ok: false
             });
-    },
-    video: function(req, res) { //post
-        
-        User.permissionControl(req, res, 10);
+            return false;
+        }
 
-        //console.log("Req for techMustStay toggle Event ID " + req.body.eventid);
-        db.events.update(
-            {_id: mongo.ObjectId(req.body.eventid)},
-            { $set: {'video': JSON.parse(req.body.make) } }, 
-            function(err, updated) {
-                if (err || !updated) {
-                    console.log(req.url);
-                    console.log("Event not video toggled:" + err);
+        if (_.has(query, "shifts")) {
+            query.shifts = query.shifts.map(function(shift) {
+                if (!_.has(shift, "id")) {
+                    shift.id = mongo.ObjectId();
                 } else {
-                    //console.log("Event video toggled");
-                    res.json(true);
+                    shift.id = mongo.ObjectId(shift.id);
                 }
+                shift.start = new Date(shift.start);
+                shift.end   = new Date(shift.end);
+                return shift;
             });
-    },
-    audio: function(req, res) { //post
-        
-        User.permissionControl(req, res, 10);
-
-        db.events.update(
-            {_id: mongo.ObjectId(req.body.eventid)},
-            { $set: {'audio': JSON.parse(req.body.make) } }, 
-            function(err, updated) {
-                if (err || !updated) {
-                    console.log(req.url);
-                    console.log("Event not audio toggled:" + err);
+        }
+        if (_.has(query, "notes")) {
+            query.notes = query.notes.map(function(note) {
+                if (!_.has(note, "id")) {
+                    note.id = mongo.ObjectId();
                 } else {
-                    //console.log("Event audio toggled");
-                    res.json(true);
+                    note.id = mongo.ObjectId(note.id);
                 }
+                return note;
             });
-    },
-    edit: function(req, res) { //post
-        
-        User.permissionControl(req, res, 10);
+        }
 
-        //console.log("Req for event edit Event ID " + req.body.eventid);
-        var query = {updated:true};
-        _.each(req.body.changedData, function(value, key) {
-            if(['title', 'desc', 'loc'].indexOf(key) > -1) {
-                query[key] = value;
-            }
-        });
-        var reqDate = new Date(Date.parse(req.body.changedData.date));
-            reqDate = (reqDate.getMonth() + 1) + '/' + reqDate.getDate() + '/' +  reqDate.getFullYear() + ' ';
-        query.start = new Date(Date.parse(reqDate + req.body.changedData.timepickerResStart));
-        query.end   = new Date(Date.parse(reqDate + req.body.changedData.timepickerResEnd));
-        query.eventStart  = new Date(Date.parse(reqDate + req.body.changedData.timepickerEventStart));
-        query.eventEnd    = new Date(Date.parse(reqDate + req.body.changedData.timepickerEventEnd));
-        query.staffNeeded = parseInt(req.body.changedData.staffNeeded);
-        db.events.findAndModify(
-            {
-                query: {_id: mongo.ObjectId(req.body.eventid)},
-                update: { $set: query }, 
-                new: true
-            },
-            function(err, updated) {
+        if (_.has(query, "start")) {
+            query.start = new Date(query.start);
+        }
+        if (_.has(query, "end")) {
+            query.end = new Date(query.end);
+        }
+        if (_.has(query, "eventStart")) {
+            query.eventStart = new Date(query.eventStart);
+        }
+        if (_.has(query, "eventEnd")) {
+            query.eventEnd = new Date(query.eventEnd);
+        }
+
+        console.log(JSON.stringify(query));
+
+        db.events.findAndModify({ 
+              query: {_id: mongo.ObjectId(req.params.id)},
+              update:{$set: query}
+            }, function(err, updated) {
                 if (err || !updated) {
-                    console.log(req.url);
-                    console.log("Event not edited:" + err);
-                } else {
-                    //console.log("Event edited");
-                    res.json(true);
+                    return;
+                }
+                res.json(query);
 
+                var previous = updated;
+                updated = _.extend(updated, query);
+
+                //Send notifications
+                if (_.has(query, "shifts")) {
+                    //Check for new shifts
+                    //Check for removed shifts
+                    //Check for shifts signed up
+                    //Check for shifts withdrawn
+                }
+
+                // Handle new shift notifications
+                    // Utility.sendSingleMail({
+                    //     to: toNotify[0].staff + '@wesleyan.edu',
+                    //     subject:'You have a new shift! : ' + updated.title,
+                    //     html: ejs.render(fs.readFileSync(__dirname + '/../views/mail/newShift.ejs', 'utf8'), {'app': req.app, 'event': updated, 'shift': toNotify[0]})
+                    // });
+
+                // Handle notifications for the existing staff of edited events
+                if(eventEdited) {
                     //Send e-mails to the registered staff after update
                     var smtpTransport = Utility.smtpTransport();
 
                     updated.shifts.forEach(function(shift) {
+                        if(shift.staff === '') {
+                            return false;
+                        }
+
                         var staffMailOptions = {
                             from: Preferences.mail.fromString,
                             to: shift.staff + "@wesleyan.edu",
@@ -166,60 +164,20 @@ module.exports = {
                     });
                     //e-mails sent
                 }
+                //end of eventEdited
             });
     },
-    spinner: function(req, res) { //post
-        
-        User.permissionControl(req, res, 10);
-
-        //console.log("Req for staffNeeded spinner for Event ID " + req.body.eventid);
-        db.events.update(
-            {_id: mongo.ObjectId(req.body.eventid)},
-            { $set: {'staffNeeded': parseInt(req.body.make) } }, 
-            function(err, updated) {
-                if (err || !updated) {
-                    console.log(req.url);
-                    console.log("Event staffNeeded not changed:" + err);
-                } else {
-                    //console.log("Event staffNeeded changed");
-                    res.json(true);
-                }
-            });
-    },
-    cancel: function(req, res) { //post
-        
-        User.permissionControl(req, res, 10);
-
-        //console.log("Req for cancel toggle Event ID " + req.body.eventid);
-        db.events.update(
-            {_id: mongo.ObjectId(req.body.eventid)},
-            { $set: {'cancelled': JSON.parse(req.body.make), 'updated': true} }, 
-            function(err, updated) {
-                if (err || !updated) {
-                    console.log(req.url);
-                    console.log("Event not cancel toggled:" + err);
-                } else {
-                    //console.log("Event cancel toggled");
-                    res.json(true);
-                }
-            });
-    },
-    remove: function(req, res) { //post
-        
-        User.permissionControl(req, res, 10);
-
-        //console.log("Req for remove Event ID " + req.body.eventid);
-        db.events.remove(
-            {_id: mongo.ObjectId(req.body.eventid)},
-            function(err, removed) {
-                if (err || !removed) {
-                    console.log(req.url);
-                    console.log("Event not removed:" + err);
-                } else {
-                    //console.log("Event removed");
-                    res.json(true);
-                    db.removedEvents.save({XMLid: parseInt(req.body.XMLid)});
-                }
-            });
+    delete: function(req, res) {
+        if(User.permission(req) < 10) {
+            res.status(400).json({ok: false});
+            return;
+        }
+        db.events.remove({_id: mongo.ObjectId(req.params.id)}, function(err, removed) {
+            if(err || !removed) {
+              res.status(400).json({ok: false});
+              return;
+            }
+            res.json({ok: true});
+          });
     }
 };
