@@ -205,7 +205,7 @@ jQuery(function($){
     render: function() {
       this.addBackgroundClasses();
       this.backBoxes();
-      this.$el.find('.fc-event-title').prepend(getIcons(this.event, true));
+      this.$('.fc-event-title').prepend(getIcons(this.event, true));
       this.staffTooltip();
       this.$el.contextmenu({'target': '#context-menu'});
       return this;
@@ -247,7 +247,7 @@ jQuery(function($){
         topPercentage = ((start - eventStart) / (start - end)) * 100;
         bottomPercentage = ((eventEnd - end) / (start - end)) * 100;
       }
-      this.$el.find('.fc-event-bg')
+      this.$('.fc-event-bg')
         .append("<div class='event-bg-section' style='height:" + topPercentage + "%'></div>")
         .append("<div style='height:" + (100-topPercentage-bottomPercentage) + "%'></div>")
         .append("<div class='event-bg-section' style='height:" + bottomPercentage + "%'></div></div>");
@@ -330,7 +330,7 @@ jQuery(function($){
         };
       });
 
-      this.$el.find('#inventory').tags({
+      this.$('#inventory').tags({
         values: inv,
         only_suggestions: true,
         suggestions: inventoryList.toJSON(),
@@ -459,7 +459,7 @@ jQuery(function($){
       'hide':               'onClose'
     },
     add: function() {
-      var text = this.$el.find('textarea').val();
+      var text = this.$('textarea').val();
       var note = {
         text: text,
         date: new Date(),
@@ -481,7 +481,7 @@ jQuery(function($){
       this.render();     
     },
     render: function() {
-      this.$el.find('ul').html(_.template($('#context-menu-template').html(), {event: this.model.attributes}));
+      this.$('ul').html(_.template($('#context-menu-template').html(), {event: this.model.attributes}));
     },
     events: {
       'click a[data-task="staff"]':    'staffEvent',
@@ -542,7 +542,7 @@ jQuery(function($){
     remove: function() {
       eventsView.$el.fullCalendar('removeEvents', this.model.get('_id'));
       this.model.destroy();
-      this.close();
+      this.$el.modal('hide');
     },
     close: function() {
       this.$el.undelegate(); 
@@ -586,8 +586,8 @@ jQuery(function($){
       this.render();
     },
     render: function() {
-      this.$el.find('.modal-body').html($('<div/>', {id: 'staff-el'}));
-      this.$el = this.$el.find('#staff-el');
+      this.$('.modal-body').html($('<div/>', {id: 'staff-el'}));
+      this.$el = this.$('#staff-el');
       this.renderModalContent();
       return this;
     },
@@ -605,24 +605,24 @@ jQuery(function($){
         event: event
       });
       this.$el.html(template);
-      this.$el.find('.spinner').spinner();
-      this.$el.find('.coverShift').tooltip({
+      this.$('.spinner').spinner();
+      this.$('.coverShift').tooltip({
         title: 'Sent a tech from the office', 
         placement: 'left'
       });
 
-      this.$el.find('#shift-start').timepicker({
+      this.$('#shift-start').timepicker({
         defaultTime: this.model.fcEvent().start.format('h:mm A')
       });
-      this.$el.find('#shift-end').timepicker({
+      this.$('#shift-end').timepicker({
         defaultTime: this.model.fcEvent().end.format('h:mm A')
       });
-      this.$el.find('.bootstrap-timepicker input').on('show.timepicker', function(e) {
+      this.$('.bootstrap-timepicker input').on('show.timepicker', function(e) {
         $(this).prev().toggle();
       });
 
       staffList.each(function(staff) {
-        self.$el.find('.combobox')
+        self.$('.combobox')
           .append($('<option>', {'value': staff.get('username')})
           .text(staff.get('name') + ' (' + staff.get('username') + ')'));
       });
@@ -647,7 +647,12 @@ jQuery(function($){
       }
     },
     addNewShift: function() {
-      var name  = this.$el.find('#staffInput').val();
+      var name  = this.$('#staffInput').val();
+      if(this.$('.combobox-container input.combobox').val() === '') {
+        //empty shift
+        name = '';
+      }
+
       var event = this.model.fcEvent();
       
       var start = moment(new Date(event.start.format('MMM D YYYY ') + $('#shift-start').val()));
@@ -778,7 +783,7 @@ jQuery(function($){
       //this.model.save(this.changed, {patch: true});
       this.model.set(this.changed);
       this.model.trigger('change');
-      this.close();
+      this.$el.modal('hide');
     },
     close: function() {
       this.$el.undelegate();

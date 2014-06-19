@@ -110,23 +110,74 @@ module.exports = {
                 }
                 res.json(query);
 
-                var previous = updated;
+                var previous = _.clone(updated);
                 updated = _.extend(updated, query);
 
                 //Send notifications
                 if (_.has(query, "shifts")) {
                     //Check for new shifts
-                    //Check for removed shifts
-                    //Check for shifts signed up
-                    //Check for shifts withdrawn
-                }
+                    var added = [];
+                    if(previous.shifts.length < updated.shifts.length) {
+                      added = _.difference(updated.shifts, previous.shifts);
+                    }
 
-                // Handle new shift notifications
-                    // Utility.sendSingleMail({
-                    //     to: toNotify[0].staff + '@wesleyan.edu',
-                    //     subject:'You have a new shift! : ' + updated.title,
-                    //     html: ejs.render(fs.readFileSync(__dirname + '/../views/mail/newShift.ejs', 'utf8'), {'app': req.app, 'event': updated, 'shift': toNotify[0]})
-                    // });
+                    //Check for removed shifts
+                    var removed = [];
+                    if(previous.shifts.length > updated.shifts.length) {
+                      removed = _.difference(previous.shifts, updated.shifts);
+                    }
+
+                    var signedUp  = [],
+                        withdrawn = [];
+
+                    try {
+                        if(previous.shifts.length === updated.shifts.length) {
+                          //Check for shifts signed up
+                          signedUp = previous.shifts.filter(function(shift) {
+                            return shift.staff === '';
+                          }).map(function(shift) {
+                            var newer = _.findWhere(updated.shifts.map(function(x) {x.id = x.id.toString(); return x;}), {id: shift.id.toString()});
+
+                            if(_.isUndefined(newer)) {
+                              throw new Error('Shift should be found if the same shifts.length');
+                            }
+                            return newer;
+                          });
+
+                          //Check for shifts withdrawn
+                          withdrawn = updated.shifts.filter(function(shift) {
+                            return shift.staff === '';
+                          }).map(function(shift) {
+                            var older = _.findWhere(previous.shifts.map(function(x) {x.id = x.id.toString(); return x;}), {id: shift.id.toString()});
+
+                            if(_.isUndefined(older)) {
+                              throw new Error('Shift should be found if the same shifts.length');
+                            }
+                            return older;
+                          });
+                        }
+                    } catch(e) {
+                      console.error(e);
+                    }
+
+                    var newShifts     = added.concat(signedUp),
+                        removedShifts = removed.concat(withdrawn);
+
+                    newShifts.forEach(function(shift) {
+                        Utility.sendSingleMail({
+                            to: shift.staff + '@wesleyan.edu',
+                            subject:'You have a new shift! : ' + updated.title,
+                            html: ejs.render(fs.readFileSync(__dirname + '/../views/mail/newShift.ejs', 'utf8'), {'app': req.app, 'event': updated, 'shift': shift})
+                        });
+                    });
+                    removedShifts.forEach(function(shift) {
+                        Utility.sendSingleMail({
+                            to: shift.staff + '@wesleyan.edu',
+                            subject:'You have a removed shift! : ' + updated.title,
+                            html: ejs.render(fs.readFileSync(__dirname + '/../views/mail/removeShift.ejs', 'utf8'), {'app': req.app, 'event': updated, 'shift': shift})
+                        });
+                    });
+                }
 
                 // Handle notifications for the existing staff of edited events
                 if(eventEdited) {
