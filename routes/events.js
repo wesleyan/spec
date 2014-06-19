@@ -99,8 +99,6 @@ module.exports = {
             query.eventEnd = new Date(query.eventEnd);
         }
 
-        console.log(JSON.stringify(query));
-
         db.events.findAndModify({ 
               query: {_id: mongo.ObjectId(req.params.id)},
               update:{$set: query}

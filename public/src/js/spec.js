@@ -207,7 +207,9 @@ jQuery(function($){
       this.backBoxes();
       this.$('.fc-event-title').prepend(getIcons(this.event, true));
       this.staffTooltip();
-      this.$el.contextmenu({'target': '#context-menu'});
+      if(Spec.permission === 10) {
+        this.$el.contextmenu({'target': '#context-menu'});
+      }
       return this;
     },
     addBackgroundClasses: function() {
@@ -822,26 +824,11 @@ jQuery(function($){
     }
   });
 
-  var router = new AppRouter();
-  Backbone.history.start();
-
   var staffList = new StaffList();
   var inventoryList = new InventoryList();
 
   var events = new Events({filter: Backbone.history.fragment});
   var eventsView = new EventsView({el: $("#calendar"), collection: events});
-
-  router.on('route:all', function (filter) {
-    $('a').removeClass('drop-active');
-    $('a[href="#' + Backbone.history.fragment + '"]').addClass('drop-active');
-    if (_.isNull(filter) || _.isUndefined(filter)) {
-      router.navigate('hideCancelled', {
-        trigger: true
-      });
-    }
-    events.filter = filter;
-    eventsView.$el.fullCalendar('refetchEvents');
-  });
 
   //fetch user information to use in the front end
   //safe, because it's in a closure
@@ -880,4 +867,21 @@ jQuery(function($){
     }
   });
 
+  var router = new AppRouter();
+
+  router.on('route:all', function (filter) {
+    if (filter === '' || _.isNull(filter) || _.isUndefined(filter)) {
+      router.navigate('hideCancelled', {
+        trigger: true
+      });
+      return;
+    }
+
+    $('a').removeClass('drop-active');
+    $('a[href="#' + filter + '"]').addClass('drop-active');
+    events.filter = filter;
+    eventsView.$el.fullCalendar('refetchEvents');
+  });
+
+  Backbone.history.start();
 });
