@@ -1,6 +1,6 @@
 var Preferences = require('./../config/Preferences.js'),
     User        = require('./../modules/user.js');
-    
+
 var _         = require('underscore'),
     cache     = require('memory-cache');
 
@@ -10,8 +10,9 @@ module.exports = {
             if(req.session.savedUrl) {
                 res.redirect(req.session.savedUrl);
             } else {
-                res.redirect(Preferences.path_on_server); //redirect to the base 
+                res.redirect(Preferences.path_on_server); //redirect to the base
             }
+            return;
         }
         var currentUser = _.findWhere(cache.get('storeStaff'), { 'username': User.getUser(req) });
         if(_.isUndefined(currentUser)) { //the user is not in the staff database
