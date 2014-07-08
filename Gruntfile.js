@@ -8,6 +8,7 @@ module.exports = function(grunt) {
     ].forEach(function(task) {
         grunt.loadNpmTasks(task);
     });
+    require('time-grunt')(grunt);
 
     var files = {
         gruntfile: ['Gruntfile.js'],

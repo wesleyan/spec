@@ -1,14 +1,14 @@
 /*
-  ____                     
- / ___|  _ __    ___   ___ 
+  ____
+ / ___|  _ __    ___   ___
  \___ \ | '_ \  / _ \ / __|
-  ___) || |_) ||  __/| (__ 
+  ___) || |_) ||  __/| (__
  |____/ | .__/  \___| \___|
-        |_|                
+        |_|
 */
 // CONFIGURATION AND MODULES
     require('ofe').call();
-    
+
     // Template engine tags are changed to {{ }} because underscore uses <% %> as well in the front end
     var ejs = require('ejs');
     ejs.open = '{{';
@@ -41,7 +41,7 @@
     app.set('views', __dirname + '/views');
     app.set('view engine', 'ejs');
     app.enable('trust proxy');
-    
+
     app.use(bodyParser({keepExtensions: true, uploadDir: __dirname + '/uploads'}));
     app.use(methodOverride());
     app.use(cookieParser());
@@ -75,7 +75,7 @@
     app.route("/events").get(cas.blocker, routes.events.events);
     // Updates the event with the given request body, does some permission checks (PATCH)
     app.route("/events/:id").patch(cas.blocker, routes.events.patch);
-    // Remove event (DELETE) 
+    // Remove event (DELETE)
     app.route("/events/:id").delete(cas.blocker, routes.events.delete);
 
 // API
@@ -87,23 +87,16 @@
 
     // INVENTORY
     // All inventory (GET)
-    app.route("/inventory/all").get(cas.blocker, routes.inventory.all);
-    // Existing inventory for each event (GET)
-    app.route("/inventory/existing/:id").get(cas.blocker, routes.inventory.existing);
-    // Add inventory to an event (POST)
-    app.route("/inventory/add").post(cas.blocker, routes.inventory.add);
-    // Remove inventory from an event (POST)
-    app.route("/inventory/remove").post(cas.blocker, routes.inventory.remove);
-    // Update the inventory amount of a specific item in an event (POST)
-    app.route("/inventory/update").post(cas.blocker, routes.inventory.update);
-
-    // NOTES
-    // Existing notes for each event (GET)
-    app.route("/notes/existing/:id").get(cas.blocker, routes.notes.existing);
-    // Add inventory to an event (POST)
-    app.route("/notes/add").post(cas.blocker, routes.notes.add);
-    // Remove inventory from an event (POST)
-    app.route("/notes/remove").post(cas.blocker, routes.notes.remove);
+    // Inventory Database Interface (GET)
+    app.route("/inventory").get(cas.blocker, routes.inventory.db.interface);
+    // Inventory DB Read (GET)
+    app.route("/inventory/db").get(cas.blocker, routes.inventory.db.get);
+    // Inventory DB Create (POST)
+    app.route("/inventory/db").post(cas.blocker, routes.inventory.db.post);
+    // Inventory DB Update (PATCH)
+    app.route("/inventory/db/:id").patch(cas.blocker, routes.inventory.db.patch);
+    // Inventory DB Delete (DELETE)
+    app.route("/inventory/db/:id").delete(cas.blocker, routes.inventory.db.delete);
 
     // STAFF
     // All event staff in IMS (GET)
@@ -157,9 +150,9 @@
     app.get('/update', function(req, res) {
         User.permissionControl(req, res, 10);
         updateEvents(function(result) {
-            //result structure -> {update: {add: int, update: int, remove: int}, 
+            //result structure -> {update: {add: int, update: int, remove: int},
             //                     autoAssignCount: int}
-            
+
             //console.log(JSON.stringify(result));
             res.redirect(Preferences.path_on_server);
         });

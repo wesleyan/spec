@@ -47,7 +47,9 @@
       <li><a href="staffCheck/"><i class="icon-user"></i> Single Staff Check</a></li>
       <li><a href="staffTable/"><i class="icon-th-list"></i> Staff Table</a></li>
       <li><a href="staff/db/"><i class="icon-th-large"></i> Staff Database</a></li>
+      <li><a href="inventory/"><i class="icon-wrench"></i> Inventory Database</a></li>
       <li><a href="report/"><i class="icon-briefcase"></i> Report/Overview</a></li>
+      <!-- <li><a href="billing/"><i class="icon-asterisk"></i> Billing</a></li> -->
       <li class="divider"></li>
       {{ } }}
       <li><a href="https://ims.wesleyan.edu/" target="_blank"><i class="icon-inbox"></i> Office Manager</a></li>
@@ -95,7 +97,7 @@
     <%=event.title %>
   </b>
   <div>
-    Technician needed for 
+    Technician needed for
     <%=event.techMustStay ? 'the duration of the event' : 'setup and breakdown' %>
 
     <span class="pull-right">
@@ -336,7 +338,7 @@
   <div class="popover-content">
     <p>
       <b><%=moment(event.start).format('dddd') %> | <%=event.loc %></b><br>
-      <i class="icon-time"></i> 
+      <i class="icon-time"></i>
       <b><%=moment(event.start).format('h:mm A') %></b>
       <i><%=moment(event.eventStart).format('h:mm A') %></i>
       <i class="icon-arrow-right"></i>
@@ -364,7 +366,7 @@
           <div class="accordion-inner" id="notes">
       <table class="table table-hover table-condensed">
         <tbody id="notesBody">
-      <% event.notes.forEach(function(note) { %>  
+      <% event.notes.forEach(function(note) { %>
         <tr>
           <td class="notesTable">
             <%= note.text %>
@@ -381,7 +383,7 @@
           </td>
         </tr>
       <% }) %>
-          
+
         </tbody>
       </table>
           </div>

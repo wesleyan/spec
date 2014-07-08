@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Spec: Inventory Database</title>
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/backgrid.js/0.2.6/backgrid.min.css" rel="stylesheet">
+    <link href="{{=app.locals.path }}dist/css/db.min.css" rel="stylesheet">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.4.6/bootstrap-editable/css/bootstrap-editable.css" rel="stylesheet"/>
+    <style>
+      body {
+        padding-top: 30px;
+      }
+      .buttons {
+        margin-top: 20px;
+        float:left;
+      }
+    </style>
+    <!-- Just for debugging purposes. Don't actually copy this line! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+      <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="#">Spec: Inventory Database</a>
+          <div class="nav-collapse collapse pull-right">
+            <ul class="nav">
+              <li><a href="{{=app.locals.path }}">Back to Spec</a></li>
+              <li><a data-toggle="modal" data-target="#helpModal">Help</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="buttons">
+        <button class="btn btn-primary" type="button" id="newInventory">New Inventory</button>
+        <button class="btn btn-danger" type="button" id="deleteInventory">Delete Selected Inventory</button>
+      </div>
+      <div class="stuff">
+      </div>
+    </div><!-- /.container -->
+    <div id="helpModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">Help</h3>
+      </div>
+      <div class="modal-body">
+        <p>Help Info</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+      </div>
+    </div>
+    <div id="newModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">New Inventory</h3>
+      </div>
+      <div class="modal-body">
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary">Add Inventory</button>
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+      </div>
+    </div>
+    <div id="deleteModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">Delete Inventory</h3>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete the staff below from the database?</p>
+        <ul>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger">Yes, delete</button>
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+      </div>
+    </div>
+    <div id="strikesModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    </div>
+    <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/backbone-pageable/1.4.5/backbone-pageable.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/backgrid.js/0.2.6/backgrid.js"></script>
+    <script src="{{=app.locals.path }}dist/js/db.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.4.6/bootstrap-editable/js/bootstrap-editable.min.js"></script>
+    <script src="{{=app.locals.path }}dist/js/manager/inventoryDatabase.min.js"></script>
+    <script type="text/template" id="deleteTemplate">
+      <% models.forEach(function(model) { %>
+        <li><%=model.get('name') %> (<%=model.get('text') %>)</li>
+      <% }) %>
+    </script>
+    <script type="text/template" id="newTemplate">
+      <div id="msg" class="alert hide"></div>
+       <table class="table table-bordered table-striped" style="clear: both">
+        <tbody>
+            <tr>
+                <td width="35%">Item Name</td>
+                <td width="65%" colspan="2">
+                <a href="#" class="x-add" id="name" data-type="text" data-placement="right" data-title="Enter title"></a>
+                </td>
+            </tr>
+             <tr>
+                <td>Hourly Price ($)</td>
+                <td colspan="2"><a href="#" class="x-add" id="price" data-type="text"></a></td>
+            </tr>
+        </tbody>
+      </table>
+    </script>
+  </body>
+</html>

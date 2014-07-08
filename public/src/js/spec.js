@@ -21,7 +21,7 @@ jQuery(function($){
     }
     if (event.audio === true) {
       symbol += '<i class="icon-volume-up"></i> ';
-    }  
+    }
     symbol = $($.parseHTML(symbol));
     symbol.siblings('i').addClass(white ? 'icon-white' : '');
     return symbol;
@@ -61,7 +61,7 @@ jQuery(function($){
   };
 
   //end of utility functions
-  
+
   var Event = Backbone.Model.extend({
     idAttribute: '_id',
     initialize: function() {
@@ -154,31 +154,31 @@ jQuery(function($){
           });
         }
       });
-      
+
       this.adjustSize();
-      
+
       $('#leftGroup').detach().prependTo('.fc-header-left');
       $('#rightGroup').detach().appendTo('.fc-header-right');
-      
+
       //Assign keyboard shortcuts
       $(document).keydown(function(e) {
         if (!$(event.target).is(':not(input, textarea)')) { return; } //don't do anything if on input/textarea
         switch (e.keyCode) {
           case 39: // pressed "right" arrow
-            hideModalPopover();    
+            hideModalPopover();
             self.$el.fullCalendar('next');
             break;
           case 37: // pressed "left" arrow
-            hideModalPopover();    
+            hideModalPopover();
             self.$el.fullCalendar('prev');
             break;
           case 38: // pressed "up" arrow
-            hideModalPopover();    
+            hideModalPopover();
             self.$el.fullCalendar('today');
             break;
         }
       });
-      
+
       setInterval(setTimeline(), 1000*60*5);
 
       return this;
@@ -199,7 +199,7 @@ jQuery(function($){
   var EventView = Backbone.View.extend({
     initialize: function() {
       this.event = this.model.attributes;
-      this.render();     
+      this.render();
     },
     //Event Render Functions
     render: function() {
@@ -301,11 +301,11 @@ jQuery(function($){
       this.model.on('change', function() {
         self.renderContent();
       });
-      this.render(); 
+      this.render();
     },
     render: function() {
       hideModalPopover();
-      this.renderContent(); 
+      this.renderContent();
       this.$el.modalPopover('show');
       $('#eventButton').removeClass('disabled');
     },
@@ -383,7 +383,7 @@ jQuery(function($){
             amt: 1,
             item: item.id.toString()
           };
-          
+
           self.model.set('inventory', self.model.get('inventory').concat(toAdd));
         }
       });
@@ -478,9 +478,9 @@ jQuery(function($){
   var ContextMenuView = Backbone.View.extend({
     initialize: function() {
       //undelegate events from previous ContextMenuView instances
-      this.$el.undelegate(); 
+      this.$el.undelegate();
 
-      this.render();     
+      this.render();
     },
     render: function() {
       this.$('ul').html(_.template($('#context-menu-template').html(), {event: this.model.attributes}));
@@ -547,7 +547,7 @@ jQuery(function($){
       this.$el.modal('hide');
     },
     close: function() {
-      this.$el.undelegate(); 
+      this.$el.undelegate();
     }
   });
 
@@ -609,7 +609,7 @@ jQuery(function($){
       this.$el.html(template);
       this.$('.spinner').spinner();
       this.$('.coverShift').tooltip({
-        title: 'Sent a tech from the office', 
+        title: 'Sent a tech from the office',
         placement: 'left'
       });
 
@@ -645,7 +645,7 @@ jQuery(function($){
     },
     staffNeededUpdate: function (e, val) {
       if (val !== this.model.get('staffNeeded')) {
-        this.model.set('staffNeeded', val);   
+        this.model.set('staffNeeded', val);
       }
     },
     addNewShift: function() {
@@ -656,7 +656,7 @@ jQuery(function($){
       }
 
       var event = this.model.fcEvent();
-      
+
       var start = moment(new Date(event.start.format('MMM D YYYY ') + $('#shift-start').val()));
       var end   = moment(new Date(event.end.format('MMM D YYYY ') + $('#shift-end').val()));
 
@@ -664,7 +664,7 @@ jQuery(function($){
         end.add('d', 1);
       }
 
-      var shift = { 
+      var shift = {
         staff: name,
         start: start.toDate(),
         end:   end.toDate()
@@ -743,8 +743,8 @@ jQuery(function($){
       });
       $('#loc').editable();
       $('#startDate').editable({
-        format: 'yyyy-mm-dd',    
-        viewformat: 'mm/dd/yyyy',    
+        format: 'yyyy-mm-dd',
+        viewformat: 'mm/dd/yyyy',
         datepicker: {
           weekStart: 1
         }
@@ -760,7 +760,7 @@ jQuery(function($){
         self.changed[this.id] = params.newValue;
       });
 
-      this.$el.modal('show'); 
+      this.$el.modal('show');
     },
     events: {
       'click .modal-footer .btn-primary': 'submit',
@@ -804,7 +804,7 @@ jQuery(function($){
   var Inventory = Backbone.Model.extend({});
   var InventoryList = Backbone.Collection.extend({
     model: Inventory,
-    url:   'inventory/all',
+    url:   'inventory/db',
     initialize: function() {
       this.fetch();
     },
@@ -843,7 +843,7 @@ jQuery(function($){
     } else {
       eventsView.$el.fullCalendar('addEventSource', 'gCalEvents/');
     }
-    $(this).toggleClass('active'); 
+    $(this).toggleClass('active');
   });
 
   $(document).ajaxStart(function() {
