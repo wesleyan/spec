@@ -1,4 +1,6 @@
 node_modules/*
+temp/*
+!temp/.gitkeep
 config/client_secret.json
 config/calendarv3-rest
 config/Preferences.js

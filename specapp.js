@@ -78,6 +78,10 @@
     // Remove event (DELETE)
     app.route("/events/:id").delete(cas.blocker, routes.events.delete);
 
+// BILLING
+    app.route("/billing").get(cas.blocker, routes.billing.main);
+    app.route("/billing/invoice/:id").get(cas.blocker, routes.billing.invoice);
+
 // API
     // To be used by other IMS applications like PullEffect. (GET)
     // More info can be found in public/doc/index.html

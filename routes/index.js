@@ -10,4 +10,6 @@ module.exports = {
 
     mobile:         require('./mobile.js'),
     googleCalendar: require('./googleCalendar.js'),
+
+    billing:        require('./billing/billing.js')
 };

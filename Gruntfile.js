@@ -71,6 +71,7 @@ module.exports = function(grunt) {
             },
             options: {
                 // options here to override JSHint defaults
+                ignores: ['public/src/js/manager/invoice.js'],
                 globals: {
                     jQuery: true,
                     console: true,

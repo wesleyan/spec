@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Spec: Billing Interface</title>
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/backgrid.js/0.2.6/backgrid.min.css" rel="stylesheet">
+    <link href="{{=app.locals.path }}dist/css/db.min.css" rel="stylesheet">
+    <link href="{{=app.locals.path }}dist/css/plugins.min.css" rel="stylesheet">
+    <style>
+      body {
+        padding-top: 30px;
+      }
+      .buttons {
+        margin-top: 20px;
+        float:left;
+      }
+      .main-tabs {
+        margin-top: 20px;
+      }
+      .main-tabs .nav-tabs>li {
+        margin-left:20px;
+      }
+    </style>
+    <!-- Just for debugging purposes. Don't actually copy this line! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+      <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="#">Spec: Billing Interface</a>
+          <div class="nav-collapse collapse pull-right">
+            <ul class="nav">
+              <li><a href="{{=app.locals.path }}">Back to Spec</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+      <div class="main-tabs">
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#events" data-toggle="tab">Events</a></li>
+        <li><a href="#settings" data-toggle="tab">Settings</a></li>
+      </ul>
+      </div>
+      <!-- Tab panes -->
+      <div class="tab-content">
+        <div class="tab-pane active" id="events"></div>
+        <div class="tab-pane" id="settings">
+          <div>
+            <table class="table table-bordered table-striped" style="clear: both">
+              <tbody>
+                <tr>
+                  <td width="35%">Hourly Price</td>
+                  <td width="65%" colspan="2">
+                    <a href="#" class="x-edit-event" id="hourly-price" data-type="text" data-placement="right" data-title="Enter hourly price"></a>
+                  </td>
+                </tr>
+              </tbody>
+          </table>
+        </div>
+          
+        </div>
+      </div>
+    <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/backbone-pageable/1.4.5/backbone-pageable.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/backgrid.js/0.2.6/backgrid.js"></script>
+    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.4.6/bootstrap-editable/js/bootstrap-editable.min.js"></script>
+    <script src="{{=app.locals.path }}dist/js/db.min.js"></script>
+    <script src="{{=app.locals.path }}dist/js/plugins.min.js"></script>
+    <script src="{{=app.locals.path }}dist/js/manager/billingInterface.min.js"></script>
+  </body>
+</html>
