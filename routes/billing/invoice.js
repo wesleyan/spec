@@ -15,7 +15,7 @@ var createList = function(event) {
     return {
       desc: Utility.inventoryName(item.item),
       amt: item.amt,
-      price: item.amt * hourlyPrice
+      rate: Utility.inventoryHourlyPrice(item.item)
     };
   });
 
@@ -23,7 +23,7 @@ var createList = function(event) {
   if(event.techMustStay) {
     var shiftHour = event.shifts.reduce(function(prev, shift){return prev + ((Date.parse(shift.end)-Date.parse(shift.start))/(60*60*1000));}, 0);
     first = {
-      desc: event.shifts.length + ' technician shifts',
+      desc: event.shifts.length + ' technician shift',
       amt: shiftHour,
     };
   } else {
@@ -36,18 +36,27 @@ var createList = function(event) {
   return [first].concat(inventory);
 };
 
-module.exports = function(req, res) {
-  db.events.findOne({_id: mongo.ObjectId(req.params.id)}, function(err, event) {
-    if(err || !event) {
-      console.error('invoice event couldnt found');
-      res.status(400).json(false);
-      return;
-    }
+module.exports = {
+  create: function(req, res) {
+    // this route creates the invoice information and assigns it
+    // https://github.com/wesleyan/spec/issues/13#issuecomment-48752684
+    res.json(true);
+  },
+  show: function(req, res) {
+    db.events.findOne({_id: mongo.ObjectId(req.params.id)}, function(err, event) {
+      if(err || !event) {
+        console.error('invoice event couldnt found');
+        res.status(400).json(false);
+        return;
+      }
 
-    res.render('invoice', {
-        app   : req.app,
-        event : event,
-        list  : createList(event)
+      res.render('invoice', {
+          app   : req.app,
+          event : event,
+          list  : createList(event)
+      });
     });
-  });
+  };
 };
+
+

@@ -42,7 +42,7 @@
     <table class="inventory">
       <thead>
         <tr>
-          <th><span contenteditable>{{=list.length }}Item</span></th>
+          <th><span contenteditable>Item</span></th>
           <th><span contenteditable>Description</span></th>
             <th><span contenteditable>Rate</span></th>
             <th><span contenteditable>Hrs / Qty</span></th>
@@ -52,9 +52,9 @@
         <tbody>
           {{ list.forEach(function(entry) { }}
           <tr>
-            <td><a class="cut">-</a><span contenteditable></span></td>
-            <td><span contenteditable>{{=entry.desc }}</span></td>
-            <td><span data-prefix>$</span><span contenteditable>{{=entry.price }}</span></td>
+            <td><a class="cut">-</a><span contenteditable>{{=entry.desc }}</span></td>
+            <td><span contenteditable>-</span></td>
+            <td><span data-prefix>$</span><span contenteditable>{{=entry.rate }}</span></td>
             <td><span contenteditable>{{=entry.amt }}</span></td>
             <td><span data-prefix>$</span><span>600.00</span></td>
           </tr>

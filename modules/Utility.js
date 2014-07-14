@@ -45,7 +45,7 @@ var Utility = {
                     console.log(err);
                 } else {
                     cache.put('storeStaff', data);
-                    cache.put('staffUsernameArray', 
+                    cache.put('staffUsernameArray',
                         cache.get('storeStaff').map(function(item) {
                             return item.username;
                         })
@@ -66,6 +66,10 @@ var Utility = {
     inventoryName: function (id) {
         id = parseInt(id);
         return _.findWhere(cache.get('allInventory'), {'id': id}).text;
+    },
+    inventoryHourlyPrice: function (id) {
+        id = parseInt(id);
+        return _.findWhere(cache.get('allInventory'), {'id': id}).price;
     }
 };
 
