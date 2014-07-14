@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script type="text/javascript" src="http://underscorejs.org/underscore-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
     <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
     <script src="{{=app.locals.path }}dist/js/plugins.min.js"></script>
     <script src="{{=app.locals.path }}dist/js/manager/utility.min.js"></script>
@@ -74,7 +74,7 @@
         <h5>Staff who did not sign up for any event in the given time period</h5>
           <ul style="columns: 2; -webkit-columns: 2; -moz-columns: 2;">
             <% _.each(rc.lazy, function(person) { %>
-              <li><%= person.name %> (<%= person.username %>)<%=addTaskIcon(person) %></li> 
+              <li><%= person.name %> (<%= person.username %>)<%=addTaskIcon(person) %></li>
             <% }) %>
           </ul>
       </div>
