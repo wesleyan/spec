@@ -8,13 +8,13 @@ module.exports = {
 
     /* the one below must match with the one you have saved in
        APIs & auth -> Credentials in https://console.developers.google.com/ */
-    googleRedirectUrl: 'http://ims-dev.wesleyan.edu/spec/oauth2callback',
+    googleRedirectUrl: 'http://spec.wesleyan.edu/oauth2callback',
 
     //CAS Configurations
     casOptions: {
         casHost: 'sso.wesleyan.edu',
         ssl: true,
-        service: 'http://ims-dev.wesleyan.edu:8080/', //it should always end with slash
+        service: 'http://spec.wesleyan.edu/', //it should always end with slash
         redirectUrl: :'/login',
         casPath: ''
     },
@@ -25,7 +25,7 @@ module.exports = {
     },
 
     //Port that Spec will run on
-    port: 8080,
+    port: 4000,
 
     //nodemailer settings
     mail: {
@@ -42,10 +42,3 @@ module.exports = {
     databaseUrl: "127.0.0.1:27017/spec",
     collections: ['events','staff','inventory','removedShifts', 'removedEvents']
 };
-
-/* //options for using SSL, not used right now
-var options = {
-        key: fs.readFileSync('../ssl-key.pem'),
-        cert: fs.readFileSync('/etc/pki/tls/certs/ca-bundle.crt'),
-        };
-*/
