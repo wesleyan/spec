@@ -8,7 +8,7 @@ var fs            = require('fs'),
     request       = require('request'),
     cache         = require('memory-cache'),
     googleapis    = require('googleapis'),
-    moment        = require('moment');
+    moment        = require('moment-range');
 
 var OAuth2Client = googleapis.OAuth2Client,
     oauth_cache  = {};
@@ -176,16 +176,16 @@ module.exports = {
                                 }
                             } else { //Now we have the calendar owner and readers, let's check it
                                 //find owner, delete 'user:' from id, split to check the user name and domain
-                                var user = (_.findWhere(names.items, {'role':'owner'})).id.substr(5).split('@'); 
+                                var user = (_.findWhere(names.items, {'role':'owner'})).id.substr(5).split('@');
                                 if(user[1] === 'wesleyan.edu' && cache.get('staffUsernameArray').indexOf(user[0]) !== -1 && User.getUser(req) === user[0]) {
                                     //console.log(user[0] + ' is in Wesleyan domain and in our staff list, and the logged in user');
                                     req.session.credentials = tokens;
                                     req.session.refresh_token = tokens.refresh_token;
 
                                     //register the refresh token to the database, for that user
-                                    db.staff.update( 
+                                    db.staff.update(
                                         {username: User.getUser(req)},
-                                        { $set: {'refresh_token': tokens.refresh_token } }, 
+                                        { $set: {'refresh_token': tokens.refresh_token } },
                                         function(err, updated) {
                                             if (err || !updated) {
                                                 console.log(req.url);
@@ -197,7 +197,7 @@ module.exports = {
                                                 res.end();
                                             }
                                         });
-                                    
+
                                     res.redirect(Preferences.path_on_server);
                                 } else {
                                     // should explain the user that they have to use their valid wesleyan.edu accounts
@@ -208,7 +208,7 @@ module.exports = {
                             }
                         });
                 });
-        });            
+        });
     },
     events: function(req, res) {
       try {

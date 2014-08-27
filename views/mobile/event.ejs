@@ -1,11 +1,11 @@
-<!DOCTYPE html> 
-<html> 
-	<head> 
-	<title>Spec Mobile</title> 
-	<meta name="viewport" content="width=device-width, initial-scale=1"> 
-	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.css" />
-	<script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
-	<script src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
+<!DOCTYPE html>
+<html>
+	<head>
+	<title>Spec Mobile</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="//code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.css" />
+	<script src="//code.jquery.com/jquery-1.6.4.min.js"></script>
+	<script src="//code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
 	<style type="text/css">
         .staffed {
             border-left:        5px solid #0f0;
@@ -42,9 +42,9 @@
             margin-top:     6px;
         }
         .ui-li-desc,h3 {
-                overflow: visible !important;        
-                white-space: normal !important;        
-          } 
+                overflow: visible !important;
+                white-space: normal !important;
+          }
           .ui-collapsible-heading {
             font-size: 13px;
             }
@@ -52,9 +52,9 @@
                 color: inherit !important;
         }
     </style>
-    
-</head> 
-<body> 
+
+</head>
+<body>
 
 <div data-role="page" id='event'>
 
@@ -63,7 +63,7 @@
 		<h1>Event - Spec M</h1>
 	</div><!-- /header -->
 
-	<div data-role="content">	
+	<div data-role="content">
         <div class="ui-bar ui-bar-a">
             <h3 >{{=event.title }}</h3>
         </div>
@@ -183,7 +183,7 @@
 
                 </div>
             </div>
-        {{ } }}    
+        {{ } }}
         <div class="ui-bar ui-bar-a">
             <h3>Notes ({{=event.notes.length}})</h3>
         </div>
@@ -218,7 +218,7 @@
         </div>
     </div>
 <script type="text/javascript">
-    
+
     $.mobile.defaultPageTransition = 'none';
     $.mobile.defaultDialogTransition = 'none';
     $.mobile.useFastClick = true;
@@ -236,32 +236,32 @@
             $('#inventoryList').listview('refresh');
 
                     {{ if(permission == 10) { }}
-                        $('#start1 option').filter(function() { 
+                        $('#start1 option').filter(function() {
                             return ($(this).text() == start.split(":")[0]);
                         }).attr('selected', true);
                         $( "#start1" ).selectmenu( "refresh" );
-                        $('#start2 option').filter(function() { 
+                        $('#start2 option').filter(function() {
                             return ($(this).text() == start.split(":")[1].split(" ")[0]);
                         }).attr('selected', true);
                         $( "#start2" ).selectmenu( "refresh" );
-                        $('#start3 option').filter(function() { 
+                        $('#start3 option').filter(function() {
                             return ($(this).text() == start.split(" ")[1]);
                         }).attr('selected', true);
                         $( "#start3" ).selectmenu( "refresh" );
-                        $('#end1 option').filter(function() { 
+                        $('#end1 option').filter(function() {
                             return ($(this).text() == end.split(":")[0]);
                         }).attr('selected', true);
                         $( "#end1" ).selectmenu( "refresh" );
-                        $('#end2 option').filter(function() { 
+                        $('#end2 option').filter(function() {
                             return ($(this).text() == end.split(":")[1].split(" ")[0]);
                         }).attr('selected', true);
                         $( "#end2" ).selectmenu( "refresh" );
-                        $('#end3 option').filter(function() { 
+                        $('#end3 option').filter(function() {
                             return ($(this).text() == end.split(" ")[1]);
                         }).attr('selected', true);
                         $( "#end3" ).selectmenu( "refresh" );
                     {{ } }}
-        }); 
+        });
 
 
     {{ if(permission == 10) { }}

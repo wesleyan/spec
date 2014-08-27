@@ -32,7 +32,6 @@
     "googleapis": "*",
     "xml2json": "*",
     "memory-cache": "*",
-    "moment": "*",
     "moment-range": "*",
     "q": "*",
     "promised-mongo": "*"
