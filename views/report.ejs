@@ -141,6 +141,11 @@
       <div class="row-fluid">
         <div class="span4">
           <table class="table table-striped table-bordered">
+            <thead>
+              <tr>
+                <th colspan="2">Staffing Stats</th>
+              </tr>
+            </thead>
               <tbody>
                   <tr>
                       <td>Total Number of Events</td>
@@ -166,16 +171,33 @@
                         <%=data.unstaffedEvents %>
                       </td>
                   </tr>
+                  <tr>
+                      <td>Total Number of Overstaffed Events</td>
+                      <td>
+                        <%=data.overStaffed %>
+                      </td>
+                  </tr>
               </tbody>
           </table>
         </div>
         <div class="span4">
           <table class="table table-striped table-bordered">
+            <thead>
+              <tr>
+                <th colspan="2">Time Stats</th>
+              </tr>
+            </thead>
             <tbody>
               <tr>
-                  <td>Total Number of Hours</td>
+                  <td>Total Number of Reserved Hours</td>
                   <td>
                     <%=data.totalHours %>
+                  </td>
+              </tr>
+              <tr>
+                  <td>Total Number of Event Hours</td>
+                  <td>
+                    <%=data.totalEventHours %>
                   </td>
               </tr>
               <tr>
@@ -189,6 +211,11 @@
         </div>
         <div class="span4">
           <table class="table table-striped table-bordered">
+            <thead>
+              <tr>
+                <th colspan="2">Category Stats</th>
+              </tr>
+            </thead>
             <tbody>
               <tr>
                   <td>Total Number of A Events</td>

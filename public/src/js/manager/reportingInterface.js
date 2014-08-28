@@ -206,7 +206,10 @@ var PageableEventList = Backbone.PageableCollection.extend({
       fullyStaffed: events.reduce(function(prev, event){return prev + ((fullShiftNumber(event) === event.staffNeeded)?1:0);}, 0),
       partiallyStaffed: events.reduce(function(prev, event){return prev + ((fullShiftNumber(event) < event.staffNeeded && fullShiftNumber(event) > 0)?1:0);}, 0),
       unstaffedEvents: events.reduce(function(prev, event){return prev + ((fullShiftNumber(event) === 0)?1:0);}, 0),
+      overStaffed: events.reduce(function(prev, event){return prev + ((fullShiftNumber(event) > event.staffNeeded)?1:0);}, 0),
+      //total number of reserved hours
       totalHours: events.reduce(function(prev, event){return prev + ((Date.parse(event.end)-Date.parse(event.start))/(60*60*1000));}, 0).toFixed(2),
+      totalEventHours: events.reduce(function(p, c){ return p + c.eventHour; }, 0).toFixed(2),
       totalShiftHours: events.reduce(function(p, c){ return p + c.shiftHour; }, 0).toFixed(2),
       getCategoryNumber: function(cat) {
         return _.where(events, {category: cat}).length;
@@ -251,7 +254,7 @@ var PageableEventList = Backbone.PageableCollection.extend({
     };
 
     var self = this;
-    
+
     var makeBarData = function() {
       if(graphType === 'Bar') {
         data = {
@@ -260,15 +263,15 @@ var PageableEventList = Backbone.PageableCollection.extend({
         };
       }
     };
-    
+
 
     var data = ['A', 'B', 'C'].map(function(cat) {
       return {
         value: self.data.getCategoryNumber(cat),
         title: cat,
-        color: randomColor() 
+        color: randomColor()
       };
-    }); 
+    });
 
     makeBarData();
 
@@ -284,12 +287,15 @@ var PageableEventList = Backbone.PageableCollection.extend({
       title: "Unstaffed",
       value: self.data.unstaffedEvents
     }, {
+      title: "Overstaffed",
+      value: self.data.overStaffed
+    }, {
       title: "Cancelled",
       value: self.data.cancelled
     }].map(function(x) {
       x.color = randomColor();
       return x;
-    }); 
+    });
     makeBarData();
 
     var chart2 = new Chart(document.getElementById("chart2").getContext("2d"))[graphType](data, options);
@@ -304,7 +310,7 @@ var PageableEventList = Backbone.PageableCollection.extend({
     }].map(function(x) {
       x.color = randomColor();
       return x;
-    }); 
+    });
     makeBarData();
 
     var chart3 = new Chart(document.getElementById("chart3").getContext("2d"))[graphType](data, options);
@@ -391,7 +397,7 @@ var PageableEventList = Backbone.PageableCollection.extend({
         eventsAtTime = eventsAtMonth;
         var n = ['January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'];
-        labels = months.map(function(o){return n[o[0]-1] + ' ' + o[1];}); 
+        labels = months.map(function(o){return n[o[0]-1] + ' ' + o[1];});
         break;
       case 'Years':
         time = years;
@@ -501,7 +507,7 @@ var columns = [{
   editable: false
 }, {
   name: "start",
-        
+
   label: "Date",
   cell: "date",
   editable: false
@@ -569,11 +575,11 @@ $(document).ready(function() {
     $('#d2').datepicker('setValue', today);
 
     pageableEventList = new PageableEventList();
-    
+
     var refreshEvents = function() {
       $('.loading').show();
-      pageableEventList.url = '/events?filter=' + $('#filter').val() + 
-                              '&start=' + ($('#d1').data('datepicker').date.getTime() / 1000) + 
+      pageableEventList.url = '/events?filter=' + $('#filter').val() +
+                              '&start=' + ($('#d1').data('datepicker').date.getTime() / 1000) +
                               '&end='   + ($('#d2').data('datepicker').date.getTime() / 1000);
       pageableEventList.fetch({
         reset: true,
@@ -684,7 +690,7 @@ $(document).ready(function() {
       suggestions: fields,
       values: fields
     });
-    
+
     $('#export button').click(function() {
       var fields = $.makeArray($('#fields .pills-list .badge').map(function() {
         return $(this).data('tag-id');
