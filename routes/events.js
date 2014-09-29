@@ -48,7 +48,7 @@ module.exports = {
                 res.json(events);
             }
         });
-        //console.log("Req for events starting at " + start.toDateString() + " and ending before " + end.toDateString());    
+        //console.log("Req for events starting at " + start.toDateString() + " and ending before " + end.toDateString());
     },
     patch: function(req, res) {
         var query = req.body;
@@ -99,7 +99,11 @@ module.exports = {
             query.eventEnd = new Date(query.eventEnd);
         }
 
-        db.events.findAndModify({ 
+        if(eventEdited) {
+          query.updated = true;
+        }
+
+        db.events.findAndModify({
               query: {_id: mongo.ObjectId(req.params.id)},
               update:{$set: query}
             }, function(err, updated) {
