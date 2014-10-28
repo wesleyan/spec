@@ -1,4 +1,4 @@
-spec
+spec [![Build Status](https://secure.travis-ci.org/wesleyan/spec.svg)](http://travis-ci.org/wesleyan/spec)
 ====
 
 spec ([Sp]ecial [E]vents [C]alendar) is an event management application built with a focus on calendaring, staff and equipment management.
