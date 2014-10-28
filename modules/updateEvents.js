@@ -45,7 +45,14 @@ var processEvent = function(apiEvent) {
     }
 
     var multipleDaysEvent = false;
-    if(apiEvent.booking_start_time.slice(-2) === 'PM' && apiEvent.booking_end_time.slice(-2) === 'AM') {
+
+    var tempStart = moment((new Date()).toDateString() + " " + apiEvent.booking_start_time);
+    var tempEnd   = moment((new Date()).toDateString() + " " + apiEvent.booking_end_time);
+
+    // creating two temp vars with strings like "08:30 PM"
+    // if end is before start, it's a 2 day event
+    // since EMS API doesn't use a standard time format, we have to do this.
+    if(tempEnd.isBefore(tempStart)) {
         multipleDaysEvent = true;
     }
 
@@ -62,7 +69,7 @@ var processEvent = function(apiEvent) {
 
     //onHold = true if the event is added before three days notice
     var onHold = moment().add('d', 3).endOf('day').isAfter(apiEvent.start);
-    
+
     return {
         XMLid:        apiEvent.service_order_detail_id,
         title:        apiEvent.event_name,
@@ -128,7 +135,7 @@ module.exports = function(cb) {
 
                 var shouldInsert = _.isUndefined(correspondent);
                 var shouldUpdate, eventDifference;
-                
+
                 if(!shouldInsert) {
                     eventDifference = giveDifferenceOnFields(processedEvent, correspondent, fieldsToCheck);
                     shouldUpdate = !_.isEqual(eventDifference, {});
@@ -137,7 +144,7 @@ module.exports = function(cb) {
                         shouldUpdate = false;
                     }
                 }
-               
+
                 if(shouldInsert) {
                     //insert event
                     return {
@@ -165,7 +172,7 @@ module.exports = function(cb) {
                 whatToReport  = {update:[], remove: dbEvents};
 
             //deal with apiEvents, insert or update accordingly
-            apiEvents.forEach(function(obj) { 
+            apiEvents.forEach(function(obj) {
                 if(obj.status === 'add') {
                     // Push a function to insert the event
                     parallel.push(function(callback) {
@@ -187,7 +194,7 @@ module.exports = function(cb) {
                     parallel.push(function(callback) {
                         db.events.findAndModify({
                             query: {XMLid: obj.event.XMLid},
-                            update: {$set: obj.update }, 
+                            update: {$set: obj.update },
                             new: true
                         },
                         function(err, updated) {
@@ -208,7 +215,7 @@ module.exports = function(cb) {
                 parallel.push(function(callback) {
                     db.events.findAndModify({
                         query: {XMLid: event.XMLid},
-                        update: {$set: {cancelled: true} }, 
+                        update: {$set: {cancelled: true} },
                         new: true
                     },
                     function(err, updated) {
@@ -224,9 +231,9 @@ module.exports = function(cb) {
             });
 
             async.parallel(parallel, function() {
-                console.log(changeNumbers.add + ' events added, ' + 
-                            changeNumbers.update + ' updated and ' + 
-                            changeNumbers.remove + ' called off, ' + 
+                console.log(changeNumbers.add + ' events added, ' +
+                            changeNumbers.update + ' updated and ' +
+                            changeNumbers.remove + ' called off, ' +
                             'update process ended successfully.');
 
                 // send notifications to the updated/called off event staff / managers
