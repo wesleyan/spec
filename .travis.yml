@@ -4,3 +4,5 @@ node_js:
 before_script:
   - npm install
 services: mongodb
+notifications:
+  slack: wesims:KQReIY3Qov6crB7tkN1t131a
