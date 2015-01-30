@@ -19,7 +19,12 @@ var cEventKeywords = [
    /\bweb-cast\b/gi,
    /\blive streaming\b/gi,
    /\blive-streaming\b/gi,
-   /\bbroadcast\b/gi
+   /\bbroadcast\b/gi,
+   /\bvideorecording\b/gi,
+   /\bvideo recording\b/gi,
+   /\brecording\b/gi,
+   /\bvideotaping\b/gi,
+   /\bvideo taping\b/gi
 ];
 
 // hasKeywords(keywords, text) = true or false
@@ -63,4 +68,9 @@ var detectCategory = function (event) {
 module.exports = function(event) {
   event.category = detectCategory(event);
 	return event;
+};
+
+// desc is the description of the event
+module.exports.isVideoEvent = function(desc) {
+  return hasKeywords(cEventKeywords, desc);
 };

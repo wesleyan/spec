@@ -81,13 +81,7 @@ var processEvent = function(apiEvent) {
         eventEnd:     apiEvent.eventEnd,
         cancelled:    apiEvent.booking_status === 'Cancelled',
         techMustStay: true,
-        video:        ['video', 'recording'].reduce(function(prev, word) {
-                          if (prev) {
-                              return true;
-                          } else {
-                              return apiEvent.notes.indexOf(word) !== -1;
-                          }
-                      }, false),
+        video:        categorize.isVideoEvent(apiEvent.notes),
         customer:     {
                           name: apiEvent.customer,
                           phone: apiEvent.customer_phone
