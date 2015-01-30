@@ -708,7 +708,7 @@ $(document).ready(function() {
             return f;
           }
           if(_.contains(['start','end','eventStart','eventEnd'], field)){
-            f = (new Date(f)).toLocaleString();
+            f = moment(new Date(f)).format('MM/DD/YYYY, HH:mm');
           }
           return ('"' + f.toString().replace(/"/g, '""') + '"');
         }).join(',');
