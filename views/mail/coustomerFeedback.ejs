@@ -1,0 +1,9 @@
+<h1>Tell us how the event went!</h1>
+<p><strong>{{=event.title}}</strong></p>
+<p>from {{=app.locals.formatAMPM(shift.start)}} to {{=app.locals.formatAMPM(shift.end)}}, on from {{=app.locals.getFormattedDate(event.start)}}</p>
+<p>in {{=event.loc}}</p>
+<p><b>This is the event description for the event:</b></p><p>{{=event.desc}}</p>
+
+<h2><a href="{{=app.locals.url}}staff/confirm/{{=shift.id}}">Fill out our 1 minute form about how our tech preformed!</a></h2>
+<p><i>If you would like to provide additional feedback, feel free to email IMS directly.</i></p>
+<p>Please do not reply to this e-mail.</p>
