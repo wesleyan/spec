@@ -63,7 +63,14 @@ var addEvent = function(name, start, end){
                 options.success(calendar.items);
         });
 };
-
+/*
+var deleteEvent = function(){
+  client.calendar.events.delete({
+    calendarId: "primary",
+    s
+  });
+};
+**/
 // Requests list and sends response to collection
 var readModels = function(options) {
     googleapis.discover('calendar', 'v3').withOpts({cache: {path: './config'}})
