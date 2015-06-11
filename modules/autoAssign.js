@@ -14,6 +14,29 @@ var isValidDate = function(d) {
   return !isNaN(d.getTime());
 };
 
+//check if works
+var addEvent = function(name, start, end){
+  client.calendar.events.insert({
+    calendarId: 'primary',
+    start: start,
+    end: end,
+    summary: name,
+      })
+        .withAuthClient(authClient)
+        .execute(function(err, calendar) {
+            if (err) {
+                // TODO: After the access_token is refreshed, there should be a new attempt to addEvent
+                if (err.message == "Invalid Credentials") {
+                    console.log("Invalid OAuth credentials");
+                } else {
+                    console.log("An error occurred!\n", err);
+                    options.error(true);
+                }
+            } else
+                options.success(calendar.items);
+        });
+};
+
 var fetch = function(start, end, user, callback) {
   fetchCalendars({
     start: start,
@@ -45,7 +68,7 @@ var sendAssignmentNotification = function(event, shift) {
   Utility.sendSingleMail({
     to: shift.staff + '@wesleyan.edu',
     subject: 'You are assigned to a new shift! : ' + event.title,
-    html: ejs.render(fs.readFileSync(__dirname + '/../views/mail/autoAssignConfirmation.ejs', 'utf8'), 
+    html: ejs.render(fs.readFileSync(__dirname + '/../views/mail/autoAssignConfirmation.ejs', 'utf8'),
                      {'app': app, 'event': event, 'shift': shift})
   });
 };
@@ -75,7 +98,7 @@ var assignEventStaff = function(event, pointStaffObj, shift) {
         sendAssignmentNotification(event, newShift);
     });
 
-  } else if(_(shift).isObject()) { 
+  } else if(_(shift).isObject()) {
     //assign to a specific shift
     shift.staff = pointStaffObj.staff.username;
     db.events.update({
@@ -200,8 +223,8 @@ module.exports = function(cb) {
           // 3) remove the assigned staff from the candidate list
           // 4) Continue looping through the events
 
-          // lookForStaff: 
-          // precondition : pointListWithEvents have the staff 
+          // lookForStaff:
+          // precondition : pointListWithEvents have the staff
           //                who are not auto assigned yet
 
           var count = 0;

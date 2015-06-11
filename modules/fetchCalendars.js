@@ -41,28 +41,6 @@ var getCalendar = function(client, authClient, userId, options) {
                 options.success(calendar.items);
         });
 };
-//check if works
-var addEvent = function(name, start, end){
-  client.calendar.events.insert({
-    calendarId: 'primary',
-    start: start,
-    end: end,
-    summary: name,
-      })
-        .withAuthClient(authClient)
-        .execute(function(err, calendar) {
-            if (err) {
-                // TODO: After the access_token is refreshed, there should be a new attempt to addEvent
-                if (err.message == "Invalid Credentials") {
-                    console.log("Invalid OAuth credentials");
-                } else {
-                    console.log("An error occurred!\n", err);
-                    options.error(true);
-                }
-            } else
-                options.success(calendar.items);
-        });
-};
 /*
 var deleteEvent = function(){
   client.calendar.events.delete({
