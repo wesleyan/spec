@@ -34,7 +34,8 @@
     "memory-cache": "*",
     "moment-range": "*",
     "q": "*",
-    "promised-mongo": "*"
+    "promised-mongo": "*",
+    "log": "*"
   },
   "devDependencies": {
     "grunt": "^0.4.3",

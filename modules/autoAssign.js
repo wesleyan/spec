@@ -9,7 +9,8 @@ var _      = require('underscore'),
     ejs    = require('ejs'),
     mongo  = require('mongojs'),
     moment = require('moment-range');
-
+    Log    = require('log')
+    ,log   = new Log('debug', fs.createWriteStream('my.log'));
 var isValidDate = function(d) {
   return !isNaN(d.getTime());
 };
@@ -44,6 +45,7 @@ var fetch = function(start, end, user, callback) {
     user: user,
     success: function(items) {
       callback(items);
+      log.error("fetched calendar: %s",items);
     },
     error: function(err) {
       callback([]);
