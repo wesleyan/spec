@@ -6,7 +6,7 @@ module.exports = function(url) {
         if(!err) {
             return deferred.resolve(body);
         } else {
-            return deferred.reject(new Error(error));
+            return deferred.reject(new Error(err));
         }
     });
     return deferred.promise;
