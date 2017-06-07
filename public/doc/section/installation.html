@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spec Documentation</title>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+    <style> body { padding-top: 60px; } </style>
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <a class="navbar-brand" href="#">Spec Documentation</a>
+      </div>
+    </div>
+
+    <!-- You can write in Markdown here -->
+    <div class="md container">
+# Installation
+
+## Preferences
+In order to use Spec, you need to set the preferences file located in `config/Preferences.js`
+* **googleRedirectUrl**: used by Google Calendar authorization.
+* **casOptions**: the options for [grand_master_cas](https://www.npmjs.org/package/grand_master_cas), which allows integration to Wesleyan CAS. `casOptions.redirectUrl` refers to the route in Spec, so you do not need to change that.
+* **port**: This is the port Spec runs on.
+* **mail**: the options used by [nodemailer](https://www.npmjs.org/package/nodemailer). See their instructions for more help.
+* **managerEmails**: These are the addresses where e-mails are sent about the updated events after event file upload.
+* **notificationEmails**: There are the addresses where e-mails are sent when there's about an hour for an event to start and there is still no staff assigned to the event. See `modules/unstaffedNotifications.js` for any modifications.
+* **databaseUrl**: This is for MongoDB notification, you should see [mongojs](https://www.npmjs.org/package/mongojs) for more help.
+
+## Google Calendar Integration
+Spec has Google Calendar integration that allows you to show your calendar events within the calendar. Currently it only allows users from Wesleyan domain to authorize their Wesleyan Google accounts. In order to use it, you need to locate a `client_secret.json` file that Google provides for your application API registration.
+    </div>
+
+    <div class="container" style="margin-top:60px">
+       <p class="text-muted">Wesleyan University Instructional Media Services - Special Events Calendar (Spec).</p>
+    </div>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/showdown/1.7.1/showdown.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+    <script src="//google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=javascript"></script>
+    <script src="../markdown.js"> </script>
+  </body>
+</html>
